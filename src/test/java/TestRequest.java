@@ -24,7 +24,7 @@ import java.security.cert.X509Certificate;
  */
 public class TestRequest {
 
-    public static final String ELASTICBEANSTALK_URL = "https://helloworld-env-1.ha4x2kktxp.us-east-2.elasticbeanstalk.com/demo";
+    public static final String ELASTICBEANSTALK_URL = "helloworld-env-1.ha4x2kktxp.us-east-2.elasticbeanstalk.com/demo";
 
     @Ignore
     @Test
@@ -35,7 +35,7 @@ public class TestRequest {
     @Ignore
     @Test
     public void testElasticbeanRequest() {
-        makeHttpRequest(ELASTICBEANSTALK_URL);
+        makeHttpRequest("http://" + ELASTICBEANSTALK_URL);
     }
 
     @Ignore
@@ -43,10 +43,10 @@ public class TestRequest {
     public void testHTTPSElasticbeanRequest() throws NoSuchAlgorithmException, KeyManagementException, IOException {
         // configure the SSLContext with a TrustManager
         SSLContext ctx = SSLContext.getInstance("TLS");
-        ctx.init(new KeyManager[0], new TrustManager[] {new DefaultTrustManager()}, new SecureRandom());
+        ctx.init(new KeyManager[0], new TrustManager[]{new DefaultTrustManager()}, new SecureRandom());
         SSLContext.setDefault(ctx);
 
-        URL url = new URL(ELASTICBEANSTALK_URL);
+        URL url = new URL("https://" + ELASTICBEANSTALK_URL);
         HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
         conn.setDoOutput(true);
         conn.setRequestMethod("POST");
@@ -54,7 +54,7 @@ public class TestRequest {
         conn.setRequestProperty("Accept", "application/json");
 
         OutputStream os = conn.getOutputStream();
-        os.write(requestJson().getBytes("UTF-8"));
+        os.write(createJson("").getBytes("UTF-8"));
         os.close();
 
         conn.setHostnameVerifier(new HostnameVerifier() {
@@ -66,7 +66,6 @@ public class TestRequest {
 
         System.out.println(conn.getResponseCode());
         System.out.println(conn.getResponseMessage());
-
 
         BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
         String inputLine;
@@ -84,14 +83,6 @@ public class TestRequest {
     private void makeHttpRequest(String url) {
         CloseableHttpClient httpclient = HttpClients.createDefault();
         try {
-            HttpPost httpPost = new HttpPost(url);
-            StringEntity params = new StringEntity(requestJson(), "UTF-8");
-            httpPost.addHeader("content-type", "application/json; charset=UTF-8");
-
-            httpPost.setEntity(params);
-
-            System.out.println("Executing request " + httpPost.getRequestLine());
-
             // Create a custom response handler
             ResponseHandler<String> responseHandler = new ResponseHandler<String>() {
 
@@ -107,9 +98,9 @@ public class TestRequest {
                 }
 
             };
-            String responseBody = httpclient.execute(httpPost, responseHandler);
-            System.out.println("----------------------------------------");
-            System.out.println(responseBody);
+
+            executeHttpRequest(url, httpclient, responseHandler, "");
+            executeHttpRequest(url, httpclient, responseHandler, "да");
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -121,86 +112,47 @@ public class TestRequest {
         }
     }
 
-    private String requestJson() {
+    private void executeHttpRequest(String url, CloseableHttpClient httpclient, ResponseHandler<String> responseHandler, String text) throws IOException {
+        HttpPost httpPost = new HttpPost(url);
+        StringEntity params = new StringEntity(createJson(text), "UTF-8");
+        httpPost.addHeader("content-type", "application/json; charset=UTF-8");
+
+        httpPost.setEntity(params);
+
+        System.out.println("Executing request " + httpPost.getRequestLine());
+
+        String responseBody = httpclient.execute(httpPost, responseHandler);
+        System.out.println("----------------------------------------");
+        System.out.println(responseBody);
+    }
+
+    private String createJson(String text) {
         return "{\n" +
                 "  \"meta\": {\n" +
-                "    \"locale\": \"ru-RU\",\n" +
-                "    \"timezone\": \"Europe/Moscow\",\n" +
-                "    \"client_id\": \"ru.yandex.searchplugin/5.80 (Samsung Galaxy; Android 4.4)\",\n" +
+                "    \"client_id\": \"ru.yandex.searchplugin/7.16 (none none; android 4.4.2)\",\n" +
                 "    \"interfaces\": {\n" +
-                "      \"screen\": { }\n" +
-                "    }\n" +
+                "      \"screen\": {}\n" +
+                "    },\n" +
+                "    \"locale\": \"ru-RU\",\n" +
+                "    \"timezone\": \"UTC\"\n" +
                 "  },\n" +
                 "  \"request\": {\n" +
-                "    \"command\": \"закажи пиццу на улицу льва толстого, 16 на завтра\",\n" +
-                "    \"original_utterance\": \"закажи пиццу на улицу льва толстого, 16 на завтра\",\n" +
-                "    \"type\": \"SimpleUtterance\",\n" +
-                "    \"markup\": {\n" +
-                "      \"dangerous_context\": true\n" +
-                "    },\n" +
-                "    \"payload\": {},\n" +
+                "    \"command\": \"" + text + "\",\n" +
                 "    \"nlu\": {\n" +
-                "      \"tokens\": [\n" +
-                "        \"закажи\",\n" +
-                "        \"пиццу\",\n" +
-                "        \"на\",\n" +
-                "        \"льва\",\n" +
-                "        \"толстого\",\n" +
-                "        \"16\",\n" +
-                "        \"на\",\n" +
-                "        \"завтра\"\n" +
-                "      ],\n" +
-                "      \"entities\": [\n" +
-                "        {\n" +
-                "          \"tokens\": {\n" +
-                "            \"start\": 2,\n" +
-                "            \"end\": 6\n" +
-                "          },\n" +
-                "          \"type\": \"YANDEX.GEO\",\n" +
-                "          \"value\": {\n" +
-                "            \"house_number\": \"16\",\n" +
-                "            \"street\": \"льва толстого\"\n" +
-                "          }\n" +
-                "        },\n" +
-                "        {\n" +
-                "          \"tokens\": {\n" +
-                "            \"start\": 3,\n" +
-                "            \"end\": 5\n" +
-                "          },\n" +
-                "          \"type\": \"YANDEX.FIO\",\n" +
-                "          \"value\": {\n" +
-                "            \"first_name\": \"лев\",\n" +
-                "            \"last_name\": \"толстой\"\n" +
-                "          }\n" +
-                "        },\n" +
-                "        {\n" +
-                "          \"tokens\": {\n" +
-                "            \"start\": 5,\n" +
-                "            \"end\": 6\n" +
-                "          },\n" +
-                "          \"type\": \"YANDEX.NUMBER\",\n" +
-                "          \"value\": 16\n" +
-                "        },\n" +
-                "        {\n" +
-                "          \"tokens\": {\n" +
-                "            \"start\": 6,\n" +
-                "            \"end\": 8\n" +
-                "          },\n" +
-                "          \"type\": \"YANDEX.DATETIME\",\n" +
-                "          \"value\": {\n" +
-                "            \"day\": 1,\n" +
-                "            \"day_is_relative\": true\n" +
-                "          }\n" +
-                "        }\n" +
+                "      \"entities\": [],\n" +
+                "      \"tokens\": [" +
+                (!text.isEmpty() ? ("\n        \"" + text + "\"\n") : "") +
                 "      ]\n" +
-                "    }\n" +
+                "    },\n" +
+                "    \"original_utterance\": \"нет\",\n" +
+                "    \"type\": \"SimpleUtterance\"\n" +
                 "  },\n" +
                 "  \"session\": {\n" +
-                "    \"new\": true,\n" +
-                "    \"message_id\": 4,\n" +
-                "    \"session_id\": \"2eac4854-fce721f3-b845abba-20d60\",\n" +
-                "    \"skill_id\": \"3ad36498-f5rd-4079-a14b-788652932056\",\n" +
-                "    \"user_id\": \"AC9WC3DF6FCE052E45A4566A48E6B7193774B84814CE49A922E163B8B29881DC\"\n" +
+                "    \"message_id\": 3,\n" +
+                "    \"new\": " + text.isEmpty() + ",\n" +
+                "    \"session_id\": \"e58cb037-712e3090-33e4d929-cca75a07\",\n" +
+                "    \"skill_id\": \"f99fbe77-b15a-4c5f-91a7-ab2595febe32\",\n" +
+                "    \"user_id\": \"AA23058EB00BD2097FAE781A72ABF8AB303994B20C8DB2D0E281FA101296A015\"\n" +
                 "  },\n" +
                 "  \"version\": \"1.0\"\n" +
                 "}";
@@ -209,10 +161,12 @@ public class TestRequest {
     private static class DefaultTrustManager implements X509TrustManager {
 
         @Override
-        public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {}
+        public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
+        }
 
         @Override
-        public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {}
+        public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
+        }
 
         @Override
         public X509Certificate[] getAcceptedIssuers() {
