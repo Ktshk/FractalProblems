@@ -13,5 +13,15 @@
     <url-pattern>/demo</url-pattern>
   </servlet-mapping>
 
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>AuthServer</web-resource-name>
+      <url-pattern>/Server</url-pattern>
+    </web-resource-collection>
+    <user-data-constraint>
+      <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+    </user-data-constraint>
+  </security-constraint>
+
 </web-app>
 
