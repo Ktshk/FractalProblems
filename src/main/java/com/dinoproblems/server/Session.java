@@ -9,7 +9,7 @@ import java.util.Set;
 public class Session {
     private final String sessionId;
     private Problem currentProblem;
-    private Set<Problem> problemsSolved = new HashSet<>();
+    private Set<Problem> solvedProblems = new HashSet<>();
 
     public Session(String sessionId) {
         this.sessionId = sessionId;
@@ -22,12 +22,12 @@ public class Session {
     public void setCurrentProblem(Problem currentProblem) {
         this.currentProblem = currentProblem;
         if (currentProblem != null) {
-            problemsSolved.add(currentProblem);
+            solvedProblems.add(currentProblem);
         }
     }
 
-    public Set<Problem> getProblemsSolved() {
-        return problemsSolved;
+    public Set<Problem> getSolvedProblems() {
+        return solvedProblems;
     }
 
     @Override

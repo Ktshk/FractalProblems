@@ -1,19 +1,16 @@
 package com.dinoproblems.server;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
-
 /**
- * Created by Katushka on 06.02.2019.
+ * Created by Katushka on 13.02.2019.
  */
-public class Problem {
+public interface Problem {
+    boolean checkAnswer(String proposedAnswer);
 
-    private final String theme;
-    private String text;
-    private int answer;
-    private Set<String> possibleTextAnswers;
-    private State state = State.NEW;
+    String getTextAnswer();
+
+    String getTheme();
+
+    String getText();
 
     enum State {
         NEW, HINT_PROPOSED, HINT_GIVEN, ANSWER_PROPOSED, ANSWER_GIVEN, SOLVED
@@ -23,40 +20,7 @@ public class Problem {
         EASY, MEDIUM, HARD
     }
 
-    public Problem(String text, int answer, String theme, Set<String> possibleTextAnswers) {
-        this.text = text;
-        this.answer = answer;
-        this.theme = theme;
-        this.possibleTextAnswers = possibleTextAnswers;
-    }
+    State getState();
 
-    public String getText() {
-        return text;
-    }
-
-    public int getAnswer() {
-        return answer;
-    }
-
-    public State getState() {
-        return state;
-    }
-
-    public void setState(State state) {
-        this.state = state;
-    }
-
-    public String getTextAnswer() {
-        return possibleTextAnswers.iterator().next();
-    }
-
-    public Set<String> getPossibleTextAnswers() {
-        return possibleTextAnswers;
-    }
-
-    public String getTheme() {
-        return theme;
-    }
-
-
+    void setState(State newState);
 }

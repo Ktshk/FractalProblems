@@ -14,12 +14,14 @@ public class ProblemCollection {
     public static final ProblemCollection INSTANCE = new ProblemCollection();
 
     public static final String GOLOVONOGI = "Golovonogi";
+    public static final String KIRPICH = "Kirpich";
 
     private Map<String, ProblemGenerator> generators = new HashMap<>();
     private Table<Problem.Difficulty, String, ProblemGenerator> availableGeneratorsPerDifficulty = HashBasedTable.create();
 
     private ProblemCollection() {
         generators.put(GOLOVONOGI, new GolovonogiGenerator());
+        generators.put(KIRPICH, new KirpichGenerator());
 
         for (Map.Entry<String, ProblemGenerator> problemGeneratorEntry : generators.entrySet()) {
             final ProblemGenerator problemGenerator = problemGeneratorEntry.getValue();
@@ -33,7 +35,7 @@ public class ProblemCollection {
     public Problem generateProblem(Session session, Problem.Difficulty difficulty) {
         final Map<String, ProblemGenerator> generatorMap = availableGeneratorsPerDifficulty.row(difficulty);
 
-        final Set<Problem> problemsSolved = session.getProblemsSolved();
+        final Set<Problem> problemsSolved = session.getSolvedProblems();
 
         final Map<String, Double> themesSolved = new TreeMap<>();
         generatorMap.keySet().forEach(s -> themesSolved.put(s, 0.0));

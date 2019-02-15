@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
 
 /**
  * Created by Katushka on 07.01.2019.
@@ -93,7 +92,7 @@ public class DemoServlet extends HttpServlet {
                     result.add("response", responseJson);
                     problem.setState(Problem.State.ANSWER_GIVEN);
                     session.setCurrentProblem(null);
-                } else if (problem.getPossibleTextAnswers().contains(command) || command.equals("" + problem.getAnswer())) {
+                } else if (problem.checkAnswer(command)) {
                     responseJson.addProperty("text", "Это правильный ответ. Еще задачку?");
                     responseJson.addProperty("end_session", false);
                     result.add("response", responseJson);

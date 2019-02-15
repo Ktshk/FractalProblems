@@ -14,9 +14,10 @@ import static com.dinoproblems.server.GeneratorUtils.getNumWithString;
 public class GolovonogiGenerator implements ProblemGenerator {
     @Override
     public Problem generateProblem(Problem.Difficulty difficulty) {
-        final int heads = ThreadLocalRandom.current().nextInt(5, 10);
-        final int ducks = ThreadLocalRandom.current().nextInt(1, heads);
-        final int cows = heads - ducks;
+        int heads = difficulty == Problem.Difficulty.EASY ? ThreadLocalRandom.current().nextInt(4, 6)
+                : ThreadLocalRandom.current().nextInt(6, 10);
+        int ducks = ThreadLocalRandom.current().nextInt(1, heads);
+        int cows = heads - ducks;
         final int quest = ThreadLocalRandom.current().nextInt(0, 2);
         int answer = quest == 0 ? ducks : cows;
 
@@ -59,6 +60,12 @@ public class GolovonogiGenerator implements ProblemGenerator {
                     + "Сколько вылупилось " + animals5more[quest][quest2] + "?";
 
         } else {
+            heads = difficulty == Problem.Difficulty.EASY ? ThreadLocalRandom.current().nextInt(3, 5)
+                    : ThreadLocalRandom.current().nextInt(5, 9);
+            ducks = ThreadLocalRandom.current().nextInt(1, heads);
+            cows = heads - ducks;
+            answer = quest == 0 ? ducks : cows;
+
             animals = new String[][]{{"жуки", "бабочки", "муравьи"},
                     {"пауки", "пауки", "пауки"}};
             animals5more = new String[][]{{"жуков", "бабочек", "муравьев"},
@@ -77,7 +84,7 @@ public class GolovonogiGenerator implements ProblemGenerator {
                 animals4less[quest][quest2], animals5more[quest][quest2]);
         final HashSet<String> possibleTextAnswers = new HashSet<>();
         possibleTextAnswers.add(possibleAnswer);
-        return new Problem(text, answer, ProblemCollection.GOLOVONOGI, possibleTextAnswers);
+        return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.GOLOVONOGI, possibleTextAnswers);
     }
 
     @Override
