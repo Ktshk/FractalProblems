@@ -10,6 +10,7 @@ public class Session {
     private final String sessionId;
     private Problem currentProblem;
     private Set<Problem> solvedProblems = new HashSet<>();
+    private Problem.Difficulty currentDifficulty = null;
 
     public Session(String sessionId) {
         this.sessionId = sessionId;
@@ -24,6 +25,14 @@ public class Session {
         if (currentProblem != null) {
             solvedProblems.add(currentProblem);
         }
+    }
+
+    public Problem.Difficulty getCurrentDifficulty() {
+        return currentDifficulty;
+    }
+
+    public void setCurrentDifficulty(Problem.Difficulty currentDifficulty) {
+        this.currentDifficulty = currentDifficulty;
     }
 
     public Set<Problem> getSolvedProblems() {

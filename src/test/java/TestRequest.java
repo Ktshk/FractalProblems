@@ -100,7 +100,7 @@ public class TestRequest {
             };
 
             executeHttpRequest(url, httpclient, responseHandler, "");
-            executeHttpRequest(url, httpclient, responseHandler, "да");
+            executeHttpRequest(url, httpclient, responseHandler, "простая");
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

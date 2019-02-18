@@ -5,7 +5,7 @@
 <web-app>
   <servlet>
     <servlet-name>demo</servlet-name>
-    <servlet-class>com.dinoproblems.server.DemoServlet</servlet-class>
+    <servlet-class>com.dinoproblems.server.MainServlet</servlet-class>
   </servlet>
 
   <servlet-mapping>

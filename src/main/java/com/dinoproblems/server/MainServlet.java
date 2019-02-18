@@ -1,6 +1,7 @@
 package com.dinoproblems.server;
 
 import com.google.common.collect.Sets;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -20,7 +21,7 @@ import java.util.Set;
  * Created by Katushka on 07.01.2019.
  */
 @WebServlet("/DemoServlet")
-public class DemoServlet extends HttpServlet {
+public class MainServlet extends HttpServlet {
 
     private Map<String, Session> currentProblems = new HashMap<>();
     private Set<String> yesAnswers = Sets.newHashSet("да", "давай", "хочу", "валяй", "можно", "ага", "угу");
@@ -58,7 +59,9 @@ public class DemoServlet extends HttpServlet {
             final Session session = currentProblems.computeIfAbsent(sessionId, Session::new);
 
             if (newSession) {
-                responseJson.addProperty("text", "У меня есть для вас интересная задачка. Хотите попробовать решить?");
+                responseJson.addProperty("text", "У меня для вас есть много интересных задач. Какую хотите: простую, среднюю или сложную?");
+                responseJson.add("buttons", createDifficultyButtons());
+
                 responseJson.addProperty("end_session", false);
                 result.add("response", responseJson);
             } else if (Objects.equals(command, "end session") ||
@@ -67,12 +70,27 @@ public class DemoServlet extends HttpServlet {
                 responseJson.addProperty("text", "Заходите еще");
                 responseJson.addProperty("end_session", true);
                 result.add("response", responseJson);
+            } else if (session.getCurrentProblem() == null && session.getCurrentDifficulty() == null) {
+                final Problem.Difficulty currentDifficulty = parseDifficulty(command);
+                if (currentDifficulty == null) {
+                    responseJson.addProperty("text", "Не поняла вас. Выберите пожалуйста сложность задач");
+                    responseJson.add("buttons", createDifficultyButtons());
+                    responseJson.addProperty("end_session", false);
+                    result.add("response", responseJson);
+                } else {
+                    session.setCurrentDifficulty(currentDifficulty);
+                    final Problem problem = ProblemCollection.INSTANCE.generateProblem(session);
+                    session.setCurrentProblem(problem);
+                    responseJson.addProperty("text", problem.getText());
+                    result.add("response", responseJson);
+                }
             } else if (session.getCurrentProblem() == null && checkAnswer(command, yesAnswers)) {
-                final Problem problem = ProblemCollection.INSTANCE.generateProblem(session, Problem.Difficulty.EASY);
+                final Problem problem = ProblemCollection.INSTANCE.generateProblem(session);
                 session.setCurrentProblem(problem);
                 responseJson.addProperty("text", problem.getText());
                 responseJson.addProperty("end_session", false);
                 result.add("response", responseJson);
+
             } else {
                 final Problem problem = session.getCurrentProblem();
 
@@ -93,7 +111,7 @@ public class DemoServlet extends HttpServlet {
                     problem.setState(Problem.State.ANSWER_GIVEN);
                     session.setCurrentProblem(null);
                 } else if (problem.checkAnswer(command)) {
-                    responseJson.addProperty("text", "Это правильный ответ. Еще задачку?");
+                    responseJson.addProperty("text", "Это правильный ответ. Еще задачу?");
                     responseJson.addProperty("end_session", false);
                     result.add("response", responseJson);
                     problem.setState(Problem.State.SOLVED);
@@ -115,9 +133,40 @@ public class DemoServlet extends HttpServlet {
             response.getOutputStream().print("Error");
             response.getOutputStream().flush();
         }
+
+    }
+
+    private Problem.Difficulty parseDifficulty(String command) {
+        if (checkAnswer(command, Sets.newHashSet("простая", "простую"), yesAnswers)) {
+            return Problem.Difficulty.EASY;
+        } else if (checkAnswer(command, Sets.newHashSet("простая", "простую"), yesAnswers)) {
+            return Problem.Difficulty.MEDIUM;
+        } else if (checkAnswer(command, Sets.newHashSet("сложная", "сложную"), yesAnswers)) {
+            return Problem.Difficulty.HARD;
+        } else {
+            return null;
+        }
+    }
+
+    private JsonArray createDifficultyButtons() {
+        final JsonArray buttons = new JsonArray();
+        buttons.add(createButton("простая"));
+        buttons.add(createButton("средняя"));
+        buttons.add(createButton("сложная"));
+        return buttons;
+    }
+
+    private JsonObject createButton(String title) {
+        final JsonObject buttonJson = new JsonObject();
+        buttonJson.addProperty("title", title);
+        return buttonJson;
     }
 
     private boolean checkAnswer(String answer, Set<String> answerCollection) {
+        return checkAnswer(answer, answerCollection, answerCollection);
+    }
+
+    private boolean checkAnswer(String answer, Set<String> answerCollection, Set<String> preAnswerCollection) {
         if (answer == null) {
             return false;
         }
@@ -133,7 +182,7 @@ public class DemoServlet extends HttpServlet {
         if (answerCollection.contains(answer.toLowerCase())) {
             return true;
         }
-        for (String yesAnswer1 : answerCollection) {
+        for (String yesAnswer1 : preAnswerCollection) {
             for (String yesAnswer2 : answerCollection) {
                 if ((yesAnswer1 + ' ' + yesAnswer2).equalsIgnoreCase(answer)) {
                     return true;
@@ -142,6 +191,7 @@ public class DemoServlet extends HttpServlet {
         }
         return false;
     }
+
 
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     }

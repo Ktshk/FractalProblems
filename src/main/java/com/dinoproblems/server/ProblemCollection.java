@@ -32,8 +32,8 @@ public class ProblemCollection {
         }
     }
 
-    public Problem generateProblem(Session session, Problem.Difficulty difficulty) {
-        final Map<String, ProblemGenerator> generatorMap = availableGeneratorsPerDifficulty.row(difficulty);
+    public Problem generateProblem(Session session) {
+        final Map<String, ProblemGenerator> generatorMap = availableGeneratorsPerDifficulty.row(session.getCurrentDifficulty());
 
         final Set<Problem> problemsSolved = session.getSolvedProblems();
 
@@ -53,7 +53,7 @@ public class ProblemCollection {
         for (int i = 0; iterator.hasNext() && i < ind; i++) {
            entry = iterator.next();
         }
-        return generators.get(entry.getKey()).generateProblem(difficulty);
+        return generators.get(entry.getKey()).generateProblem(session.getCurrentDifficulty());
     }
 
 }

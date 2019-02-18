@@ -43,7 +43,8 @@ public class GolovonogiGenerator implements ProblemGenerator {
                     {"коровы", "овцы", "козы"}};
 
             text = "Во дворе гуляют " + animals[0][i2] + " и " + animals[1][i4]
-                    + ". У них вместе " + heads + " голов и " + getLegsString((ducks * 2 + cows * 4)) + ". "
+                    + ". У них вместе " + getNumWithString(heads, "голова", "головы", "голов")
+                    + " и " + getLegsString((ducks * 2 + cows * 4)) + ". "
                     + "Сколько " + animals5more[quest][quest2] + " гуляет во дворе?";
         } else if (i == 1) {
             animals = new String[][]{{"цыплята", "утята", "страусы"},

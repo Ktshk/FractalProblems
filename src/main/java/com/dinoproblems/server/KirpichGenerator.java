@@ -17,7 +17,6 @@ public class KirpichGenerator implements ProblemGenerator {
                 ThreadLocalRandom.current().nextInt(1, 5)) * (k - 1);
         final int answer = n * k / (k - 1);
 
-
         int problemType = ThreadLocalRandom.current().nextInt(0, 3);
 
         if (problemType == 0) {
@@ -36,7 +35,7 @@ public class KirpichGenerator implements ProblemGenerator {
                         Sets.newHashSet(answer + " кг", GeneratorUtils.getNumWithString(answer, "килограмм", "килограмма", "килограммов")));
             } else {
                 final String text = things1[i] + " стоит " + n * 10 + " рублей и ещё " + getPartString(k) + " " + thingsMod[i] + ". Сколько стоит " + things[i] + "?";
-                return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.KIRPICH,
+                return new ProblemWithPossibleTextAnswers(text, answer * 10, ProblemCollection.KIRPICH,
                         Sets.newHashSet(answer * 10 +  " рублей"));
 
             }

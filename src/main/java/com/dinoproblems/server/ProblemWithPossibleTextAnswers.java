@@ -1,8 +1,6 @@
 package com.dinoproblems.server;
 
-import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Created by Katushka on 06.02.2019.
@@ -14,7 +12,6 @@ public class ProblemWithPossibleTextAnswers implements Problem {
     private int answer;
     private Set<String> possibleTextAnswers;
     private State state = State.NEW;
-
 
     public ProblemWithPossibleTextAnswers(String text, int answer, String theme, Set<String> possibleTextAnswers) {
         this.text = text;
@@ -56,6 +53,5 @@ public class ProblemWithPossibleTextAnswers implements Problem {
     public String getTheme() {
         return theme;
     }
-
 
 }
