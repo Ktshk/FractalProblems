@@ -15,6 +15,7 @@ public class ProblemCollection {
 
     public static final String GOLOVONOGI = "Golovonogi";
     public static final String KIRPICH = "Kirpich";
+    public static final String SNAIL = "Snail";
 
     private Map<String, ProblemGenerator> generators = new HashMap<>();
     private Table<Problem.Difficulty, String, ProblemGenerator> availableGeneratorsPerDifficulty = HashBasedTable.create();
@@ -22,6 +23,7 @@ public class ProblemCollection {
     private ProblemCollection() {
         generators.put(GOLOVONOGI, new GolovonogiGenerator());
         generators.put(KIRPICH, new KirpichGenerator());
+        generators.put(SNAIL, new SnailGenerator());
 
         for (Map.Entry<String, ProblemGenerator> problemGeneratorEntry : generators.entrySet()) {
             final ProblemGenerator problemGenerator = problemGeneratorEntry.getValue();

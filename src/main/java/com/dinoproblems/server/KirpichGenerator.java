@@ -5,6 +5,8 @@ import com.google.common.collect.Sets;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
+import static com.dinoproblems.server.GeneratorUtils.randomInt;
+
 /**
  * Created by Katushka on 12.02.2019.
  */
@@ -12,12 +14,12 @@ public class KirpichGenerator implements ProblemGenerator {
 
     @Override
     public Problem generateProblem(Problem.Difficulty difficulty) {
-        int k = difficulty == Problem.Difficulty.EASY ? 2 : ThreadLocalRandom.current().nextInt(3, 5);
-        int n = (difficulty == Problem.Difficulty.EASY ? ThreadLocalRandom.current().nextInt(1, 4) :
-                ThreadLocalRandom.current().nextInt(1, 5)) * (k - 1);
+        int k = difficulty == Problem.Difficulty.EASY ? 2 : randomInt(3, 5);
+        int n = (difficulty == Problem.Difficulty.EASY ? randomInt(1, 4) :
+                randomInt(1, 5)) * (k - 1);
         final int answer = n * k / (k - 1);
 
-        int problemType = ThreadLocalRandom.current().nextInt(0, 3);
+        int problemType = randomInt(0, 3);
 
         if (problemType == 0) {
             final String text = "Миша прошёл " + n * 100 + " метров и ещё " + getPartString(k) + " пути. Какова длина пути?";
@@ -28,7 +30,7 @@ public class KirpichGenerator implements ProblemGenerator {
             String[] things = new String[]{"кирпич", "арбуз", "мешок картошки"};
             String[] thingsMod = new String[]{"кирпича", "арбуза", "мешка картошки"};
 
-            int i = ThreadLocalRandom.current().nextInt(0, 3);
+            int i = randomInt(0, 3);
             if (problemType == 1) {
                 final String text = things1[i] + " весит " + n + " кг и ещё " + getPartString(k) + " " + thingsMod[i] + ". Сколько весит " + things[i] + "?";
                 return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.KIRPICH,

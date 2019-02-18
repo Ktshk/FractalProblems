@@ -1,5 +1,7 @@
 package com.dinoproblems.server;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 /**
  * Created by Katushka on 10.02.2019.
  */
@@ -21,5 +23,9 @@ public class GeneratorUtils {
                 return legs + " " + moreThanFive;
             }
         }
+    }
+
+    static int randomInt(int origin, int bound) {
+        return ThreadLocalRandom.current().nextInt(origin, bound);
     }
 }

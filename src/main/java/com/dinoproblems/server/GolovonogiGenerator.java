@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static com.dinoproblems.server.GeneratorUtils.getNumWithString;
+import static com.dinoproblems.server.GeneratorUtils.randomInt;
 
 /**
  * Created by Katushka on 10.02.2019.
@@ -14,11 +15,11 @@ import static com.dinoproblems.server.GeneratorUtils.getNumWithString;
 public class GolovonogiGenerator implements ProblemGenerator {
     @Override
     public Problem generateProblem(Problem.Difficulty difficulty) {
-        int heads = difficulty == Problem.Difficulty.EASY ? ThreadLocalRandom.current().nextInt(4, 6)
-                : ThreadLocalRandom.current().nextInt(6, 10);
-        int ducks = ThreadLocalRandom.current().nextInt(1, heads);
+        int heads = difficulty == Problem.Difficulty.EASY ? randomInt(4, 6)
+                : randomInt(6, 10);
+        int ducks = randomInt(1, heads);
         int cows = heads - ducks;
-        final int quest = ThreadLocalRandom.current().nextInt(0, 2);
+        final int quest = randomInt(0, 2);
         int answer = quest == 0 ? ducks : cows;
 
         final String[][] animals;
@@ -26,12 +27,12 @@ public class GolovonogiGenerator implements ProblemGenerator {
         final String[][] animals1;
         final String[][] animals4less;
 
-        final int i2 = ThreadLocalRandom.current().nextInt(0, 3);
-        final int i4 = ThreadLocalRandom.current().nextInt(0, 3);
+        final int i2 = randomInt(0, 3);
+        final int i4 = randomInt(0, 3);
         final int quest2 = quest == 0 ? i2 : i4;
 
         final String text;
-        final int i = ThreadLocalRandom.current().nextInt(0, 3);
+        final int i = randomInt(0, 3);
         if (i == 0) {
             animals = new String[][]{{"куры", "утки", "петухи"},
                     {"коровы", "овцы", "козы"}};
@@ -61,9 +62,9 @@ public class GolovonogiGenerator implements ProblemGenerator {
                     + "Сколько вылупилось " + animals5more[quest][quest2] + "?";
 
         } else {
-            heads = difficulty == Problem.Difficulty.EASY ? ThreadLocalRandom.current().nextInt(3, 5)
-                    : ThreadLocalRandom.current().nextInt(5, 9);
-            ducks = ThreadLocalRandom.current().nextInt(1, heads);
+            heads = difficulty == Problem.Difficulty.EASY ? randomInt(3, 5)
+                    : randomInt(5, 9);
+            ducks = randomInt(1, heads);
             cows = heads - ducks;
             answer = quest == 0 ? ducks : cows;
 
