@@ -4,7 +4,6 @@ import com.google.common.collect.Sets;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 
 import static com.dinoproblems.server.GeneratorUtils.getNumWithString;
 import static com.dinoproblems.server.GeneratorUtils.randomInt;
@@ -12,7 +11,7 @@ import static com.dinoproblems.server.GeneratorUtils.randomInt;
 /**
  * Created by Katushka on 10.02.2019.
  */
-public class GolovonogiGenerator implements ProblemGenerator {
+public class LegsAndHeadsGenerator implements ProblemGenerator {
     @Override
     public Problem generateProblem(Problem.Difficulty difficulty) {
         int heads = difficulty == Problem.Difficulty.EASY ? randomInt(4, 6)
@@ -86,7 +85,7 @@ public class GolovonogiGenerator implements ProblemGenerator {
                 animals4less[quest][quest2], animals5more[quest][quest2]);
         final HashSet<String> possibleTextAnswers = new HashSet<>();
         possibleTextAnswers.add(possibleAnswer);
-        return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.GOLOVONOGI, possibleTextAnswers);
+        return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.LEGS_AND_HEADS, possibleTextAnswers);
     }
 
     @Override

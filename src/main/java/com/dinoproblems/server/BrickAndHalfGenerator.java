@@ -3,14 +3,13 @@ package com.dinoproblems.server;
 import com.google.common.collect.Sets;
 
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 
 import static com.dinoproblems.server.GeneratorUtils.randomInt;
 
 /**
  * Created by Katushka on 12.02.2019.
  */
-public class KirpichGenerator implements ProblemGenerator {
+public class BrickAndHalfGenerator implements ProblemGenerator {
 
     @Override
     public Problem generateProblem(Problem.Difficulty difficulty) {
@@ -23,7 +22,7 @@ public class KirpichGenerator implements ProblemGenerator {
 
         if (problemType == 0) {
             final String text = "Миша прошёл " + n * 100 + " метров и ещё " + getPartString(k) + " пути. Какова длина пути?";
-            return new ProblemWithPossibleTextAnswers(text, answer * 100, ProblemCollection.KIRPICH,
+            return new ProblemWithPossibleTextAnswers(text, answer * 100, ProblemCollection.BRICK_AND_HALF,
                     Sets.newHashSet(answer + " м", answer * 100 + " метров"));
         } else {
             String[] things1 = new String[]{"Кирпич", "Арбуз", "Мешок картошки"};
@@ -33,11 +32,11 @@ public class KirpichGenerator implements ProblemGenerator {
             int i = randomInt(0, 3);
             if (problemType == 1) {
                 final String text = things1[i] + " весит " + n + " кг и ещё " + getPartString(k) + " " + thingsMod[i] + ". Сколько весит " + things[i] + "?";
-                return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.KIRPICH,
+                return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.BRICK_AND_HALF,
                         Sets.newHashSet(answer + " кг", GeneratorUtils.getNumWithString(answer, "килограмм", "килограмма", "килограммов")));
             } else {
                 final String text = things1[i] + " стоит " + n * 10 + " рублей и ещё " + getPartString(k) + " " + thingsMod[i] + ". Сколько стоит " + things[i] + "?";
-                return new ProblemWithPossibleTextAnswers(text, answer * 10, ProblemCollection.KIRPICH,
+                return new ProblemWithPossibleTextAnswers(text, answer * 10, ProblemCollection.BRICK_AND_HALF,
                         Sets.newHashSet(answer * 10 +  " рублей"));
 
             }

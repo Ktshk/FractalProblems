@@ -13,16 +13,16 @@ import java.util.stream.Collectors;
 public class ProblemCollection {
     public static final ProblemCollection INSTANCE = new ProblemCollection();
 
-    public static final String GOLOVONOGI = "Golovonogi";
-    public static final String KIRPICH = "Kirpich";
+    public static final String LEGS_AND_HEADS = "Legs and heads";
+    public static final String BRICK_AND_HALF = "Brick and a half";
     public static final String SNAIL = "Snail";
 
     private Map<String, ProblemGenerator> generators = new HashMap<>();
     private Table<Problem.Difficulty, String, ProblemGenerator> availableGeneratorsPerDifficulty = HashBasedTable.create();
 
     private ProblemCollection() {
-        generators.put(GOLOVONOGI, new GolovonogiGenerator());
-        generators.put(KIRPICH, new KirpichGenerator());
+        generators.put(LEGS_AND_HEADS, new LegsAndHeadsGenerator());
+        generators.put(BRICK_AND_HALF, new BrickAndHalfGenerator());
         generators.put(SNAIL, new SnailGenerator());
 
         for (Map.Entry<String, ProblemGenerator> problemGeneratorEntry : generators.entrySet()) {
