@@ -4,6 +4,7 @@ import com.google.common.collect.Sets;
 
 import java.util.Set;
 
+import static com.dinoproblems.server.GeneratorUtils.Gender.MASCULINE;
 import static com.dinoproblems.server.GeneratorUtils.randomInt;
 
 /**
@@ -33,7 +34,7 @@ public class BrickAndHalfGenerator implements ProblemGenerator {
             if (problemType == 1) {
                 final String text = things1[i] + " весит " + n + " кг и ещё " + getPartString(k) + " " + thingsMod[i] + ". Сколько весит " + things[i] + "?";
                 return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.BRICK_AND_HALF,
-                        Sets.newHashSet(answer + " кг", GeneratorUtils.getNumWithString(answer, "килограмм", "килограмма", "килограммов")));
+                        Sets.newHashSet(answer + " кг", GeneratorUtils.getNumWithString(answer, "килограмм", "килограмма", "килограммов", MASCULINE)));
             } else {
                 final String text = things1[i] + " стоит " + n * 10 + " рублей и ещё " + getPartString(k) + " " + thingsMod[i] + ". Сколько стоит " + things[i] + "?";
                 return new ProblemWithPossibleTextAnswers(text, answer * 10, ProblemCollection.BRICK_AND_HALF,

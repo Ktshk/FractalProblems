@@ -5,6 +5,8 @@ import com.google.common.collect.Sets;
 import java.util.HashSet;
 import java.util.Set;
 
+import static com.dinoproblems.server.GeneratorUtils.Gender.FEMININE;
+import static com.dinoproblems.server.GeneratorUtils.Gender.MASCULINE;
 import static com.dinoproblems.server.GeneratorUtils.getNumWithString;
 import static com.dinoproblems.server.GeneratorUtils.randomInt;
 
@@ -22,6 +24,7 @@ public class LegsAndHeadsGenerator implements ProblemGenerator {
         int answer = quest == 0 ? ducks : cows;
 
         final String[][] animals;
+        final GeneratorUtils.Gender[][] animalGender;
         final String[][] animals5more;
         final String[][] animals1;
         final String[][] animals4less;
@@ -35,6 +38,8 @@ public class LegsAndHeadsGenerator implements ProblemGenerator {
         if (i == 0) {
             animals = new String[][]{{"куры", "утки", "петухи"},
                     {"коровы", "овцы", "козы"}};
+            animalGender = new GeneratorUtils.Gender[][]{{FEMININE, FEMININE, MASCULINE},
+                    {FEMININE, FEMININE, FEMININE}};
             animals5more = new String[][]{{"кур", "уток", "петухов"},
                     {"коров", "овец", "коз"}};
             animals1 = new String[][]{{"курица", "утка", "петух"},
@@ -43,12 +48,14 @@ public class LegsAndHeadsGenerator implements ProblemGenerator {
                     {"коровы", "овцы", "козы"}};
 
             text = "Во дворе гуляют " + animals[0][i2] + " и " + animals[1][i4]
-                    + ". У них вместе " + getNumWithString(heads, "голова", "головы", "голов")
+                    + ". У них вместе " + getNumWithString(heads, "голова", "головы", "голов", FEMININE)
                     + " и " + getLegsString((ducks * 2 + cows * 4)) + ". "
                     + "Сколько " + animals5more[quest][quest2] + " гуляет во дворе?";
         } else if (i == 1) {
             animals = new String[][]{{"цыплята", "утята", "страусы"},
                     {"ящерицы", "утконосы", "крокодилы"}};
+            animalGender = new GeneratorUtils.Gender[][]{{MASCULINE, MASCULINE, MASCULINE},
+                    {FEMININE, MASCULINE, MASCULINE}};
             animals5more = new String[][]{{"цыплят", "утят", "страусов"},
                     {"ящериц", "утконосов", "крокодилов"}};
             animals1 = new String[][]{{"цыплёнок", "утёнок", "страус"},
@@ -69,6 +76,8 @@ public class LegsAndHeadsGenerator implements ProblemGenerator {
 
             animals = new String[][]{{"жуки", "бабочки", "муравьи"},
                     {"пауки", "пауки", "пауки"}};
+            animalGender = new GeneratorUtils.Gender[][]{{MASCULINE, FEMININE, MASCULINE},
+                    {MASCULINE, MASCULINE, MASCULINE}};
             animals5more = new String[][]{{"жуков", "бабочек", "муравьев"},
                     {"пауков", "пауков", "пауков"}};
             animals1 = new String[][]{{"жук", "бабочка", "муравей"},
@@ -78,11 +87,11 @@ public class LegsAndHeadsGenerator implements ProblemGenerator {
 
             text = "Вася поймал несколько " + animals5more[0][i2] + " и " + animals5more[1][i4]
                     + ". Получилось всего " + getInsectString(heads) + " и у них на всех " + getLegsString(ducks * 6 + cows * 8) +". "
-                    + "Сколько " + animals5more[quest][quest2] + " поймал Вася?";
+                    + "Сколько " + animals5more[quest][quest2] + " у Васи?";
         }
 
         String possibleAnswer = getNumWithString(answer, animals1[quest][quest2],
-                animals4less[quest][quest2], animals5more[quest][quest2]);
+                animals4less[quest][quest2], animals5more[quest][quest2], animalGender[quest][quest2]);
         final HashSet<String> possibleTextAnswers = new HashSet<>();
         possibleTextAnswers.add(possibleAnswer);
         return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.LEGS_AND_HEADS, possibleTextAnswers);
@@ -94,11 +103,11 @@ public class LegsAndHeadsGenerator implements ProblemGenerator {
     }
 
     private static String getLegsString(int legs) {
-        return getNumWithString(legs, "нога", "ноги", "ног");
+        return getNumWithString(legs, "нога", "ноги", "ног", FEMININE);
     }
 
     private static String getInsectString(int legs) {
-        return getNumWithString(legs, "букашка", "букашки", "букашек");
+        return getNumWithString(legs, "букашка", "букашки", "букашек", FEMININE);
     }
 
 }

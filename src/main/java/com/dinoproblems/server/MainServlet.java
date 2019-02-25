@@ -139,7 +139,7 @@ public class MainServlet extends HttpServlet {
     private Problem.Difficulty parseDifficulty(String command) {
         if (checkAnswer(command, Sets.newHashSet("простая", "простую"), yesAnswers)) {
             return Problem.Difficulty.EASY;
-        } else if (checkAnswer(command, Sets.newHashSet("простая", "простую"), yesAnswers)) {
+        } else if (checkAnswer(command, Sets.newHashSet("средняя", "среднюю"), yesAnswers)) {
             return Problem.Difficulty.MEDIUM;
         } else if (checkAnswer(command, Sets.newHashSet("сложная", "сложную"), yesAnswers)) {
             return Problem.Difficulty.HARD;
