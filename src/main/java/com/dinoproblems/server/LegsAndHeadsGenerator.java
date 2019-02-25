@@ -14,8 +14,8 @@ import static com.dinoproblems.server.GeneratorUtils.randomInt;
 public class LegsAndHeadsGenerator implements ProblemGenerator {
     @Override
     public Problem generateProblem(Problem.Difficulty difficulty) {
-        int heads = difficulty == Problem.Difficulty.EASY ? randomInt(4, 6)
-                : randomInt(6, 10);
+        int heads = difficulty == Problem.Difficulty.EASY ? randomInt(3, 5)
+                : randomInt(5, 10);
         int ducks = randomInt(1, heads);
         int cows = heads - ducks;
         final int quest = randomInt(0, 2);
