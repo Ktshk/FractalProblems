@@ -59,7 +59,7 @@ public class MainServlet extends HttpServlet {
             final Session session = currentProblems.computeIfAbsent(sessionId, Session::new);
 
             if (newSession) {
-                responseJson.addProperty("text", "У меня для вас есть много интересных задач. Какую хотите: простую, среднюю или сложную?");
+                responseJson.addProperty("text", "Это закрытый навык. Я предлагаю вам решить логическую задачу. Какую хотите: простую, среднюю или сложную?");
                 responseJson.add("buttons", createDifficultyButtons());
 
                 responseJson.addProperty("end_session", false);

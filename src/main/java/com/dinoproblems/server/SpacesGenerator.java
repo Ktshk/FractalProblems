@@ -155,7 +155,7 @@ public class SpacesGenerator implements ProblemGenerator {
             }
         }
 
-        return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.LEGS_AND_HEADS, possibleTextAnswers);
+        return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.SPACES, possibleTextAnswers);
     }
 
     private String getBlocksStringNa(int count) {

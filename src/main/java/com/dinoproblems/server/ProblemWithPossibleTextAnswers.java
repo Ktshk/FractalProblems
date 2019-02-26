@@ -54,4 +54,23 @@ public class ProblemWithPossibleTextAnswers implements Problem {
         return theme;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ProblemWithPossibleTextAnswers that = (ProblemWithPossibleTextAnswers) o;
+
+        if (answer != that.answer) return false;
+        if (theme != null ? !theme.equals(that.theme) : that.theme != null) return false;
+        return text != null ? text.equals(that.text) : that.text == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = theme != null ? theme.hashCode() : 0;
+        result = 31 * result + (text != null ? text.hashCode() : 0);
+        result = 31 * result + answer;
+        return result;
+    }
 }
