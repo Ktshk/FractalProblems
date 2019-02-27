@@ -70,7 +70,7 @@ public class SpacesGenerator implements ProblemGenerator {
                     {"монету", "монеты", "монет"}};
             int thing = GeneratorUtils.randomInt(0, things.length);
             if (difficulty == Problem.Difficulty.EASY) {
-                String[] chosenHeroes = chooseRandom(heroes, 2);
+                String[] chosenHeroes = chooseRandomString(heroes, 2);
                 final int question = GeneratorUtils.randomInt(0, 1);
 
                 if (question == 0) {
@@ -78,7 +78,7 @@ public class SpacesGenerator implements ProblemGenerator {
                             + getNumWithString(pieces, things[thing][0], things[thing][1], things[thing][2], FEMININE, ACCUSATIVE)
                             + ". " + chosenHeroes[1] + " между каждыми двумя "
                             + (thing < 2 ? " нарисовал " : " выложил ") + " ещё по одной. "
-                            + ". Сколько " + things[thing][2] + (thing < 2 ? " нарисовал " : " выложил ") + chosenHeroes[1] + "?";
+                            + "Сколько " + things[thing][2] + (thing < 2 ? " нарисовал " : " выложил ") + chosenHeroes[1] + "?";
                     possibleTextAnswers = Sets.newHashSet(getNumWithString(spaces, things[thing][0], things[thing][1], things[thing][2], FEMININE, ACCUSATIVE));
                     answer = spaces;
                 } else {
@@ -95,7 +95,7 @@ public class SpacesGenerator implements ProblemGenerator {
                 int spaces2 = total - 1;
                 int total2 = total + spaces2;
 
-                String[] chosenHeroes = chooseRandom(heroes, 3);
+                String[] chosenHeroes = chooseRandomString(heroes, 3);
                 final int question = GeneratorUtils.randomInt(0, 2);
 
                 if (question == 0) {

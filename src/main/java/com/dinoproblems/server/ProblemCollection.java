@@ -1,9 +1,6 @@
 package com.dinoproblems.server;
 
-import com.dinoproblems.server.generators.BrickAndHalfGenerator;
-import com.dinoproblems.server.generators.LegsAndHeadsGenerator;
-import com.dinoproblems.server.generators.SnailGenerator;
-import com.dinoproblems.server.generators.SpacesGenerator;
+import com.dinoproblems.server.generators.*;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 
@@ -21,6 +18,7 @@ public class ProblemCollection {
     public static final String BRICK_AND_HALF = "Brick and a half";
     public static final String SNAIL = "Snail";
     public static final String SPACES = "Spaces";
+    public static final String WITH_CLOSED_EYES = "With closed eyes";
 
     private Map<String, ProblemGenerator> generators = new HashMap<>();
     private Table<Problem.Difficulty, String, ProblemGenerator> availableGeneratorsPerDifficulty = HashBasedTable.create();
@@ -30,6 +28,7 @@ public class ProblemCollection {
         generators.put(BRICK_AND_HALF, new BrickAndHalfGenerator());
         generators.put(SNAIL, new SnailGenerator());
         generators.put(SPACES, new SpacesGenerator());
+        generators.put(WITH_CLOSED_EYES, new WithClosedEyesGenerator());
 
         for (Map.Entry<String, ProblemGenerator> problemGeneratorEntry : generators.entrySet()) {
             final ProblemGenerator problemGenerator = problemGeneratorEntry.getValue();

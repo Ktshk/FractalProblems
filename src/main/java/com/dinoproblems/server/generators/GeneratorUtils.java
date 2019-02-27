@@ -2,6 +2,8 @@ package com.dinoproblems.server.generators;
 
 import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static com.dinoproblems.server.generators.GeneratorUtils.Gender.MASCULINE;
 
@@ -126,15 +128,19 @@ public class GeneratorUtils {
         return ThreadLocalRandom.current().nextInt(origin, bound);
     }
 
-    static String[] chooseRandom(String[] array, int count) {
-        String[] arrayCopy = Arrays.copyOf(array, array.length);
+    static String[] chooseRandomString(String[] array, int count) {
+        return chooseRandom(array, count, String[]::new);
+    }
 
-        final String[] result = new String[count];
+    static <T> T[] chooseRandom(T[] array, int count, Function<Integer, T[]> arrayConstructor) {
+        T[] arrayCopy = Arrays.copyOf(array, array.length);
+
+        final T[] result = arrayConstructor.apply(count);
         for (int i = 0; i < count; i++) {
             int ind = randomInt(i, arrayCopy.length);
             result[i] = arrayCopy[ind];
 
-            String t = arrayCopy[ind];
+            T t = arrayCopy[ind];
             arrayCopy[ind] = arrayCopy[i];
             arrayCopy[i] = t;
         }
