@@ -1,11 +1,12 @@
-package com.dinoproblems.server;
+package com.dinoproblems.server.generators;
 
+import com.dinoproblems.server.*;
 import com.google.common.collect.Sets;
 
 import java.util.Set;
 
-import static com.dinoproblems.server.GeneratorUtils.Gender.MASCULINE;
-import static com.dinoproblems.server.GeneratorUtils.randomInt;
+import static com.dinoproblems.server.generators.GeneratorUtils.Gender.MASCULINE;
+import static com.dinoproblems.server.generators.GeneratorUtils.randomInt;
 
 /**
  * Created by Katushka on 12.02.2019.

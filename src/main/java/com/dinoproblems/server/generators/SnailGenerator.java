@@ -1,12 +1,13 @@
-package com.dinoproblems.server;
+package com.dinoproblems.server.generators;
 
+import com.dinoproblems.server.*;
 import com.google.common.collect.Sets;
 
 import java.util.Set;
 
-import static com.dinoproblems.server.GeneratorUtils.Gender.MASCULINE;
-import static com.dinoproblems.server.GeneratorUtils.getNumWithString;
-import static com.dinoproblems.server.GeneratorUtils.randomInt;
+import static com.dinoproblems.server.generators.GeneratorUtils.Gender.MASCULINE;
+import static com.dinoproblems.server.generators.GeneratorUtils.getNumWithString;
+import static com.dinoproblems.server.generators.GeneratorUtils.randomInt;
 
 /**
  * Created by Katushka on 15.02.2019.
@@ -35,11 +36,11 @@ public class SnailGenerator implements ProblemGenerator {
         String text = heroes[hero] + " ползет по " + trees[tree] + " высотой " + getMetersString(h) + ". "
                 + "За день " + (hero == 0 ? "она" : "он") + " поднимается на " + getMetersString(d) + ", а за ночь опускается на " + getMetersString(n) + ". "
                 + "Сколько дней " + (hero == 0 ? "ей" : "ему") + " потребуется, чтобы подняться на вершину?";
-        return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.SNAIL, Sets.newHashSet(getNumWithString(answer, "день", "дня", "дней", MASCULINE)));
+        return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.SNAIL, Sets.newHashSet(GeneratorUtils.getNumWithString(answer, "день", "дня", "дней", MASCULINE)));
     }
 
     private String getMetersString(int h) {
-        return getNumWithString(h, "метр", "метра", "метров", MASCULINE);
+        return GeneratorUtils.getNumWithString(h, "метр", "метра", "метров", MASCULINE);
     }
 
     @Override

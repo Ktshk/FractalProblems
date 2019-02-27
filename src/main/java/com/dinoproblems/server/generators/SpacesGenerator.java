@@ -1,13 +1,14 @@
-package com.dinoproblems.server;
+package com.dinoproblems.server.generators;
 
+import com.dinoproblems.server.*;
 import com.google.common.collect.Sets;
 
 import java.util.Set;
 
-import static com.dinoproblems.server.GeneratorUtils.*;
-import static com.dinoproblems.server.GeneratorUtils.Case.ACCUSATIVE;
-import static com.dinoproblems.server.GeneratorUtils.Gender.FEMININE;
-import static com.dinoproblems.server.GeneratorUtils.Gender.MASCULINE;
+import static com.dinoproblems.server.generators.GeneratorUtils.*;
+import static com.dinoproblems.server.generators.GeneratorUtils.Case.ACCUSATIVE;
+import static com.dinoproblems.server.generators.GeneratorUtils.Gender.FEMININE;
+import static com.dinoproblems.server.generators.GeneratorUtils.Gender.MASCULINE;
 
 /**
  * Created by Katushka on 24.02.2019.

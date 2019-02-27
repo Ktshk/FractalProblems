@@ -1,14 +1,15 @@
-package com.dinoproblems.server;
+package com.dinoproblems.server.generators;
 
+import com.dinoproblems.server.*;
 import com.google.common.collect.Sets;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.dinoproblems.server.GeneratorUtils.Gender.FEMININE;
-import static com.dinoproblems.server.GeneratorUtils.Gender.MASCULINE;
-import static com.dinoproblems.server.GeneratorUtils.getNumWithString;
-import static com.dinoproblems.server.GeneratorUtils.randomInt;
+import static com.dinoproblems.server.generators.GeneratorUtils.Gender.FEMININE;
+import static com.dinoproblems.server.generators.GeneratorUtils.Gender.MASCULINE;
+import static com.dinoproblems.server.generators.GeneratorUtils.getNumWithString;
+import static com.dinoproblems.server.generators.GeneratorUtils.randomInt;
 
 /**
  * Created by Katushka on 10.02.2019.
@@ -48,7 +49,7 @@ public class LegsAndHeadsGenerator implements ProblemGenerator {
                     {"коровы", "овцы", "козы"}};
 
             text = "Во дворе гуляют " + animals[0][i2] + " и " + animals[1][i4]
-                    + ". У них вместе " + getNumWithString(heads, "голова", "головы", "голов", FEMININE)
+                    + ". У них вместе " + GeneratorUtils.getNumWithString(heads, "голова", "головы", "голов", FEMININE)
                     + " и " + getLegsString((ducks * 2 + cows * 4)) + ". "
                     + "Сколько " + animals5more[quest][quest2] + " гуляет во дворе?";
         } else if (i == 1) {
@@ -90,7 +91,7 @@ public class LegsAndHeadsGenerator implements ProblemGenerator {
                     + "Сколько " + animals5more[quest][quest2] + " у Васи?";
         }
 
-        String possibleAnswer = getNumWithString(answer, animals1[quest][quest2],
+        String possibleAnswer = GeneratorUtils.getNumWithString(answer, animals1[quest][quest2],
                 animals4less[quest][quest2], animals5more[quest][quest2], animalGender[quest][quest2]);
         final HashSet<String> possibleTextAnswers = new HashSet<>();
         possibleTextAnswers.add(possibleAnswer);
@@ -103,11 +104,11 @@ public class LegsAndHeadsGenerator implements ProblemGenerator {
     }
 
     private static String getLegsString(int legs) {
-        return getNumWithString(legs, "нога", "ноги", "ног", FEMININE);
+        return GeneratorUtils.getNumWithString(legs, "нога", "ноги", "ног", FEMININE);
     }
 
     private static String getInsectString(int legs) {
-        return getNumWithString(legs, "букашка", "букашки", "букашек", FEMININE);
+        return GeneratorUtils.getNumWithString(legs, "букашка", "букашки", "букашек", FEMININE);
     }
 
 }

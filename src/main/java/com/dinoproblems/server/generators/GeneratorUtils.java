@@ -1,9 +1,9 @@
-package com.dinoproblems.server;
+package com.dinoproblems.server.generators;
 
 import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static com.dinoproblems.server.GeneratorUtils.Gender.MASCULINE;
+import static com.dinoproblems.server.generators.GeneratorUtils.Gender.MASCULINE;
 
 /**
  * Created by Katushka on 10.02.2019.

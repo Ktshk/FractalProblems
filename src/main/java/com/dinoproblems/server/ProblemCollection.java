@@ -1,5 +1,9 @@
 package com.dinoproblems.server;
 
+import com.dinoproblems.server.generators.BrickAndHalfGenerator;
+import com.dinoproblems.server.generators.LegsAndHeadsGenerator;
+import com.dinoproblems.server.generators.SnailGenerator;
+import com.dinoproblems.server.generators.SpacesGenerator;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 
