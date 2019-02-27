@@ -18,7 +18,7 @@ public class SpacesGenerator implements ProblemGenerator {
     public Problem generateProblem(Problem.Difficulty difficulty) {
         int spaces = difficulty == Problem.Difficulty.EASY ? GeneratorUtils.randomInt(7, 15) : GeneratorUtils.randomInt(10, 25);
         int blocks = difficulty == Problem.Difficulty.EASY ? 1 : GeneratorUtils.randomInt(1, 5);
-        int pieces = spaces + blocks;
+        int pieces = spaces + 1;
         int total = spaces + pieces;
 
         int scenario = GeneratorUtils.randomInt(0, 3);
@@ -47,6 +47,7 @@ public class SpacesGenerator implements ProblemGenerator {
                     answer = spaces;
                 }
             } else {
+                pieces = spaces + blocks;
                 if (question == 0) {
                     text = "Бобер пилил бревна. На " + getBlocksStringNa(blocks) + " он сделал "
                             + spaceWithText
