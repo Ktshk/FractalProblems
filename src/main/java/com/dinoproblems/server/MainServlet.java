@@ -24,7 +24,7 @@ import java.util.Set;
 public class MainServlet extends HttpServlet {
 
     private Map<String, Session> currentProblems = new HashMap<>();
-    private Set<String> yesAnswers = Sets.newHashSet("да", "давай", "хочу", "валяй", "можно", "ага", "угу");
+    private Set<String> yesAnswers = Sets.newHashSet("да", "давай", "ну давай", "хочу", "валяй", "можно", "ага", "угу");
     private Set<String> noAnswers = Sets.newHashSet("нет", "не хочу", "хватит", "не надо");
     private Set<String> endSessionAnswers = Sets.newHashSet("хватит", "больше не хочу", "давай закончим", "надоело");
     private Set<String> askAnswer = Sets.newHashSet("ответ", "скажи", "сдаюсь");
