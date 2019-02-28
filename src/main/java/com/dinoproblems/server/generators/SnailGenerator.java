@@ -24,7 +24,8 @@ public class SnailGenerator implements ProblemGenerator {
             final String text = "Однажды улитка заползла на вершину бамбука, который растет так, что каждая его точка поднимается вверх с одной и той же скоростью. " +
                     "Путь вверх занял у улитки 7 часов. Отдохнув на вершине бамбука ровно час, она спустилась на землю за 8 часов. " +
                     "Во сколько раз скорость улитки больше скорости роста бамбука?";
-            return new ProblemWithPossibleTextAnswers(text, 16, ProblemCollection.SNAIL, Sets.newHashSet("в 16 раз"));
+            return new ProblemWithPossibleTextAnswers(text, 16, ProblemCollection.SNAIL,
+                    Sets.newHashSet("в 16 раз", "16 раз", "в 16 раз больше"));
         }
 
         int d = difficulty == Problem.Difficulty.EASY ? randomInt(2, 5) :
