@@ -45,6 +45,11 @@ public class ProblemWithPossibleTextAnswers implements Problem {
     }
 
     @Override
+    public boolean checkNumericAnswer(int proposedAnswer) {
+        return answer == proposedAnswer;
+    }
+
+    @Override
     public State getState() {
         return state;
     }

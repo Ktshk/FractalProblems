@@ -6,6 +6,8 @@ package com.dinoproblems.server;
 public interface Problem {
     boolean checkAnswer(String proposedAnswer);
 
+    boolean checkNumericAnswer(int proposedAnswer);
+
     String getTextAnswer();
 
     String getTheme();

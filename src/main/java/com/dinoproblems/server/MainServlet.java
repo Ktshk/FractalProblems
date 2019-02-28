@@ -2,6 +2,7 @@ package com.dinoproblems.server;
 
 import com.google.common.collect.Sets;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -51,6 +52,7 @@ public class MainServlet extends HttpServlet {
             final String command = requestJson.get("command").getAsString();
             final boolean newSession = bodyJson.get("session").getAsJsonObject().get("new").getAsBoolean();
             final String sessionId = bodyJson.get("session").getAsJsonObject().get("session_id").getAsString();
+            final JsonArray entitiesArray = requestJson.get("nlu").getAsJsonObject().get("entities").getAsJsonArray();
 
             final JsonObject result = new JsonObject();
             final JsonObject responseJson = new JsonObject();
@@ -107,7 +109,7 @@ public class MainServlet extends HttpServlet {
                     result.add("response", responseJson);
                     problem.setState(Problem.State.ANSWER_GIVEN);
                     session.setCurrentProblem(null);
-                } else if (problem.checkAnswer(command)) {
+                } else if (isCorrectAnswer(problem, command, entitiesArray)) {
                     responseJson.addProperty("text", "Это правильный ответ. Хотите еще задачу?");
                     responseJson.addProperty("end_session", false);
                     result.add("response", responseJson);
@@ -131,6 +133,23 @@ public class MainServlet extends HttpServlet {
             response.getOutputStream().flush();
         }
 
+    }
+
+    private boolean isCorrectAnswer(Problem problem, String command, JsonArray entitiesArray) {
+        if (problem.checkAnswer(command)) {
+            return true;
+        }
+        for (JsonElement jsonElement : entitiesArray) {
+            final String type = jsonElement.getAsJsonObject().get("type").getAsString();
+            if (type.equalsIgnoreCase("YANDEX.NUMBER")) {
+                final int value = jsonElement.getAsJsonObject().get("value").getAsInt();
+                if (problem.checkNumericAnswer(value)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     private void addProblemTextToResponse(JsonObject responseJson, Session session) {
