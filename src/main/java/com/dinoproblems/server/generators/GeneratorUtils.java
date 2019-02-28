@@ -3,9 +3,9 @@ package com.dinoproblems.server.generators;
 import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import static com.dinoproblems.server.generators.GeneratorUtils.Gender.MASCULINE;
+import static com.dinoproblems.server.generators.NumberWord.getStringForNumber;
 
 /**
  * Created by Katushka on 10.02.2019.
@@ -19,6 +19,7 @@ public class GeneratorUtils {
 
     enum Case {
         NOMINATIVE,
+        GENITIVE,
         ACCUSATIVE
 
         // TODO: add other cases
@@ -42,6 +43,14 @@ public class GeneratorUtils {
         return getNumWithString(count, one, lessThanFive, moreThanFive, gender, Case.NOMINATIVE);
     }
 
+    static String getNumWithString(int count, AbstractNoun noun) {
+        return getNumWithString(count, noun.getNominative(), noun.getGenitive(), noun.getCountingForm(), noun.getGender(), Case.NOMINATIVE);
+    }
+
+    static String getNumWithString(int count, final String[] wordForms, Gender gender) {
+        return getNumWithString(count, wordForms[0], wordForms[1], wordForms[2], gender, Case.NOMINATIVE);
+    }
+
     static String getNumWithString(int count, final String one, final String lessThanFive, final String moreThanFive, Gender gender, Case wordCase) {
         if (count >= 5 && count <= 20) {
             return count + " " + moreThanFive;
@@ -51,77 +60,17 @@ public class GeneratorUtils {
                 if (gender == Gender.MASCULINE) {
                     return count + " " + one;
                 } else {
-                    return getNumberEndsWithOneOrTwo(count, gender, wordCase) + " " + one;
+                    return getStringForNumber(count, gender, wordCase) + " " + one;
                 }
             } else if (lastDigit >= 2 && lastDigit <= 4) {
-                if (lastDigit == 2 && gender == Gender.FEMININE) {
-                    return getNumberEndsWithOneOrTwo(count, gender, wordCase) + " " + lessThanFive;
+                if (lastDigit == 2 && gender != Gender.MASCULINE) {
+                    return getStringForNumber(count, gender, wordCase) + " " + lessThanFive;
                 }
                 return count + " " + lessThanFive;
             } else {
                 return count + " " + moreThanFive;
             }
         }
-    }
-
-    private static String getNumberEndsWithOneOrTwo(int count, Gender gender, Case wordCase) {
-        String result = "";
-
-        if (count / 100 > 0) {
-            result += HUNDREDS[count / 100];
-            count = count / 100;
-        }
-
-        if (count / 10 > 0) {
-            if (!result.isEmpty()) {
-                result += " ";
-            }
-            result += TENS[count / 10];
-            count = count / 10;
-        }
-
-        if (count % 10 == 1) {
-            if (!result.isEmpty()) {
-                result += " ";
-            }
-            if (gender == Gender.MASCULINE) {
-                switch (wordCase) {
-                    case NOMINATIVE:
-                    case ACCUSATIVE:
-                        return result + "один";
-
-                }
-            } else if (gender == Gender.FEMININE) {
-                switch (wordCase) {
-                    case NOMINATIVE:
-                        return result + "одна";
-                    case ACCUSATIVE:
-                        return result + "одну";
-                }
-            } else {
-                switch (wordCase) {
-                    case NOMINATIVE:
-                    case ACCUSATIVE:
-                        return result + "одно";
-                }
-            }
-        } else if (count % 10 == 2) {
-            if (!result.isEmpty()) {
-                result += " ";
-            }
-            if (gender == Gender.FEMININE) {
-                result += "две";
-            } else {
-                result += "два";
-            }
-        } else if (count % 10 > 0) {
-            if (!result.isEmpty()) {
-                result += " ";
-            }
-            result += ONES[count % 10];
-        }
-
-        return result;
     }
 
     static int randomInt(int origin, int bound) {

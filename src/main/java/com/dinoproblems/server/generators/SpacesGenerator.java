@@ -86,7 +86,7 @@ public class SpacesGenerator implements ProblemGenerator {
                             + "несколько " + things[thing][2]
                             + ". " + chosenHeroes[1] + " между каждыми двумя "
                             + (thing < 2 ? " нарисовал " : " выложил ") + " ещё по одной. "
-                            + "Всего получилось " + getNumWithString(total, things[thing][0], things[thing][1], things[thing][2], FEMININE)
+                            + "Всего получилось " + getNumWithString(total, things[thing], FEMININE)
                             + ".  Сколько " + things[thing][2] + (thing < 2 ? " нарисовал " : " выложил ") + chosenHeroes[0] + "?";
                     possibleTextAnswers = Sets.newHashSet(getNumWithString(spaces, things[thing][0], things[thing][1], things[thing][2], FEMININE, ACCUSATIVE));
                     answer = pieces;
@@ -113,7 +113,7 @@ public class SpacesGenerator implements ProblemGenerator {
                         + "Потом пришёл " + chosenHeroes[2] + " и сделал то же самое. ";
 
                 if (question == 0) {
-                    text += "Всего получилось " + getNumWithString(total2, things[thing][0], things[thing][1], things[thing][2], FEMININE)
+                    text += "Всего получилось " + getNumWithString(total2, things[thing], FEMININE)
                             + ". Сколько " + things[thing][2] + (thing < 2 ? " нарисовал " : " выложил ") + chosenHeroes[0] + "?";
                     possibleTextAnswers = Sets.newHashSet(getNumWithString(spaces, things[thing][0], things[thing][1], things[thing][2], FEMININE, ACCUSATIVE));
                     answer = pieces;

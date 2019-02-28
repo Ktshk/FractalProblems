@@ -19,6 +19,7 @@ public class ProblemCollection {
     public static final String SNAIL = "Snail";
     public static final String SPACES = "Spaces";
     public static final String WITH_CLOSED_EYES = "With closed eyes";
+    public static final String AT_LEAST_ONE_FOUND = "At least one found";
 
     private Map<String, ProblemGenerator> generators = new HashMap<>();
     private Table<Problem.Difficulty, String, ProblemGenerator> availableGeneratorsPerDifficulty = HashBasedTable.create();
@@ -29,6 +30,7 @@ public class ProblemCollection {
         generators.put(SNAIL, new SnailGenerator());
         generators.put(SPACES, new SpacesGenerator());
         generators.put(WITH_CLOSED_EYES, new WithClosedEyesGenerator());
+        generators.put(AT_LEAST_ONE_FOUND, new FoundAtLeastOneGenerator());
 
         for (Map.Entry<String, ProblemGenerator> problemGeneratorEntry : generators.entrySet()) {
             final ProblemGenerator problemGenerator = problemGeneratorEntry.getValue();

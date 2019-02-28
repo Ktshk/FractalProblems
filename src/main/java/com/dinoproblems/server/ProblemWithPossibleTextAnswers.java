@@ -9,12 +9,18 @@ public class ProblemWithPossibleTextAnswers implements Problem {
 
     private final String theme;
     private String text;
+    private final String tts;
     private int answer;
     private Set<String> possibleTextAnswers;
     private State state = State.NEW;
 
     public ProblemWithPossibleTextAnswers(String text, int answer, String theme, Set<String> possibleTextAnswers) {
+        this(text, null, answer, theme, possibleTextAnswers);
+    }
+
+    public ProblemWithPossibleTextAnswers(String text, String tts, int answer, String theme, Set<String> possibleTextAnswers) {
         this.text = text;
+        this.tts = tts;
         this.answer = answer;
         this.theme = theme;
         this.possibleTextAnswers = possibleTextAnswers;
@@ -22,6 +28,11 @@ public class ProblemWithPossibleTextAnswers implements Problem {
 
     public String getText() {
         return text;
+    }
+
+    @Override
+    public String getTTS() {
+        return tts;
     }
 
     public int getAnswer() {

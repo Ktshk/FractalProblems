@@ -27,6 +27,7 @@ public class MainServlet extends HttpServlet {
     private Set<String> yesAnswers = Sets.newHashSet("да", "давай", "хочу", "валяй", "можно", "ага", "угу");
     private Set<String> noAnswers = Sets.newHashSet("нет", "не хочу", "хватит", "не надо");
     private Set<String> endSessionAnswers = Sets.newHashSet("хватит", "больше не хочу", "давай закончим", "надоело");
+    private Set<String> askAnswer = Sets.newHashSet("ответ", "скажи", "сдаюсь");
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("application/json; charset=UTF-8");
@@ -79,15 +80,11 @@ public class MainServlet extends HttpServlet {
                     result.add("response", responseJson);
                 } else {
                     session.setCurrentDifficulty(currentDifficulty);
-                    final Problem problem = ProblemCollection.INSTANCE.generateProblem(session);
-                    session.setCurrentProblem(problem);
-                    responseJson.addProperty("text", problem.getText());
+                    addProblemTextToResponse(responseJson, session);
                     result.add("response", responseJson);
                 }
             } else if (session.getCurrentProblem() == null && checkAnswer(command, yesAnswers)) {
-                final Problem problem = ProblemCollection.INSTANCE.generateProblem(session);
-                session.setCurrentProblem(problem);
-                responseJson.addProperty("text", problem.getText());
+                addProblemTextToResponse(responseJson, session);
                 responseJson.addProperty("end_session", false);
                 result.add("response", responseJson);
 
@@ -95,7 +92,7 @@ public class MainServlet extends HttpServlet {
                 final Problem problem = session.getCurrentProblem();
 
                 if (problem == null) {
-                    responseJson.addProperty("text", "Не поняла вас. Хотите задачу?");
+                    responseJson.addProperty("text", "Не поняла вас. Хотите решить задачу?");
                     responseJson.addProperty("end_session", false);
                     result.add("response", responseJson);
                 } else if (problem.getState() == Problem.State.ANSWER_PROPOSED && checkAnswer(command, noAnswers)) {
@@ -104,20 +101,20 @@ public class MainServlet extends HttpServlet {
                     result.add("response", responseJson);
                     problem.setState(Problem.State.ANSWER_PROPOSED);
                 } else if (problem.getState() == Problem.State.ANSWER_PROPOSED &&
-                        (checkAnswer(command, yesAnswers) || "скажи ответ".equalsIgnoreCase("command"))) {
-                    responseJson.addProperty("text", "Правильный ответ " + problem.getTextAnswer() + ". Ещё задачу?");
+                        (checkAnswer(command, yesAnswers) || checkAnswer(command, askAnswer))) {
+                    responseJson.addProperty("text", "Правильный ответ " + problem.getTextAnswer() + ". Хотите еще задачу?");
                     responseJson.addProperty("end_session", false);
                     result.add("response", responseJson);
                     problem.setState(Problem.State.ANSWER_GIVEN);
                     session.setCurrentProblem(null);
                 } else if (problem.checkAnswer(command)) {
-                    responseJson.addProperty("text", "Это правильный ответ. Еще задачу?");
+                    responseJson.addProperty("text", "Это правильный ответ. Хотите еще задачу?");
                     responseJson.addProperty("end_session", false);
                     result.add("response", responseJson);
                     problem.setState(Problem.State.SOLVED);
                     session.setCurrentProblem(null);
                 } else {
-                    responseJson.addProperty("text", "Это неправильный ответ. Сдаетесь?");
+                    responseJson.addProperty("text", "Это неправильный ответ. Хотите скажу ответ?");
                     responseJson.addProperty("end_session", false);
                     result.add("response", responseJson);
                     problem.setState(Problem.State.ANSWER_PROPOSED);
@@ -134,6 +131,15 @@ public class MainServlet extends HttpServlet {
             response.getOutputStream().flush();
         }
 
+    }
+
+    private void addProblemTextToResponse(JsonObject responseJson, Session session) {
+        final Problem problem = ProblemCollection.INSTANCE.generateProblem(session);
+        session.setCurrentProblem(problem);
+        responseJson.addProperty("text", problem.getText());
+        if (problem.getTTS() != null) {
+            responseJson.addProperty("tts", problem.getTTS());
+        }
     }
 
     private Problem.Difficulty parseDifficulty(String command) {

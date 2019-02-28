@@ -12,6 +12,14 @@ public interface Problem {
 
     String getText();
 
+    /**
+     * Text-to-speech. + means accent
+     * @return tts for yandex dialog, null if not specified
+     */
+    default String getTTS() {
+        return null;
+    }
+
     enum State {
         NEW, HINT_PROPOSED, HINT_GIVEN, ANSWER_PROPOSED, ANSWER_GIVEN, SOLVED
     }
