@@ -10,6 +10,8 @@ import java.util.Set;
 import java.util.stream.IntStream;
 
 import static com.dinoproblems.server.ProblemCollection.WITH_CLOSED_EYES;
+import static com.dinoproblems.server.generators.Dictionary.*;
+import static com.dinoproblems.server.generators.GeneratorUtils.Gender.MASCULINE;
 import static com.dinoproblems.server.generators.GeneratorUtils.getNumWithString;
 import static com.dinoproblems.server.generators.GeneratorUtils.randomInt;
 
@@ -18,107 +20,118 @@ import static com.dinoproblems.server.generators.GeneratorUtils.randomInt;
  */
 public class WithClosedEyesGenerator implements ProblemGenerator {
 
-    private static final String[][] COLORS = {{"красный", "красного", "красных"}, {"синий", "синего", "синих"},
-            {"жёлтый", "жёлтого", "жёлтых"}, {"чёрный", "чёрного", "чёрных"}};
-    private static final String[][] THINGS = {{"шарики", "шарик", "шарика", "шариков"},
-            {"карандаши", "карандаш", "карандаша", "карандашей"},
-            {"носки", "носок", "носка", "носков"}};
-    private static final String[][] PAIRED_THINGS = {{"ботинки", "ботинок", "ботинка", "ботинок"},
-            {"перчатки", "перчатка", "перчатки", "перчаток"},
-            {"коньки", "конёк", "конька", "коньков"}};
+    private static final Adjective[] COLORS = {RED, BLUE, YELLOW, GREEN, BLACK};
+
+    private static final Noun[] THINGS = {BALL, PENCIL, SOCK};
+    private static final Noun[] PAIRED_THINGS = {SHOE, GLOVE, SKATES};
     private static final String[] WHERE = {"коробке", "ящике", "сумке", "пакете"};
 
     @Override
     public Problem generateProblem(Problem.Difficulty difficulty) {
         int scenario = randomInt(0, 4);
         int answer;
-        StringBuilder text;
         final HashSet<String> possibleTextAnswers = Sets.newHashSet();
-
-        String[][] things = scenario < 3 ? THINGS : PAIRED_THINGS;
-        int thing = randomInt(0, things.length);
         String where = WHERE[randomInt(0, WHERE.length)];
 
-        if (scenario < 3) {
-            int[] count = difficulty == Problem.Difficulty.EASY ? new int[2] : new int[randomInt(2, 5)];
-            String[][] chosenColors = GeneratorUtils.chooseRandom(COLORS, count.length, String[][]::new);
+        Noun[] things = (difficulty == Problem.Difficulty.HARD || scenario < 3) ? THINGS : PAIRED_THINGS;
+        int thing = randomInt(0, things.length);
 
-            int min = Integer.MAX_VALUE;
-            int max = 0;
-            for (int i = 0; i < count.length; i++) {
-                count[i] = difficulty == Problem.Difficulty.EASY ? randomInt(4, 8) : randomInt(6, 20);
-                min = Math.min(min, count[i]);
-                max = Math.max(max, count[i]);
-            }
+        StringBuilder text = new StringBuilder("В " + where + " лежат " + things[thing].getPluralForm() + ": ");
 
-            text = new StringBuilder("В " + where + " лежат " + things[thing][0] + ": ");
+        int[] count = difficulty == Problem.Difficulty.EASY ? new int[2] :
+                (difficulty == Problem.Difficulty.HARD ? new int[3] : new int[randomInt(2, scenario < 3 ? 5 : 4)]);
+        Adjective[] chosenColors = GeneratorUtils.chooseRandom(COLORS, count.length, Adjective[]::new);
+
+        int min = Integer.MAX_VALUE;
+        int max = 0;
+        for (int i = 0; i < count.length; i++) {
+            count[i] = difficulty == Problem.Difficulty.EASY ? randomInt(4, 8) :
+                    (difficulty == Problem.Difficulty.HARD ? randomInt(3, 9) : randomInt(6, scenario < 3 ? 20 : 12));
+            min = Math.min(min, count[i]);
+            max = Math.max(max, count[i]);
+        }
+
+        if (difficulty == Problem.Difficulty.HARD) {
             for (int i = 0; i < count.length; i++) {
                 if (i == count.length - 1) {
                     text.append(" и ");
                 } else if (i > 0) {
                     text.append(", ");
                 }
-                text.append(count[i]).append(" ").append(chosenColors[i][2]);
+                text.append(count[i]).append(" ").append(chosenColors[i].getGenitiveForm(MASCULINE));
             }
-            int question = randomInt(scenario == 2 ? 1 : 2, min - 1);
+            text.append(" цвета. Чтобы вытащить 1 ").append(chosenColors[0].getNominative(MASCULINE)).append(" ").append(things[thing].getNominative());
+            text.append(", нужно взять наугад ").append(getNumWithString(count[1] + count[2] + 1, things[thing]));
 
-            text.append(". Какое наименьшее количество ")
-                    .append(things[thing][3])
-                    .append(" нужно вытащить, не глядя, чтобы среди них обязательно ")
-                    .append(question == 1 ? "оказался " : "оказалось ");
+            text.append(". Чтобы вытащить 1 ").append(chosenColors[1].getNominative(MASCULINE)).append(" ").append(things[thing].getNominative());
+            text.append(", нужно взять наугад ").append(getNumWithString(count[0] + count[2] + 1, things[thing]));
 
-            if (scenario == 0) {
-                text.append(getNumWithString(question, things[thing][1], things[thing][2], things[thing][3], GeneratorUtils.Gender.MASCULINE));
-                text.append(" одного (любого) цвета?");
-                answer = count.length * (question - 1) + 1;
-            } else if (scenario == 1) {
-                text.append(getNumWithString(2, things[thing][1], things[thing][2], things[thing][3], GeneratorUtils.Gender.MASCULINE));
-                text.append(" разных цветов?");
-                answer = max + 1;
+            text.append(". Чтобы вытащить 1 ").append(chosenColors[2].getNominative(MASCULINE)).append(" ").append(things[thing].getNominative());
+            text.append(", нужно взять наугад ").append(getNumWithString(count[0] + count[1] + 1, things[thing]));
+
+            int question = randomInt(0, 4);
+            if (question == 0) {
+                text.append(". Сколько всего ").append(things[thing].getCountingForm());
+                answer = count[0] + count[1] + count[2];
             } else {
-                text.append(getNumWithString(question, things[thing][1], things[thing][2], things[thing][3], GeneratorUtils.Gender.MASCULINE));
-                int questionColor = randomInt(0, count.length);
-                text.append(" ");
-                text.append(chosenColors[questionColor][1]);
-                text.append(" цвета?");
-                answer = 0;
-                for (int i = 0; i < count.length; i++) {
-                    if (i != questionColor) {
-                        answer += count[i];
-                    }
-                }
-                answer += question;
+                AdjectiveWithNoun questionedThing = new AdjectiveWithNoun(chosenColors[question - 1], things[thing]);
+                text.append(". Сколько ").append(questionedThing.getCountingForm());
+                answer = count[question - 1];
+                possibleTextAnswers.add(getNumWithString(answer, questionedThing));
             }
-            possibleTextAnswers.add(getNumWithString(answer, things[thing][1], things[thing][2], things[thing][3], GeneratorUtils.Gender.MASCULINE));
+            text.append(" в ").append(where).append("?");
+            possibleTextAnswers.add(getNumWithString(answer, things[thing]));
         } else {
-            int[] count = difficulty == Problem.Difficulty.EASY ? new int[2] : new int[randomInt(2, 3)];
-            String[][] chosenColors = GeneratorUtils.chooseRandom(COLORS, count.length, String[][]::new);
-
-            int min = Integer.MAX_VALUE;
-            int max = 0;
-            for (int i = 0; i < count.length; i++) {
-                count[i] = difficulty == Problem.Difficulty.EASY ? randomInt(4, 8) : randomInt(6, 12);
-                min = Math.min(min, count[i]);
-                max = Math.max(max, count[i]);
-            }
-
-            text = new StringBuilder("В " + where + " лежат " + things[thing][0] + ": ");
             for (int i = 0; i < count.length; i++) {
                 if (i == count.length - 1) {
                     text.append(" и ");
                 } else if (i > 0) {
                     text.append(", ");
                 }
-                text.append(count[i]).append(" пар ").append(chosenColors[i][2]);
+                text.append(count[i]).append(scenario < 3 ? " " : " пар ").append(chosenColors[i].getCountingForm());
             }
 
-            text.append(". Какое наименьшее количество ")
-                    .append(things[thing][3])
-                    .append(" нужно вытащить, не глядя, чтобы среди них обязательно оказалась пара ")
-                    .append(things[thing][3])
-                    .append(" одного цвета?");
-            answer = 1 + IntStream.of(count).sum();
-            possibleTextAnswers.add(getNumWithString(answer, things[thing][1], things[thing][2], things[thing][3], GeneratorUtils.Gender.MASCULINE));
+            if (scenario < 3) {
+
+                int question = randomInt(scenario == 2 ? 1 : 2, min - 1);
+
+                text.append(". Какое наименьшее количество ")
+                        .append(things[thing].getCountingForm())
+                        .append(" нужно вытащить, не глядя, чтобы среди них обязательно ")
+                        .append(question == 1 ? "оказался " : "оказалось ");
+
+                if (scenario == 0) {
+                    text.append(getNumWithString(question, things[thing]));
+                    text.append(" одного (любого) цвета?");
+                    answer = count.length * (question - 1) + 1;
+                } else if (scenario == 1) {
+                    text.append(getNumWithString(2, things[thing]));
+                    text.append(" разных цветов?");
+                    answer = max + 1;
+                } else {
+                    text.append(getNumWithString(question, things[thing]));
+                    int questionColor = randomInt(0, count.length);
+                    text.append(" ");
+                    text.append(chosenColors[questionColor].getGenitiveForm(MASCULINE));
+                    text.append(" цвета?");
+                    answer = 0;
+                    for (int i = 0; i < count.length; i++) {
+                        if (i != questionColor) {
+                            answer += count[i];
+                        }
+                    }
+                    answer += question;
+                }
+                possibleTextAnswers.add(getNumWithString(answer, things[thing]));
+            } else {
+                text.append(". Какое наименьшее количество ")
+                        .append(things[thing].getCountingForm())
+                        .append(" нужно вытащить, не глядя, чтобы среди них обязательно оказалась пара ")
+                        .append(things[thing].getCountingForm())
+                        .append(" одного цвета?");
+                answer = 1 + IntStream.of(count).sum();
+                possibleTextAnswers.add(getNumWithString(answer, things[thing]));
+            }
         }
         return new ProblemWithPossibleTextAnswers(text.toString(), answer, WITH_CLOSED_EYES, possibleTextAnswers);
     }

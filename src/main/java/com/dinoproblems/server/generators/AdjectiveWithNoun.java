@@ -12,7 +12,6 @@ public class AdjectiveWithNoun implements AbstractNoun {
         this.noun = noun;
     }
 
-
     @Override
     public GeneratorUtils.Gender getGender() {
         return noun.getGender();
@@ -25,11 +24,16 @@ public class AdjectiveWithNoun implements AbstractNoun {
 
     @Override
     public String getGenitive() {
-        return adjective.getGenitive() + " " + noun.getGenitive();
+        return adjective.getGenitiveForm(noun.getGender()) + " " + noun.getGenitive();
+    }
+
+    @Override
+    public String getCountingGenitive() {
+        return adjective.getCountingForm() + " " + noun.getCountingGenitive();
     }
 
     @Override
     public String getCountingForm() {
-        return adjective.getGenitive() + " " + noun.getCountingForm();
+        return adjective.getCountingForm() + " " + noun.getCountingForm();
     }
 }

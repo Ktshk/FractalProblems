@@ -9,12 +9,14 @@ public class Noun implements AbstractNoun {
     private final String nominative;
     private final String genitive;
     private final String countingForm;
+    private final String pluralForm;
 
-    public Noun(String nominative, String genitive, String countingForm, GeneratorUtils.Gender gender) {
+    public Noun(String nominative, String genitive, String countingForm, String pluralForm, GeneratorUtils.Gender gender) {
         this.gender = gender;
         this.nominative = nominative;
         this.genitive = genitive;
         this.countingForm = countingForm;
+        this.pluralForm = pluralForm;
     }
 
     @Override
@@ -33,8 +35,18 @@ public class Noun implements AbstractNoun {
     }
 
     @Override
+    public String getCountingGenitive() {
+        return genitive;
+    }
+
+    @Override
     public String getCountingForm() {
         return countingForm;
+    }
+
+    @Override
+    public String getPluralForm() {
+        return pluralForm;
     }
 
     @Override

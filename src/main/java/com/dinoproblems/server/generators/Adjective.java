@@ -7,13 +7,19 @@ public class Adjective {
     private final String nominativeMasculine;
     private final String nominativeFeminine;
     private final String nominativeNeuter;
-    private final String genitive;
+    private final String countingForm;
+    private final String genitiveMasculine;
+    private final String genitiveFeminine;
+    private final String pluralForm;
 
-    public Adjective(String nominativeMasculine, String nominativeFeminine, String nominativeNeuter, String genitive) {
+    public Adjective(String nominativeMasculine, String nominativeFeminine, String nominativeNeuter, String countingForm, String genitiveMasculine, String genitiveFeminine, String pluralForm) {
         this.nominativeMasculine = nominativeMasculine;
         this.nominativeFeminine = nominativeFeminine;
         this.nominativeNeuter = nominativeNeuter;
-        this.genitive = genitive;
+        this.countingForm = countingForm;
+        this.genitiveMasculine = genitiveMasculine;
+        this.genitiveFeminine = genitiveFeminine;
+        this.pluralForm = pluralForm;
     }
 
     public String getNominativeMasculine() {
@@ -28,8 +34,23 @@ public class Adjective {
         return nominativeNeuter;
     }
 
-    public String getGenitive() {
-        return genitive;
+    public String getCountingForm() {
+        return countingForm;
+    }
+
+    public String getPluralForm() {
+        return pluralForm;
+    }
+
+    public String getGenitiveForm(GeneratorUtils.Gender gender) {
+        switch (gender) {
+            case MASCULINE:
+            case NEUTER:
+                return genitiveMasculine;
+            case FEMININE:
+                return genitiveFeminine;
+        }
+        throw new IllegalArgumentException();
     }
 
     public String getNominative(GeneratorUtils.Gender gender) {

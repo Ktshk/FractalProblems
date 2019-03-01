@@ -11,5 +11,9 @@ public interface AbstractNoun {
 
     String getGenitive();
 
+    String getCountingGenitive();
+
     String getCountingForm();
+
+    String getPluralForm();
 }
