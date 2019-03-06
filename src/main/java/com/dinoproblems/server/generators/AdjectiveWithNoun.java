@@ -36,4 +36,9 @@ public class AdjectiveWithNoun implements AbstractNoun {
     public String getCountingForm() {
         return adjective.getCountingForm() + " " + noun.getCountingForm();
     }
+
+    @Override
+    public String getPluralForm() {
+        return adjective.getPluralForm() + " " + noun.getPluralForm();
+    }
 }

@@ -47,15 +47,15 @@ public class FoundAtLeastOneGenerator implements ProblemGenerator {
                 break;
             case 2:
                 text += "В коробке ";
-                tts += "В корзине лежит ";
+                tts += "В коробке ";
                 break;
             case 3:
                 text += "Клоун надул ";
-                tts += "В корзине лежит ";
+                tts += "Клоун надул ";
                 break;
             case 4:
                 text += "В классе ";
-                tts += "В корзине лежит ";
+                tts += "В классе ";
                 break;
         }
 
@@ -63,37 +63,38 @@ public class FoundAtLeastOneGenerator implements ProblemGenerator {
         tts += getNumWithString(total, things[scenario])+ ". Известно, что среди любых ";
 
         text += (count1 + 1);
-        tts += NumberWord.getStringForNumber(count1 + 1, chosenParticularThings[0].getGender(), Case.GENITIVE);
+        tts += NumberWord.getStringForNumber(count1 + 1, things[0].getGender(), Case.GENITIVE);
 
         text += " найдется хотя бы " + getNumWithString(1, chosenParticularThings[1]) + ", а среди любых "
                 + (count2 + 1);
-        tts += " найдется хотя бы " + getNumWithString(1, chosenParticularThings[1]) + ", а среди любых "
+        tts += " найдется хотя бы " + getNumWithString(1, things[1]) + ", а среди любых "
                 + NumberWord.getStringForNumber(count2 + 1, chosenParticularThings[0].getGender(), Case.GENITIVE);;
 
         String textEnd = " найдется хотя бы " + getNumWithString(1, chosenParticularThings[0])
-                + ". Сколько " + chosenParticularThings[question].getCountingForm();
-        switch (scenario) {
-            case 0:
-                textEnd += " в вазе?";
-                break;
-            case 1:
-                textEnd += " в корзине?";
-                break;
-            case 2:
-                textEnd += " в коробке?";
-                break;
-            case 3:
-                textEnd += " надул клоун?";
-                break;
-            case 4:
-                textEnd += " в классе?";
-                break;
-        }
-        text += textEnd;
-        tts += textEnd;
+                + ". Сколько " + chosenParticularThings[question].getCountingForm() + getWhere(scenario);
+        text += textEnd + "?";
+        tts += textEnd + "?";
 
         final HashSet<String> possibleTextAnswers = Sets.newHashSet(getNumWithString(answer, chosenParticularThings[question]));
-        return new ProblemWithPossibleTextAnswers(text, tts, answer, AT_LEAST_ONE_FOUND, possibleTextAnswers);
+        final String hint = "Подумайте, может ли " + chosenParticularThings[0].getCountingForm() + " быть больше или равно " +
+                NumberWord.getStringForNumber(count1 + 1, chosenParticularThings[0].getGender(), Case.GENITIVE);
+        return new ProblemWithPossibleTextAnswers(text, tts, answer, AT_LEAST_ONE_FOUND, possibleTextAnswers, hint);
+    }
+
+    private String getWhere(int scenario) {
+        switch (scenario) {
+            case 0:
+                return " в вазе";
+            case 1:
+                return " в корзине";
+            case 2:
+                return " в коробке";
+            case 3:
+                return " надул клоун";
+            case 4:
+                return " в классе";
+        }
+        return "";
     }
 
     @Override

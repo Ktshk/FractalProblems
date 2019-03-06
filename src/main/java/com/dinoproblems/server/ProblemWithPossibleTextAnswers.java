@@ -13,21 +13,28 @@ public class ProblemWithPossibleTextAnswers implements Problem {
     private int answer;
     private Set<String> possibleTextAnswers;
     private State state = State.NEW;
+    private String hint;
 
-    public ProblemWithPossibleTextAnswers(String text, int answer, String theme, Set<String> possibleTextAnswers) {
-        this(text, null, answer, theme, possibleTextAnswers);
+    public ProblemWithPossibleTextAnswers(String text, int answer, String theme, Set<String> possibleTextAnswers, String hint) {
+        this(text, null, answer, theme, possibleTextAnswers, hint);
     }
 
-    public ProblemWithPossibleTextAnswers(String text, String tts, int answer, String theme, Set<String> possibleTextAnswers) {
+    public ProblemWithPossibleTextAnswers(String text, String tts, int answer, String theme, Set<String> possibleTextAnswers, String hint) {
         this.text = text;
         this.tts = tts;
         this.answer = answer;
         this.theme = theme;
         this.possibleTextAnswers = possibleTextAnswers;
+        this.hint = hint;
     }
 
     public String getText() {
         return text;
+    }
+
+    @Override
+    public String getHint() {
+        return hint;
     }
 
     @Override
@@ -45,8 +52,13 @@ public class ProblemWithPossibleTextAnswers implements Problem {
     }
 
     @Override
-    public boolean checkNumericAnswer(int proposedAnswer) {
-        return answer == proposedAnswer;
+    public int getNumericAnswer() {
+        return answer;
+    }
+
+    @Override
+    public boolean isNumericAnswer() {
+        return true;
     }
 
     @Override

@@ -6,13 +6,17 @@ package com.dinoproblems.server;
 public interface Problem {
     boolean checkAnswer(String proposedAnswer);
 
-    boolean checkNumericAnswer(int proposedAnswer);
+    int getNumericAnswer();
+
+    boolean isNumericAnswer();
 
     String getTextAnswer();
 
     String getTheme();
 
     String getText();
+
+    String getHint();
 
     /**
      * Text-to-speech. + means accent
@@ -23,7 +27,7 @@ public interface Problem {
     }
 
     enum State {
-        NEW, HINT_PROPOSED, HINT_GIVEN, ANSWER_PROPOSED, ANSWER_GIVEN, SOLVED
+        NEW, HINT_GIVEN, ANSWER_GIVEN, SOLVED
     }
 
     enum Difficulty {

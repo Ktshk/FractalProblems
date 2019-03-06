@@ -84,6 +84,7 @@ public class FromEndToBeginGenerator implements ProblemGenerator {
         String choice;
         String text = null;//итоговый текст задачи
         int i = 10;
+        String hint = "";
         switch (type) {
             case 1:
                 for (; ; ) {
@@ -176,6 +177,7 @@ public class FromEndToBeginGenerator implements ProblemGenerator {
                 // System.out.println(probablePrime);
                // System.out.println(answer);
               //  System.out.print(text);
+               hint = "Подумайте, какое число было до того, как " + hero1[token1] + " " +  Actions[actions[0]] + operands[0] + ". ";
             case 2:
                 for (; ; ) {
                     if (Day % 2 == 0) break;
@@ -190,12 +192,12 @@ public class FromEndToBeginGenerator implements ProblemGenerator {
                         " день всё озеро покрылось цветами. " + "\n" + Questions1[token3];
                 // System.out.println(answer);
                 // System.out.print(text);
-
+                hint = "Подумайте, что было накануне дня, когда все озеро было покрыто цветами. ";
         }
         String possibleAnswer = Integer.toString(answer);//?
         final HashSet<String> possibleTextAnswers = Sets.newHashSet(Integer.toString(answer));//?
         possibleTextAnswers.add(possibleAnswer);//?
-        return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.FROM_END_TO_BEGIN, possibleTextAnswers);//?
+        return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.FROM_END_TO_BEGIN, possibleTextAnswers, hint);//?
     }
 
     @Override

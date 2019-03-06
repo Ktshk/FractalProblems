@@ -73,7 +73,7 @@ public class GeneratorUtils {
         }
     }
 
-    static int randomInt(int origin, int bound) {
+    public static int randomInt(int origin, int bound) {
         return ThreadLocalRandom.current().nextInt(origin, bound);
     }
 

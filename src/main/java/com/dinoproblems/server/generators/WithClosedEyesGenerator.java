@@ -51,6 +51,8 @@ public class WithClosedEyesGenerator implements ProblemGenerator {
             max = Math.max(max, count[i]);
         }
 
+        String hint;
+
         if (difficulty == Problem.Difficulty.HARD) {
             for (int i = 0; i < count.length; i++) {
                 if (i == count.length - 1) {
@@ -81,6 +83,8 @@ public class WithClosedEyesGenerator implements ProblemGenerator {
             }
             text.append(" в ").append(where).append("?");
             possibleTextAnswers.add(getNumWithString(answer, things[thing]));
+            hint = "Чтобы вытащить 1 " + chosenColors[0].getNominative(MASCULINE) + " " + things[thing].getNominative() +
+                    ", нужно сначала вытащить все " + chosenColors[1].getPluralForm() + chosenColors[2].getPluralForm();
         } else {
             for (int i = 0; i < count.length; i++) {
                 if (i == count.length - 1) {
@@ -104,10 +108,12 @@ public class WithClosedEyesGenerator implements ProblemGenerator {
                     text.append(getNumWithString(question, things[thing]));
                     text.append(" одного (любого) цвета?");
                     answer = count.length * (question - 1) + 1;
+                    hint = "Допустим, что сначала нам не повезет и мы будем вытаскивать шары разных цветов.";
                 } else if (scenario == 1) {
                     text.append(getNumWithString(2, things[thing]));
                     text.append(" разных цветов?");
                     answer = max + 1;
+                    hint = "Что если сначала мы будем вытаскивать шары одного цвета? Подумайте, как долго это может продолжаться.";
                 } else {
                     text.append(getNumWithString(question, things[thing]));
                     int questionColor = randomInt(0, count.length);
@@ -121,6 +127,8 @@ public class WithClosedEyesGenerator implements ProblemGenerator {
                         }
                     }
                     answer += question;
+                    hint = "Если сначала нам не повезет, мы будем вытаскивать шары других цветов. " +
+                            "Но в когда-то нам точно должен попасться " + chosenColors[question].getNominativeNeuter() + ". ";
                 }
                 possibleTextAnswers.add(getNumWithString(answer, things[thing]));
             } else {
@@ -131,9 +139,10 @@ public class WithClosedEyesGenerator implements ProblemGenerator {
                         .append(" одного цвета?");
                 answer = 1 + IntStream.of(count).sum();
                 possibleTextAnswers.add(getNumWithString(answer, things[thing]));
+                hint = "Что если мы будем сначала доставать только левые " + things[thing].getPluralForm() + "? Но для пары нам нужен и левый, и правый. ";
             }
         }
-        return new ProblemWithPossibleTextAnswers(text.toString(), answer, WITH_CLOSED_EYES, possibleTextAnswers);
+        return new ProblemWithPossibleTextAnswers(text.toString(), answer, WITH_CLOSED_EYES, possibleTextAnswers, hint);
     }
 
     @Override

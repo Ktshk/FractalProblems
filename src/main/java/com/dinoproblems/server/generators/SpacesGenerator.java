@@ -27,6 +27,7 @@ public class SpacesGenerator implements ProblemGenerator {
         int answer;
         Set<String> possibleTextAnswers;
 
+        String hint;
         if (scenario == 0) {
             final int question = GeneratorUtils.randomInt(0, 1);
             final String spaceWithText = getNumWithString(spaces, "распил", "распила", "распилов", MASCULINE);
@@ -57,11 +58,12 @@ public class SpacesGenerator implements ProblemGenerator {
                 } else {
                     text = "Бобер пилил бревна. Из " + getBlocksStringIz(blocks) + " бревна у него получилось "
                             + piecesWithText
-                            + ". Сколько разрубов он сделал?";
+                            + ". Сколько распилов он сделал?";
                     possibleTextAnswers = Sets.newHashSet(spaceWithText);
                     answer = spaces;
                 }
             }
+            hint = "Подумайте, сколько стало кусков после первого распила, и насколько меняется число кусков после каждого следующего распила";
         } else if (scenario == 1) {
             String[] heroes = new String[]{"Миша", "Дима", "Коля", "Вася", "Рома", "Сережа"};
             String[][] things = {{"палочку", "палочки", "палочек"},
@@ -91,6 +93,7 @@ public class SpacesGenerator implements ProblemGenerator {
                     possibleTextAnswers = Sets.newHashSet(getNumWithString(spaces, things[thing][0], things[thing][1], things[thing][2], FEMININE, ACCUSATIVE));
                     answer = pieces;
                 }
+                hint = "Подумайте, насколько меньше " + things[thing][2] + (thing < 2 ? " нарисовал " : " выложил ") + chosenHeroes[1] + ". ";
             } else {
                 int spaces2 = total - 1;
                 int total2 = total + spaces2;
@@ -122,6 +125,7 @@ public class SpacesGenerator implements ProblemGenerator {
                     possibleTextAnswers = Sets.newHashSet(getNumWithString(spaces, things[thing][0], things[thing][1], things[thing][2], FEMININE, ACCUSATIVE));
                     answer = spaces2;
                 }
+                hint = "Подумайте, насколько меньше " + things[thing][2] + (thing < 2 ? " нарисовал " : " выложил ") + chosenHeroes[2] + ", чем до этого было.";
             }
         } else {
             final int question = GeneratorUtils.randomInt(0, 1);
@@ -140,6 +144,7 @@ public class SpacesGenerator implements ProblemGenerator {
                     answer = spaces;
                     possibleTextAnswers = Sets.newHashSet(GeneratorUtils.getMetersString(spaces));
                 }
+                hint = "Нарисуйте картинку.";
             } else {
                 int meters = randomInt(2, 5);
                 if (question == 0) {
@@ -154,10 +159,11 @@ public class SpacesGenerator implements ProblemGenerator {
                     answer = spaces * meters;
                     possibleTextAnswers = Sets.newHashSet(GeneratorUtils.getMetersString(spaces * meters));
                 }
+                hint = "Нарисуйте картинку. Сколько промежутков между столбами? Помните, каждый промежуток - это " + getMetersString(meters) + ".";
             }
         }
 
-        return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.SPACES, possibleTextAnswers);
+        return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.SPACES, possibleTextAnswers, hint);
     }
 
     private String getBlocksStringNa(int count) {

@@ -36,6 +36,7 @@ public class LegsAndHeadsGenerator implements ProblemGenerator {
 
         final String text;
         final int i = randomInt(0, 3);
+        final String hint;
         if (i == 0) {
             animals = new String[][]{{"куры", "утки", "петухи"},
                     {"коровы", "овцы", "козы"}};
@@ -43,10 +44,18 @@ public class LegsAndHeadsGenerator implements ProblemGenerator {
                     {FEMININE, FEMININE, FEMININE}};
             animals5more = new String[][]{{"кур", "уток", "петухов"},
                     {"коров", "овец", "коз"}};
+            String[][] animalsAcc = new String[][]{{"курицу", "утку", "петуха"},
+                    {"корову", "овцу", "козу"}};
+            String[][] animalsDat = new String[][]{{"курице", "утке", "петуху"},
+                    {"корове", "овце", "козе"}};
             animals1 = new String[][]{{"курица", "утка", "петух"},
                     {"корова", "овца", "коза"}};
             animals4less = new String[][]{{"курицы", "утки", "петуха"},
                     {"коровы", "овцы", "козы"}};
+
+            hint = "Предположим, что все животные во дворе - это " + animals[0][i2]
+                    + ". А потом подумайте, сколько ног надо добавить " + animalsDat[0][i2] + ", чтобы превратить " + (i2 < 2 ? "её" : "его")
+                    + " в " + animalsAcc[1][i4] + ". ";
 
             text = "Во дворе гуляют " + animals[0][i2] + " и " + animals[1][i4]
                     + ". У них вместе " + GeneratorUtils.getNumWithString(heads, "голова", "головы", "голов", FEMININE)
@@ -63,6 +72,14 @@ public class LegsAndHeadsGenerator implements ProblemGenerator {
                     {"ящерица", "утконос", "крокодил"}};
             animals4less = new String[][]{{"цыплёнка", "утёнка", "страуса"},
                     {"ящерицы", "утконоса", "крокодила"}};
+            String[][] animalsAcc = new String[][]{{"цыплёнка", "утёнка", "страуса"},
+                    {"ящерицу", "утконоса", "крокодила"}};
+            String[][] animalsDat = new String[][]{{"цыплёнку", "утёнку", "страусу"},
+                    {"ящерице", "утконосу", "крокодилу"}};
+
+            hint = "Представьте, что все, кто вылупился, - это " + animals[0][i2]
+                    + ". А потом подумайте, сколько ног надо добавить " + animalsDat[0][i2] + ", чтобы превратить его"
+                    + " в " + animalsAcc[1][i4] + ". ";
 
             text = "Из " + heads + " яиц вылупились " + animals[0][i2] + " и " + animals[1][i4]
                     + ". У них вместе " + getLegsString((ducks * 2 + cows * 4)) + ". "
@@ -85,6 +102,14 @@ public class LegsAndHeadsGenerator implements ProblemGenerator {
                     {"паук", "паук", "паук"}};
             animals4less = new String[][]{{"жука", "бабочки", "муравья"},
                     {"паука", "паука", "паука"}};
+            String[][] animalsAcc = new String[][]{{"жука", "бабочку", "муравью"},
+                    {"паука", "паука", "паука"}};
+            String[][] animalsDat = new String[][]{{"жуку", "бабочке", "муравью"},
+                    {"пауку", "пауку", "пауку"}};
+
+            hint = "Сколько ног было бы у букашек, если бы они все были - " + animals[0][i2]
+                    + ". А потом подумайте, сколько ног надо добавить " + animalsDat[0][i2] + ", чтобы превратить " + (i2 < 2 ? "её" : "его")
+                    + " в " + animalsAcc[1][i4] + ". ";
 
             text = "Вася поймал несколько " + animals5more[0][i2] + " и " + animals5more[1][i4]
                     + ". Получилось всего " + getInsectString(heads) + " и у них на всех " + getLegsString(ducks * 6 + cows * 8) +". "
@@ -95,7 +120,8 @@ public class LegsAndHeadsGenerator implements ProblemGenerator {
                 animals4less[quest][quest2], animals5more[quest][quest2], animalGender[quest][quest2]);
         final HashSet<String> possibleTextAnswers = new HashSet<>();
         possibleTextAnswers.add(possibleAnswer);
-        return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.LEGS_AND_HEADS, possibleTextAnswers);
+
+        return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.LEGS_AND_HEADS, possibleTextAnswers, hint);
     }
 
     @Override

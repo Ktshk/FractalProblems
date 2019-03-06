@@ -18,6 +18,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import static com.dinoproblems.server.generators.GeneratorUtils.randomInt;
+
 /**
  * Created by Katushka on 07.01.2019.
  */
@@ -28,7 +30,17 @@ public class MainServlet extends HttpServlet {
     private Set<String> yesAnswers = Sets.newHashSet("да", "давай", "ну давай", "хочу", "валяй", "можно", "ага", "угу");
     private Set<String> noAnswers = Sets.newHashSet("нет", "не хочу", "хватит", "не надо");
     private Set<String> endSessionAnswers = Sets.newHashSet("хватит", "больше не хочу", "давай закончим", "надоело");
-    private Set<String> askAnswer = Sets.newHashSet("ответ", "скажи", "сдаюсь");
+    private Set<String> askAnswer = Sets.newHashSet("ответ", "сдаюсь", "сказать ответ", "скажи ответ");
+    private Set<String> askHint = Sets.newHashSet("подсказка", "подсказку", "сказать подсказку", "дать подсказку", "дай", "дай подсказку");
+    private Set<String> askToRepeat = Sets.newHashSet("повтори", "повторить", "повтори задачу", "повтори условие");
+    private String[] praises = {"Молодец!", "Это правильный ответ.", "Ну конечно! Так и есть.",
+            "У вас отлично получается решать задачи.", "Я не сомневалась, что у вас получится.", "Правильно."};
+    private String[] oneMoreQuestion = {"Хотите ещё задачу?", "Ещё задачу?", "Решаем дальше?",
+            "Ещё одну?", "Давайте решим еще одну?"};
+    private String[] wrongAnswer = {"Нет, это неверно.", "Неверно.", "Это неправильный ответ.", "Нет.", "Нет, это точно неправильно."};
+    private String[] notAnAnswer = {"Хотите скажу подсказку или повторю задачу?", "Я могу повторить задачу.", "Могу дать вам подсказку.",
+            "Задача не из простых, но я могу помочь", "Я могу подсказать."};
+    private String[] almost = {"Почти.", "Почти верно.", "Близко, но нет."};
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("application/json; charset=UTF-8");
@@ -95,32 +107,31 @@ public class MainServlet extends HttpServlet {
 
                 if (problem == null) {
                     responseJson.addProperty("text", "Не поняла вас. Хотите решить задачу?");
-                    responseJson.addProperty("end_session", false);
                     result.add("response", responseJson);
-                } else if (problem.getState() == Problem.State.ANSWER_PROPOSED && checkAnswer(command, noAnswers)) {
-                    responseJson.addProperty("text", "Хорошо, подумайте еще");
-                    responseJson.addProperty("end_session", false);
+                } else if (checkAnswer(command, askHint, yesAnswers)) {
+                    if (problem.getState() == Problem.State.HINT_GIVEN) {
+                        responseJson.addProperty("text", "Я уже давала вам подсказку. " + problem.getHint());
+                    } else {
+                        responseJson.addProperty("text", problem.getHint());
+                    }
                     result.add("response", responseJson);
-                    problem.setState(Problem.State.ANSWER_PROPOSED);
-                } else if (problem.getState() == Problem.State.ANSWER_PROPOSED &&
-                        (checkAnswer(command, yesAnswers) || checkAnswer(command, askAnswer))) {
+                    problem.setState(Problem.State.HINT_GIVEN);
+                    addProblemButtons(responseJson);
+                } else if (checkAnswer(command, askToRepeat, yesAnswers)) {
+                    responseJson.addProperty("text", problem.getText());
+                    result.add("response", responseJson);
+                    addProblemButtons(responseJson);
+                } else if (checkAnswer(command, askAnswer, yesAnswers)) {
                     responseJson.addProperty("text", "Правильный ответ " + problem.getTextAnswer() + ". Хотите еще задачу?");
-                    responseJson.addProperty("end_session", false);
                     result.add("response", responseJson);
                     problem.setState(Problem.State.ANSWER_GIVEN);
                     session.setCurrentProblem(null);
-                } else if (isCorrectAnswer(problem, command, entitiesArray)) {
-                    responseJson.addProperty("text", "Это правильный ответ. Хотите еще задачу?");
-                    responseJson.addProperty("end_session", false);
-                    result.add("response", responseJson);
-                    problem.setState(Problem.State.SOLVED);
-                    session.setCurrentProblem(null);
                 } else {
-                    responseJson.addProperty("text", "Это неправильный ответ. Хотите скажу ответ?");
-                    responseJson.addProperty("end_session", false);
+                    checkCorrectAnswer(command, entitiesArray, responseJson, session);
                     result.add("response", responseJson);
-                    problem.setState(Problem.State.ANSWER_PROPOSED);
                 }
+
+                responseJson.addProperty("end_session", false);
             }
 
             PrintWriter out = response.getWriter();
@@ -135,30 +146,63 @@ public class MainServlet extends HttpServlet {
 
     }
 
-    private boolean isCorrectAnswer(Problem problem, String command, JsonArray entitiesArray) {
-        if (problem.checkAnswer(command)) {
-            return true;
-        }
-        for (JsonElement jsonElement : entitiesArray) {
-            final String type = jsonElement.getAsJsonObject().get("type").getAsString();
-            if (type.equalsIgnoreCase("YANDEX.NUMBER")) {
-                final int value = jsonElement.getAsJsonObject().get("value").getAsInt();
-                if (problem.checkNumericAnswer(value)) {
-                    return true;
+    private void checkCorrectAnswer(String command, JsonArray entitiesArray, JsonObject responseJson, Session session) {
+        final Problem problem = session.getCurrentProblem();
+
+        boolean correctAnswer = problem.checkAnswer(command);
+        boolean almostCorrect = false;
+
+        if (!correctAnswer && problem.isNumericAnswer()) {
+            boolean numberFound = false;
+
+            for (JsonElement jsonElement : entitiesArray) {
+                final String type = jsonElement.getAsJsonObject().get("type").getAsString();
+                if (type.equalsIgnoreCase("YANDEX.NUMBER")) {
+                    final int value = jsonElement.getAsJsonObject().get("value").getAsInt();
+                    if (problem.getNumericAnswer() == value) {
+                        correctAnswer = true;
+                    }
+                    if (Math.abs(value - problem.getNumericAnswer()) <= problem.getNumericAnswer() + 1) {
+                        almostCorrect = true;
+                    }
+                    numberFound = true;
                 }
+            }
+            if (!numberFound) {
+                responseJson.addProperty("text", chooseRandomElement(notAnAnswer));
             }
         }
 
-        return false;
+        if (correctAnswer) {
+            responseJson.addProperty("text", chooseRandomElement(praises) + " " + chooseRandomElement(oneMoreQuestion));
+            problem.setState(Problem.State.SOLVED);
+            session.setCurrentProblem(null);
+        } else {
+            responseJson.addProperty("text", chooseRandomElement(almostCorrect ? almost : wrongAnswer) + " " + chooseRandomElement(notAnAnswer));
+            addProblemButtons(responseJson);
+        }
+    }
+
+    private String chooseRandomElement(String[] array) {
+        return array[randomInt(0, array.length)];
     }
 
     private void addProblemTextToResponse(JsonObject responseJson, Session session) {
         final Problem problem = ProblemCollection.INSTANCE.generateProblem(session);
         session.setCurrentProblem(problem);
         responseJson.addProperty("text", problem.getText());
+        addProblemButtons(responseJson);
         if (problem.getTTS() != null) {
             responseJson.addProperty("tts", problem.getTTS());
         }
+    }
+
+    private void addProblemButtons(JsonObject responseJson) {
+        final JsonArray buttons = new JsonArray();
+        buttons.add(createButton("Повторить"));
+        buttons.add(createButton("Подсказка"));
+        buttons.add(createButton("Сказать ответ"));
+        responseJson.add("buttons", buttons);
     }
 
     private Problem.Difficulty parseDifficulty(String command) {
@@ -184,6 +228,7 @@ public class MainServlet extends HttpServlet {
     private JsonObject createButton(String title) {
         final JsonObject buttonJson = new JsonObject();
         buttonJson.addProperty("title", title);
+        buttonJson.addProperty("hide", true);
         return buttonJson;
     }
 

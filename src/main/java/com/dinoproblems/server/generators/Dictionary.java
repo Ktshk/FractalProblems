@@ -10,7 +10,7 @@ import static com.dinoproblems.server.generators.GeneratorUtils.Gender.NEUTER;
 public class Dictionary {
     final static Noun ORANGE = new Noun("апельсин", "апельсина", "апельсинов", "апельсины", MASCULINE);
     final static Noun BANANA = new Noun("банан", "банана", "бананов", "бананы", MASCULINE);
-    final static Noun SHOE = new Noun("ботинок", "ботинка", "ботинок", "бьотинки", MASCULINE);
+    final static Noun SHOE = new Noun("ботинок", "ботинка", "ботинок", "ботинки", MASCULINE);
     final static Noun PEAR = new Noun("груша", "груши", "груш", "груши", FEMININE);
     final static Noun GIRL = new Noun("девочка", "девочки", "девочек", "девочки", FEMININE);
     final static Adjective YELLOW = new Adjective("жёлтый", "жёлтая", "жёлтое", "жёлтых", "жёлтого", "жёлтой", "жёлтые");
