@@ -35,9 +35,8 @@ public class SnailGenerator implements ProblemGenerator {
         int d = difficulty == Problem.Difficulty.EASY ? randomInt(2, 5) :
                 randomInt(3, 6);
         int n = randomInt(1, d);
-        int h = difficulty == Problem.Difficulty.EASY ? (randomInt(3, 6) * (d - n) + d) :
-                randomInt(4, 8) * (d - n) + randomInt(0, d);
-        int answer = (h - n - 1) / (d - n) + 1;
+        int answer = difficulty == Problem.Difficulty.EASY ? randomInt(4, 7) : randomInt(5, 11);
+        int h = answer * (d - n) + 2 * n - d + 1 + (difficulty == Problem.Difficulty.EASY ? (d - n - 1) : randomInt(0, d - n));
         String text = heroes[hero] + " ползет по " + trees[tree] + " высотой " + getMetersString(h) + ". "
                 + "За день " + (hero == 0 ? "она" : "он") + " поднимается на " + getMetersString(d) + ", а за ночь опускается на " + getMetersString(n) + ". "
                 + "Сколько дней " + (hero == 0 ? "ей" : "ему") + " потребуется, чтобы подняться на вершину?";
