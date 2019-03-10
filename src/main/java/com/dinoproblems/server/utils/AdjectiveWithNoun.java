@@ -1,4 +1,4 @@
-package com.dinoproblems.server.generators;
+package com.dinoproblems.server.utils;
 
 /**
  * Created by Katushka on 27.02.2019.
@@ -40,5 +40,20 @@ public class AdjectiveWithNoun implements AbstractNoun {
     @Override
     public String getPluralForm() {
         return adjective.getPluralForm() + " " + noun.getPluralForm();
+    }
+
+    @Override
+    public String getInstrumentalForm() {
+        return adjective.getInstrumentalForm(noun.getGender()) + " " + noun.getInstrumentalForm();
+    }
+
+    @Override
+    public String getAccusativeForm() {
+        return adjective.getAccusativeForm(noun.getGender()) + " " + noun.getAccusativeForm();
+    }
+
+    @Override
+    public String getAccusativePluralForm() {
+        return (noun.getPluralForm() != null ? getPluralForm() : getAccusativeForm());
     }
 }

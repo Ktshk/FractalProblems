@@ -21,6 +21,7 @@ public class ProblemCollection {
     public static final String WITH_CLOSED_EYES = "With closed eyes";
     public static final String AT_LEAST_ONE_FOUND = "At least one found";
     public static final String FROM_END_TO_BEGIN ="From end to begin";
+    public static final String EILER_CIRCLES ="Eiler Circles";
 
     private Map<String, ProblemGenerator> generators = new HashMap<>();
     private Table<Problem.Difficulty, String, ProblemGenerator> availableGeneratorsPerDifficulty = HashBasedTable.create();
@@ -33,6 +34,7 @@ public class ProblemCollection {
         generators.put(WITH_CLOSED_EYES, new WithClosedEyesGenerator());
         generators.put(AT_LEAST_ONE_FOUND, new FoundAtLeastOneGenerator());
         generators.put(FROM_END_TO_BEGIN,new FromEndToBeginGenerator());
+        generators.put(EILER_CIRCLES, new EilerCirclesGenerator());
 
         for (Map.Entry<String, ProblemGenerator> problemGeneratorEntry : generators.entrySet()) {
             final ProblemGenerator problemGenerator = problemGeneratorEntry.getValue();

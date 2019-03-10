@@ -3,13 +3,14 @@ package com.dinoproblems.server.generators;
 import com.dinoproblems.server.Problem;
 import com.dinoproblems.server.ProblemGenerator;
 import com.dinoproblems.server.ProblemWithPossibleTextAnswers;
+import com.dinoproblems.server.utils.*;
 import com.google.common.collect.Sets;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import static com.dinoproblems.server.ProblemCollection.AT_LEAST_ONE_FOUND;
-import static com.dinoproblems.server.generators.GeneratorUtils.*;
+import static com.dinoproblems.server.utils.GeneratorUtils.*;
 
 /**
  * Created by Katushka on 27.02.2019.
@@ -29,8 +30,8 @@ public class FoundAtLeastOneGenerator implements ProblemGenerator {
         int scenario = randomInt(0, 5);
         Noun[] things = {Dictionary.FLOWER, Dictionary.FRUIT, Dictionary.CANDY, Dictionary.BALL, Dictionary.CHILD};
         AbstractNoun[][] particularThings = {{Dictionary.TULIP, Dictionary.ROSE, Dictionary.DAFFODIL, Dictionary.CAMOMILE},
-                {Dictionary.APPLE, Dictionary.PEAR, Dictionary.ORANGE, Dictionary.BANANA},
-                {Dictionary.CHOCOLATE_CANDY, Dictionary.JELLY_CANDY, Dictionary.LOLLIPOP},
+                Dictionary.FRUITS,
+                Dictionary.CANDIES,
                 {new AdjectiveWithNoun(Dictionary.RED, Dictionary.BALL), new AdjectiveWithNoun(Dictionary.GREEN, Dictionary.BALL), new AdjectiveWithNoun(Dictionary.BLUE, Dictionary.BALL), new AdjectiveWithNoun(Dictionary.YELLOW, Dictionary.BALL)},
                 {Dictionary.BOY, Dictionary.GIRL}};
         AbstractNoun[] chosenParticularThings = chooseRandom(particularThings[scenario], 2, AbstractNoun[]::new);

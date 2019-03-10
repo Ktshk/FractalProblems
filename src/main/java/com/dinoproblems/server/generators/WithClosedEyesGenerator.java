@@ -3,6 +3,10 @@ package com.dinoproblems.server.generators;
 import com.dinoproblems.server.Problem;
 import com.dinoproblems.server.ProblemGenerator;
 import com.dinoproblems.server.ProblemWithPossibleTextAnswers;
+import com.dinoproblems.server.utils.Adjective;
+import com.dinoproblems.server.utils.AdjectiveWithNoun;
+import com.dinoproblems.server.utils.GeneratorUtils;
+import com.dinoproblems.server.utils.Noun;
 import com.google.common.collect.Sets;
 
 import java.util.HashSet;
@@ -10,10 +14,10 @@ import java.util.Set;
 import java.util.stream.IntStream;
 
 import static com.dinoproblems.server.ProblemCollection.WITH_CLOSED_EYES;
-import static com.dinoproblems.server.generators.Dictionary.*;
-import static com.dinoproblems.server.generators.GeneratorUtils.Gender.MASCULINE;
-import static com.dinoproblems.server.generators.GeneratorUtils.getNumWithString;
-import static com.dinoproblems.server.generators.GeneratorUtils.randomInt;
+import static com.dinoproblems.server.utils.Dictionary.*;
+import static com.dinoproblems.server.utils.GeneratorUtils.Gender.MASCULINE;
+import static com.dinoproblems.server.utils.GeneratorUtils.getNumWithString;
+import static com.dinoproblems.server.utils.GeneratorUtils.randomInt;
 
 /**
  * Created by Katushka on 27.02.2019.
@@ -128,7 +132,7 @@ public class WithClosedEyesGenerator implements ProblemGenerator {
                     }
                     answer += question;
                     hint = "Если сначала нам не повезет, мы будем вытаскивать шары других цветов. " +
-                            "Но в когда-то нам точно должен попасться " + chosenColors[question].getNominativeNeuter() + ". ";
+                            "Но в когда-то нам точно должен попасться " + chosenColors[questionColor].getNominativeNeuter() + ". ";
                 }
                 possibleTextAnswers.add(getNumWithString(answer, things[thing]));
             } else {

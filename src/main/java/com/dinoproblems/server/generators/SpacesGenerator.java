@@ -1,14 +1,15 @@
 package com.dinoproblems.server.generators;
 
 import com.dinoproblems.server.*;
+import com.dinoproblems.server.utils.GeneratorUtils;
 import com.google.common.collect.Sets;
 
 import java.util.Set;
 
-import static com.dinoproblems.server.generators.GeneratorUtils.*;
-import static com.dinoproblems.server.generators.GeneratorUtils.Case.ACCUSATIVE;
-import static com.dinoproblems.server.generators.GeneratorUtils.Gender.FEMININE;
-import static com.dinoproblems.server.generators.GeneratorUtils.Gender.MASCULINE;
+import static com.dinoproblems.server.utils.GeneratorUtils.*;
+import static com.dinoproblems.server.utils.GeneratorUtils.Case.ACCUSATIVE;
+import static com.dinoproblems.server.utils.GeneratorUtils.Gender.FEMININE;
+import static com.dinoproblems.server.utils.GeneratorUtils.Gender.MASCULINE;
 
 /**
  * Created by Katushka on 24.02.2019.
@@ -150,14 +151,14 @@ public class SpacesGenerator implements ProblemGenerator {
                 if (question == 0) {
                     text = "Забор крепится на столбы через каждые " + getMetersString(meters) + ". " +
                             "Сколько нужно врыть столбов, чтобы установить забор длиной " +
-                            GeneratorUtils.getMetersString(spaces * meters) + "?";
+                            getMetersString(spaces * meters) + "?";
                     answer = pieces;
                     possibleTextAnswers = Sets.newHashSet(postsString);
                 } else {
                     text = "Забор крепится на столбы через каждые " + getMetersString(meters) + ". " +
                             "Какой длины забор, если в нем " + postsString + "?";
                     answer = spaces * meters;
-                    possibleTextAnswers = Sets.newHashSet(GeneratorUtils.getMetersString(spaces * meters));
+                    possibleTextAnswers = Sets.newHashSet(getMetersString(spaces * meters));
                 }
                 hint = "Нарисуйте картинку. Сколько промежутков между столбами? Помните, каждый промежуток - это " + getMetersString(meters) + ".";
             }

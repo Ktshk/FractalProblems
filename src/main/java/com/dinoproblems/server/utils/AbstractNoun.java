@@ -1,4 +1,4 @@
-package com.dinoproblems.server.generators;
+package com.dinoproblems.server.utils;
 
 /**
  * Created by Katushka on 27.02.2019.
@@ -16,4 +16,11 @@ public interface AbstractNoun {
     String getCountingForm();
 
     String getPluralForm();
+
+    String getInstrumentalForm();
+
+    String getAccusativeForm();
+
+    String getAccusativePluralForm();
+
 }

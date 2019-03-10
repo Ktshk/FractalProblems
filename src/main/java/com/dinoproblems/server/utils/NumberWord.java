@@ -1,4 +1,4 @@
-package com.dinoproblems.server.generators;
+package com.dinoproblems.server.utils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -64,7 +64,7 @@ public enum NumberWord {
         return cases.get(GeneratorUtils.Case.GENITIVE);
     }
 
-    static String getStringForNumber(int number, GeneratorUtils.Gender gender, GeneratorUtils.Case wordCase) {
+    public static String getStringForNumber(int number, GeneratorUtils.Gender gender, GeneratorUtils.Case wordCase) {
         if (number >= 200) {
             throw new IllegalArgumentException();
         }

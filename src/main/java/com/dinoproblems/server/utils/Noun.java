@@ -1,4 +1,4 @@
-package com.dinoproblems.server.generators;
+package com.dinoproblems.server.utils;
 
 /**
  * Created by Katushka on 27.02.2019.
@@ -10,13 +10,43 @@ public class Noun implements AbstractNoun {
     private final String genitive;
     private final String countingForm;
     private final String pluralForm;
+    private final String instrumentalForm; // творительный падеж
+    private final String accusativeForm;
+    private final String accusativePluralForm;
 
-    public Noun(String nominative, String genitive, String countingForm, String pluralForm, GeneratorUtils.Gender gender) {
+    Noun(String nominative, String genitive, String countingForm, String pluralForm, GeneratorUtils.Gender gender) {
         this.gender = gender;
         this.nominative = nominative;
         this.genitive = genitive;
         this.countingForm = countingForm;
         this.pluralForm = pluralForm;
+        this.instrumentalForm = null;
+        this.accusativeForm = null;
+        this.accusativePluralForm = null;
+    }
+
+    public Noun(GeneratorUtils.Gender gender, String nominative, String genitive, String countingForm, String pluralForm, String instrumentalForm, String accusativeForm, String accusativePluralForm) {
+        this.gender = gender;
+        this.nominative = nominative;
+        this.genitive = genitive;
+        this.countingForm = countingForm;
+        this.pluralForm = pluralForm;
+        this.instrumentalForm = instrumentalForm;
+        this.accusativeForm = accusativeForm;
+        this.accusativePluralForm = accusativePluralForm;
+    }
+
+    public String getInstrumentalForm() {
+        return instrumentalForm;
+    }
+
+    public String getAccusativeForm() {
+        return accusativeForm;
+    }
+
+    @Override
+    public String getAccusativePluralForm() {
+        return accusativePluralForm != null ? accusativePluralForm : (pluralForm != null ? pluralForm : accusativeForm);
     }
 
     @Override

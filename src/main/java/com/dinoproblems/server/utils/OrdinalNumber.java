@@ -1,4 +1,4 @@
-package com.dinoproblems.server.generators;
+package com.dinoproblems.server.utils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +36,7 @@ public class OrdinalNumber extends Adjective {
         numbers.put(num, this);
     }
 
-    static OrdinalNumber number(int num) {
+    public static OrdinalNumber number(int num) {
         return numbers.get(num);
     }
 }

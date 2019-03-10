@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import static com.dinoproblems.server.generators.GeneratorUtils.randomInt;
+import static com.dinoproblems.server.utils.GeneratorUtils.randomInt;
 
 /**
  * Created by Katushka on 07.01.2019.

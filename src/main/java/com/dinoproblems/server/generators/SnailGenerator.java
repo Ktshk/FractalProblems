@@ -1,14 +1,16 @@
 package com.dinoproblems.server.generators;
 
 import com.dinoproblems.server.*;
+import com.dinoproblems.server.utils.GeneratorUtils;
+import com.dinoproblems.server.utils.OrdinalNumber;
 import com.google.common.collect.Sets;
 
 import java.util.Set;
 
-import static com.dinoproblems.server.generators.GeneratorUtils.Gender.FEMININE;
-import static com.dinoproblems.server.generators.GeneratorUtils.Gender.MASCULINE;
-import static com.dinoproblems.server.generators.GeneratorUtils.getNumWithString;
-import static com.dinoproblems.server.generators.GeneratorUtils.randomInt;
+import static com.dinoproblems.server.utils.GeneratorUtils.Gender.FEMININE;
+import static com.dinoproblems.server.utils.GeneratorUtils.Gender.MASCULINE;
+import static com.dinoproblems.server.utils.GeneratorUtils.getNumWithString;
+import static com.dinoproblems.server.utils.GeneratorUtils.randomInt;
 
 /**
  * Created by Katushka on 15.02.2019.
@@ -40,8 +42,8 @@ public class SnailGenerator implements ProblemGenerator {
         String text = heroes[hero] + " ползет по " + trees[tree] + " высотой " + getMetersString(h) + ". "
                 + "За день " + (hero == 0 ? "она" : "он") + " поднимается на " + getMetersString(d) + ", а за ночь опускается на " + getMetersString(n) + ". "
                 + "Сколько дней " + (hero == 0 ? "ей" : "ему") + " потребуется, чтобы подняться на вершину?";
-        hint = "Посчитайте, где будет " + heroesLowCase[hero] + " вечером на " + OrdinalNumber.number(n-1).getNominativeMasculine() + " день," +
-                "  и где " + (hero == 0 ? "она" : "он") + " будет утром после " + OrdinalNumber.number(n-1).getGenitiveForm(FEMININE) + " ночи. ";
+        hint = "Посчитайте, где будет " + heroesLowCase[hero] + " вечером на " + OrdinalNumber.number(answer - 1).getNominativeMasculine() + " день," +
+                "  и где " + (hero == 0 ? "она" : "он") + " будет утром после " + OrdinalNumber.number(answer - 1).getGenitiveForm(FEMININE) + " ночи. ";
         return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.SNAIL, Sets.newHashSet(GeneratorUtils.getNumWithString(answer, "день", "дня", "дней", MASCULINE)), hint);
     }
 

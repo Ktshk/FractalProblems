@@ -1,4 +1,6 @@
-package com.dinoproblems.server.generators;
+package com.dinoproblems.server.utils;
+
+import com.dinoproblems.server.utils.GeneratorUtils;
 
 /**
  * Created by Katushka on 27.02.2019.
@@ -63,5 +65,15 @@ public class Adjective {
                 return getNominativeNeuter();
         }
         throw new IllegalArgumentException();
+    }
+
+    public String getAccusativeForm(GeneratorUtils.Gender gender) {
+        // TODO: implement
+        return getNominative(gender);
+    }
+
+    public String getInstrumentalForm(GeneratorUtils.Gender gender) {
+        // TODO: implement
+        return getGenitiveForm(gender);
     }
 }

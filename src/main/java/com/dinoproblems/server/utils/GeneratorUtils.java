@@ -1,23 +1,23 @@
-package com.dinoproblems.server.generators;
+package com.dinoproblems.server.utils;
 
 import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 
-import static com.dinoproblems.server.generators.GeneratorUtils.Gender.MASCULINE;
-import static com.dinoproblems.server.generators.NumberWord.getStringForNumber;
+import static com.dinoproblems.server.utils.GeneratorUtils.Gender.MASCULINE;
+import static com.dinoproblems.server.utils.NumberWord.getStringForNumber;
 
 /**
  * Created by Katushka on 10.02.2019.
  */
 public class GeneratorUtils {
-    enum Gender {
+    public enum Gender {
         MASCULINE,
         FEMININE,
         NEUTER
     }
 
-    enum Case {
+    public enum Case {
         NOMINATIVE,
         GENITIVE,
         ACCUSATIVE
@@ -35,23 +35,23 @@ public class GeneratorUtils {
 
     }
 
-    static String getMetersString(int meters) {
+    public static String getMetersString(int meters) {
         return getNumWithString(meters, "метр", "метра", "метров", MASCULINE);
     }
 
-    static String getNumWithString(int count, final String one, final String lessThanFive, final String moreThanFive, Gender gender) {
+    public static String getNumWithString(int count, final String one, final String lessThanFive, final String moreThanFive, Gender gender) {
         return getNumWithString(count, one, lessThanFive, moreThanFive, gender, Case.NOMINATIVE);
     }
 
-    static String getNumWithString(int count, AbstractNoun noun) {
+    public static String getNumWithString(int count, AbstractNoun noun) {
         return getNumWithString(count, noun.getNominative(), noun.getCountingGenitive(), noun.getCountingForm(), noun.getGender(), Case.NOMINATIVE);
     }
 
-    static String getNumWithString(int count, final String[] wordForms, Gender gender) {
+    public static String getNumWithString(int count, final String[] wordForms, Gender gender) {
         return getNumWithString(count, wordForms[0], wordForms[1], wordForms[2], gender, Case.NOMINATIVE);
     }
 
-    static String getNumWithString(int count, final String one, final String lessThanFive, final String moreThanFive, Gender gender, Case wordCase) {
+    public static String getNumWithString(int count, final String one, final String lessThanFive, final String moreThanFive, Gender gender, Case wordCase) {
         if (count >= 5 && count <= 20) {
             return count + " " + moreThanFive;
         } else {
@@ -77,11 +77,11 @@ public class GeneratorUtils {
         return ThreadLocalRandom.current().nextInt(origin, bound);
     }
 
-    static String[] chooseRandomString(String[] array, int count) {
+    public static String[] chooseRandomString(String[] array, int count) {
         return chooseRandom(array, count, String[]::new);
     }
 
-    static <T> T[] chooseRandom(T[] array, int count, Function<Integer, T[]> arrayConstructor) {
+    public static <T> T[] chooseRandom(T[] array, int count, Function<Integer, T[]> arrayConstructor) {
         T[] arrayCopy = Arrays.copyOf(array, array.length);
 
         final T[] result = arrayConstructor.apply(count);

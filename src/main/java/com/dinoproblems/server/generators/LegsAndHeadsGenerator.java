@@ -1,15 +1,16 @@
 package com.dinoproblems.server.generators;
 
 import com.dinoproblems.server.*;
+import com.dinoproblems.server.utils.GeneratorUtils;
 import com.google.common.collect.Sets;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.dinoproblems.server.generators.GeneratorUtils.Gender.FEMININE;
-import static com.dinoproblems.server.generators.GeneratorUtils.Gender.MASCULINE;
-import static com.dinoproblems.server.generators.GeneratorUtils.getNumWithString;
-import static com.dinoproblems.server.generators.GeneratorUtils.randomInt;
+import static com.dinoproblems.server.utils.GeneratorUtils.Gender.FEMININE;
+import static com.dinoproblems.server.utils.GeneratorUtils.Gender.MASCULINE;
+import static com.dinoproblems.server.utils.GeneratorUtils.getNumWithString;
+import static com.dinoproblems.server.utils.GeneratorUtils.randomInt;
 
 /**
  * Created by Katushka on 10.02.2019.
