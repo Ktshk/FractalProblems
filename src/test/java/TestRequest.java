@@ -19,17 +19,66 @@ import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
+//добавление генерации случайного сессионного ключа для каждого запроса 07.03.19
+import java.security.SecureRandom;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Random;
+import java.util.UUID;
+
+/*public class RandomString {
+    public static final String upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    public static final String lower = upper.toLowerCase(Locale.ROOT);
+    public static final String digits = "0123456789";
+    public static final String alphanum = upper + lower + digits;
+    private final Random random;
+    private final char[] symbols;
+    private final char[] buf;
+
+    //генерация строки
+    public String nextString()
+    {
+        for (int i = 0; i < buf.length; i++)
+            buf[i] = symbols[random.nextInt(symbols.length)];
+        return new String(buf);
+    }
+    //заполнение итоговой строки сгенерированными строками
+    public RandomString(int length, Random random, String symbols)
+    {
+        if(length<1) throw new IllegalArgumentException();
+        if(symbols.length()<2) throw new IllegalArgumentException();
+        this.random=Objects.requireNonNull(random);
+        this.symbols=symbols.toCharArray();
+        this.buf=new char[length];
+    }
+    //создание генератора буквенно-числовой строки
+    public RandomString(int length, Random random)
+    {
+        this(length, random, alphanum);
+    }
+    //создание буквенно-числовой строки с помощью безопасного генератора
+    public RandomString(int length)
+    {
+        this(length, new SecureRandom());
+    }
+    public RandomString()
+    {
+        this(21);
+    }
+}*/
+
 /**
  * Created by Katushka on 05.02.2019.
  */
 public class TestRequest {
+
 
     public static final String ELASTICBEANSTALK_URL = "helloworld-env-1.ha4x2kktxp.us-east-2.elasticbeanstalk.com/demo";
 
     @Ignore
     @Test
     public void testLocalHttpRequest() {
-        makeHttpRequest("http://localhost:8080/demo");
+        makeHttpRequest("http://localhost:8080/Alisa_war/demo");
     }
 
     @Ignore
@@ -150,7 +199,8 @@ public class TestRequest {
                 "  \"session\": {\n" +
                 "    \"message_id\": 3,\n" +
                 "    \"new\": " + text.isEmpty() + ",\n" +
-                "    \"session_id\": \"e58cb037-712e3090-33e4d929-cca75a07\",\n" +
+               //"    \"session_id\": \"e58cb037-712e3090-33e4d929-cca75a07\",\n" +
+               "    \"session_id\": \""+ UUID.randomUUID().toString() +"\",\n" +
                 "    \"skill_id\": \"f99fbe77-b15a-4c5f-91a7-ab2595febe32\",\n" +
                 "    \"user_id\": \"AA23058EB00BD2097FAE781A72ABF8AB303994B20C8DB2D0E281FA101296A015\"\n" +
                 "  },\n" +

@@ -20,20 +20,22 @@ public class ProblemCollection {
     public static final String SPACES = "Spaces";
     public static final String WITH_CLOSED_EYES = "With closed eyes";
     public static final String AT_LEAST_ONE_FOUND = "At least one found";
-    public static final String FROM_END_TO_BEGIN ="From end to begin";
-    public static final String EILER_CIRCLES ="Eiler Circles";
+    public static final String FROM_END_TO_BEGIN = "From end to begin";
+    public static final String SUM_DIFFERENCE = "Sum difference";
+    public static final String EILER_CIRCLES = "Eiler Circles";
 
     private Map<String, ProblemGenerator> generators = new HashMap<>();
     private Table<Problem.Difficulty, String, ProblemGenerator> availableGeneratorsPerDifficulty = HashBasedTable.create();
 
     private ProblemCollection() {
+        generators.put(SUM_DIFFERENCE, new SumDifferenceGenerator());
         generators.put(LEGS_AND_HEADS, new LegsAndHeadsGenerator());
         generators.put(BRICK_AND_HALF, new BrickAndHalfGenerator());
         generators.put(SNAIL, new SnailGenerator());
         generators.put(SPACES, new SpacesGenerator());
         generators.put(WITH_CLOSED_EYES, new WithClosedEyesGenerator());
         generators.put(AT_LEAST_ONE_FOUND, new FoundAtLeastOneGenerator());
-        generators.put(FROM_END_TO_BEGIN,new FromEndToBeginGenerator());
+        generators.put(FROM_END_TO_BEGIN, new FromEndToBeginGenerator());
         generators.put(EILER_CIRCLES, new EilerCirclesGenerator());
 
         for (Map.Entry<String, ProblemGenerator> problemGeneratorEntry : generators.entrySet()) {
@@ -64,7 +66,7 @@ public class ProblemCollection {
         Iterator<Map.Entry<String, Double>> iterator = minValues.iterator();
         Map.Entry<String, Double> entry = iterator.next();
         for (int i = 0; iterator.hasNext() && i < ind; i++) {
-           entry = iterator.next();
+            entry = iterator.next();
         }
         return generators.get(entry.getKey()).generateProblem(session.getCurrentDifficulty());
     }
