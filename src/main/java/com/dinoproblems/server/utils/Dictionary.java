@@ -42,13 +42,14 @@ public class Dictionary {
 
     public static final AbstractNoun[] FRUITS = {APPLE, PEAR, ORANGE, BANANA};
     public static final AbstractNoun[] CANDIES = {CHOCOLATE_CANDY, JELLY_CANDY, LOLLIPOP};
-    public static final AbstractNoun[] SUBJECTS = {MUSIC, BIOLOGY, MATH, SPORT, PHYSICS, CHEMISTRY, HISTORY};
+    public static final AbstractNoun[] SUBJECTS = {MUSIC, BIOLOGY, MATH, PHYSICS, CHEMISTRY, HISTORY};
 
     public final static Adjective YELLOW = new Adjective("жёлтый", "жёлтая", "жёлтое", "жёлтых", "жёлтого", "жёлтой", "жёлтые");
     public final static Adjective GREEN = new Adjective("зелёный", "зелёная", "зелёное", "зелёных", "зелёного", "зелёной", "зелёные");
     public final static Adjective RED = new Adjective("красный", "красная", "красное", "красных", "красного", "красной", "красные");
     public final static Adjective BLUE = new Adjective("синий", "синяя", "синее", "синих", "синего", "синей", "синие");
     public final static Adjective BLACK = new Adjective("чёрный", "чёрная", "чёрное", "чёрных", "чёрного", "чёрной", "чёрные");
+
 
 
     private Dictionary() {
