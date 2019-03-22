@@ -27,6 +27,7 @@ import static com.dinoproblems.server.utils.GeneratorUtils.randomInt;
 public class MainServlet extends HttpServlet {
 
     private Map<String, Session> currentProblems = new HashMap<>();
+
     private Set<String> yesAnswers = Sets.newHashSet("да", "давай", "ну давай", "хочу", "валяй", "можно", "ага", "угу");
     private Set<String> noAnswers = Sets.newHashSet("нет", "не хочу", "хватит", "не надо");
     private Set<String> endSessionAnswers = Sets.newHashSet("хватит", "больше не хочу", "давай закончим", "надоело");
@@ -42,7 +43,11 @@ public class MainServlet extends HttpServlet {
             "Задача не из простых, но я могу помочь", "Я могу подсказать."};
     private String[] almost = {"Почти.", "Почти верно.", "Близко, но нет."};
 
+
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        final DataBaseService dataBaseService = DataBaseService.INSTANCE;
+
         response.setContentType("application/json; charset=UTF-8");
         response.setCharacterEncoding("UTF-8");
 
