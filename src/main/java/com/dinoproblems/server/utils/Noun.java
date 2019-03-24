@@ -1,5 +1,7 @@
 package com.dinoproblems.server.utils;
 
+import java.util.Objects;
+
 /**
  * Created by Katushka on 27.02.2019.
  */
@@ -96,7 +98,7 @@ public class Noun implements AbstractNoun {
 
         Noun noun = (Noun) o;
 
-        return nominative != null ? nominative.equals(noun.nominative) : noun.nominative == null;
+        return Objects.equals(nominative, noun.nominative);
     }
 
     @Override
