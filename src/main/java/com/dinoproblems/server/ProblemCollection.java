@@ -24,21 +24,23 @@ public class ProblemCollection {
     public static final String SUM_DIFFERENCE = "Sum difference";
     public static final String EILER_CIRCLES = "Eiler Circles";
     public static final String SEQUENCE="Sequence";
+    public static final String RANGE = "Range";
 
     private Map<String, ProblemGenerator> generators = new HashMap<>();
     private Table<Problem.Difficulty, String, ProblemGenerator> availableGeneratorsPerDifficulty = HashBasedTable.create();
 
     private ProblemCollection() {
-      //  generators.put(SUM_DIFFERENCE, new SumDifferenceGenerator());
-        //generators.put(LEGS_AND_HEADS, new LegsAndHeadsGenerator());
-        //generators.put(BRICK_AND_HALF, new BrickAndHalfGenerator());
-        //generators.put(SNAIL, new SnailGenerator());
-        //generators.put(SPACES, new SpacesGenerator());
-        //generators.put(WITH_CLOSED_EYES, new WithClosedEyesGenerator());
-        //generators.put(AT_LEAST_ONE_FOUND, new FoundAtLeastOneGenerator());
-        //generators.put(FROM_END_TO_BEGIN, new FromEndToBeginGenerator());
-        //generators.put(EILER_CIRCLES, new EilerCirclesGenerator());
-       generators.put(SEQUENCE,new SequenceGenerator());
+        generators.put(SUM_DIFFERENCE, new SumDifferenceGenerator());
+        generators.put(LEGS_AND_HEADS, new LegsAndHeadsGenerator());
+        generators.put(BRICK_AND_HALF, new BrickAndHalfGenerator());
+        generators.put(SNAIL, new SnailGenerator());
+        generators.put(SPACES, new SpacesGenerator());
+        generators.put(WITH_CLOSED_EYES, new WithClosedEyesGenerator());
+        generators.put(AT_LEAST_ONE_FOUND, new FoundAtLeastOneGenerator());
+        generators.put(FROM_END_TO_BEGIN, new FromEndToBeginGenerator());
+        generators.put(EILER_CIRCLES, new EilerCirclesGenerator());
+        generators.put(SEQUENCE,new SequenceGenerator());
+        generators.put(RANGE,new RangeGenerator());
 
         for (Map.Entry<String, ProblemGenerator> problemGeneratorEntry : generators.entrySet()) {
             final ProblemGenerator problemGenerator = problemGeneratorEntry.getValue();

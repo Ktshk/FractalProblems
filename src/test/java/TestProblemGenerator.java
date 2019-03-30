@@ -1,5 +1,5 @@
 import com.dinoproblems.server.Problem;
-import com.dinoproblems.server.generators.EilerCirclesGenerator;
+import com.dinoproblems.server.generators.RangeGenerator;
 import org.junit.Test;
 
 import java.util.Set;
@@ -9,7 +9,7 @@ import java.util.Set;
  */
 public class TestProblemGenerator {
 
-    public static final EilerCirclesGenerator GENERATOR = new EilerCirclesGenerator();
+    public static final RangeGenerator GENERATOR = new RangeGenerator();
 
     @Test
     public void testGenerateProblem() {

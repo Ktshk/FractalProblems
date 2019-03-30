@@ -9,6 +9,7 @@ import com.google.common.collect.Sets;
 import java.util.Set;
 import com.dinoproblems.server.utils.*;
 import static com.dinoproblems.server.ProblemCollection.RANGE;
+import static com.dinoproblems.server.utils.GeneratorUtils.Gender.MASCULINE;
 import static com.dinoproblems.server.utils.GeneratorUtils.Gender.FEMININE;
 import static com.dinoproblems.server.utils.GeneratorUtils.Gender.NEUTER;
 import static com.dinoproblems.server.utils.GeneratorUtils.getNumWithString;
@@ -80,7 +81,7 @@ public class RangeGenerator implements ProblemGenerator {
 			first = difficulty == EASY ? randomInt(10, 20) : randomInt(10, 15);
 			second = difficulty == EASY ? randomInt(1, 6) : randomInt(10, 18);
 			ANSWER = 31 - first + second + 1;
-			final String daysWithText = getNumWithString(ANSWER, "день", "дня", "дней", FEMININE);
+			final String daysWithText = getNumWithString(ANSWER, "день", "дня", "дней", MASCULINE);
 			possibleTextAnswers = Sets.newHashSet(daysWithText);
 			text = "На дверях библиотеки " + hero + " прочла: «С " + first + beginMonth + "по " + second + endMonth +
 					"библиотека не работает». Сколько дней отпуск у библиотекаря? (В месяце выхода в отпуск 31 день)";
