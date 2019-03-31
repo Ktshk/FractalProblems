@@ -31,6 +31,7 @@ public class Dictionary {
     public final static Noun ROSE = new NounBuilder().nom("роза").gen("розы").counting("роз").plural("розы").gender(FEMININE).createNoun();
     public final static Noun CAMOMILE = new NounBuilder().nom("ромашка").gen("ромашки").counting("ромашек").plural("ромашки").gender(FEMININE).createNoun();
     public final static Noun SPORT = new NounBuilder().nom("спорт").gen("спорта").instr("спортом").acc("спорт").gender(MASCULINE).createNoun();
+    public final static Noun PAGE = new NounBuilder().nom("страница").gen("страницы").instr("страницей").acc("страницу").counting("страниц").gender(MASCULINE).createNoun();
     public final static Noun TULIP = new NounBuilder().nom("тюльпан").gen("тюльпана").counting("тюльпанов").plural("тюльпаны").gender(MASCULINE).createNoun();
     public final static Noun STUDENT = new NounBuilder().nom("ученик").gen("ученика").counting("учеников").plural("ученики").gender(MASCULINE).createNoun();
     public final static Noun PHYSICS = new NounBuilder().nom("физика").gen("физики").instr("физикой").acc("физику").gender(FEMININE).createNoun();

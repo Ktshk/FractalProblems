@@ -47,6 +47,10 @@ public class GeneratorUtils {
         return getNumWithString(count, noun.getNominative(), noun.getCountingGenitive(), noun.getCountingForm(), noun.getGender(), Case.NOMINATIVE);
     }
 
+    public static String getNumWithString(int count, AbstractNoun noun, Case wordCase) {
+        return getNumWithString(count, noun.getNominative(), noun.getCountingGenitive(), noun.getCountingForm(), noun.getGender(), wordCase);
+    }
+
     public static String getNumWithString(int count, final String[] wordForms, Gender gender) {
         return getNumWithString(count, wordForms[0], wordForms[1], wordForms[2], gender, Case.NOMINATIVE);
     }
