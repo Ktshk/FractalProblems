@@ -89,7 +89,7 @@ public class RangeGenerator implements ProblemGenerator {
             hint = "Попробуйте из количества дней в" + monthsInstr[monthIndex] + "вычесть дату начала отпуска. " +
                     "Не забывайте, что день начала и день конца отпуска входят в количество дней в отпуске.";
         }
-        return new ProblemWithPossibleTextAnswers(text, first, RANGE, possibleTextAnswers, hint);
+        return new ProblemWithPossibleTextAnswers(text, answer, RANGE, possibleTextAnswers, hint);
     }
 
     @Override

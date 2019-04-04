@@ -36,6 +36,9 @@ public class MainServlet extends HttpServlet {
     private Set<String> askToRepeat = Sets.newHashSet("повтори", "повторить", "повтори задачу", "повтори условие");
     private String[] praises = {"Молодец!", "Это правильный ответ.", "Ну конечно! Так и есть.",
             "У вас отлично получается решать задачи.", "Я не сомневалась, что у вас получится.", "Правильно."};
+    private String[] soundPraises = {"<speaker audio=\"alice-sounds-game-8-bit-coin-1.opus\">",
+            "<speaker audio=\"alice-sounds-game-win-1.opus\">", "<speaker audio=\"alice-sounds-game-win-2.opus\">",
+            "<speaker audio=\"alice-sounds-game-win-3.opus\">"};//Попытка добавления звуков
     private String[] oneMoreQuestion = {"Хотите ещё задачу?", "Ещё задачу?", "Решаем дальше?",
             "Ещё одну?", "Давайте решим еще одну?"};
     private String[] wrongAnswer = {"Нет, это неверно.", "Неверно.", "Это неправильный ответ.", "Нет.", "Нет, это точно неправильно."};
@@ -180,6 +183,7 @@ public class MainServlet extends HttpServlet {
 
         if (correctAnswer) {
             responseJson.addProperty("text", chooseRandomElement(praises) + " " + chooseRandomElement(oneMoreQuestion));
+            responseJson.addProperty("tts", chooseRandomElement(soundPraises) + " " + responseJson.get("text")); //Попытка добавления звуков
             problem.setState(Problem.State.SOLVED);
             session.setCurrentProblem(null);
         } else {
