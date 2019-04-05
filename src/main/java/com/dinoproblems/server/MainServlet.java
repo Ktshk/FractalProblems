@@ -87,7 +87,7 @@ public class MainServlet extends HttpServlet {
             } else if (Objects.equals(command, "end session") ||
                     checkAnswer(command, endSessionAnswers) ||
                     (session.getCurrentProblem() == null && checkAnswer(command, noAnswers))) {
-                responseJson.addProperty("text", "Заходите еще");
+                responseJson.addProperty("text", "Заходите еще. "+session.getSessionResult());//итоговое сообщение пользователю
                 responseJson.addProperty("end_session", true);
                 result.add("response", responseJson);
             } else if (session.getCurrentProblem() == null && session.getCurrentDifficulty() == null) {

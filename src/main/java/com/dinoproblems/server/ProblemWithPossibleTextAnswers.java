@@ -14,6 +14,7 @@ public class ProblemWithPossibleTextAnswers implements Problem {
     private Set<String> possibleTextAnswers;
     private State state = State.NEW;
     private String hint;
+    private Difficulty difficulty=Difficulty.EASY;
 
     public ProblemWithPossibleTextAnswers(String text, int answer, String theme, Set<String> possibleTextAnswers, String hint) {
         this(text, null, answer, theme, possibleTextAnswers, hint);
@@ -64,6 +65,10 @@ public class ProblemWithPossibleTextAnswers implements Problem {
     @Override
     public State getState() {
         return state;
+    }
+    @Override
+    public Difficulty getDifficulty(){
+        return difficulty;
     }
 
     public void setState(State state) {

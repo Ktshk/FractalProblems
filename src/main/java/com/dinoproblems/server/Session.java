@@ -61,4 +61,7 @@ public class Session {
                 ", currentProblem=" + currentProblem +
                 '}';
     }
+    public SessionResult getSessionResult(){
+        return new SessionResult(solvedProblems);//должно быть TaskResult
+    }
 }

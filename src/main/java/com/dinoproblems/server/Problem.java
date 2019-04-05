@@ -34,7 +34,7 @@ public interface Problem {
         EASY, MEDIUM, HARD
     }
 
-    State getState();
-
+    State getState();//вынести в TaskResult с удалением из Problem
+    Difficulty getDifficulty();
     void setState(State newState);
 }
