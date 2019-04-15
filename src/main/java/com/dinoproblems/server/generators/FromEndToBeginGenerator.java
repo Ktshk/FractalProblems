@@ -1,29 +1,35 @@
 package com.dinoproblems.server.generators;
 
-import com.dinoproblems.server.Problem;
-import com.dinoproblems.server.ProblemCollection;
-import com.dinoproblems.server.ProblemGenerator;
-import com.dinoproblems.server.ProblemWithPossibleTextAnswers;
+import com.dinoproblems.server.*;
+import com.dinoproblems.server.Problem.Difficulty;
+import com.dinoproblems.server.utils.GeneratorUtils;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import javax.annotation.Nonnull;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
-import java.math.*;
+
 import static com.dinoproblems.server.utils.GeneratorUtils.randomInt;
-import static com.dinoproblems.server.Problem.Difficulty.EASY;
 
 /*
 Created by Simar 17.02.19
   */
 public class FromEndToBeginGenerator implements ProblemGenerator {
-    @Override
-    public Problem generateProblem(Problem.Difficulty difficulty) {
+    private static final ProblemScenario LILY_SCENARIO = new ProblemScenarioImpl(ProblemCollection.FROM_END_TO_BEGIN + "_LILY");
+    private static final ProblemScenario DEFAULT_SCENARIO = new ProblemScenarioImpl(ProblemCollection.FROM_END_TO_BEGIN + "_DEFAULT");
+    private static final ArrayList<ProblemScenario> SCENARIOS = Lists.newArrayList(DEFAULT_SCENARIO, LILY_SCENARIO);
 
-        //1-смешарики, 2-лилии
-        int type = ThreadLocalRandom.current().nextInt(1, 3);//определяется сложностью?
-       // int type=1;
-        int way = difficulty == Problem.Difficulty.EASY ? 1 : 2;//1-лёгкая, 2-сложная
+    @Nonnull
+    @Override
+    public Problem generateProblem(Difficulty difficulty, ProblemAvailability problemAvailability) {
+
+        ProblemScenario scenario = problemAvailability.getScenario();
+        // int type=1;
+        int way = difficulty == Difficulty.EASY ? 1 : 2;//1-лёгкая, 2-сложная
         //int way=1;
         int steps = 3;//кол-во действий
         //флаги арифметических действий:
@@ -45,7 +51,7 @@ public class FromEndToBeginGenerator implements ProblemGenerator {
         int token1 = ThreadLocalRandom.current().nextInt(0, 8);//выбор первого героя
         int token2 = ThreadLocalRandom.current().nextInt(0, 8);//выбор второго героя
         //int token3 = ThreadLocalRandom.current().nextInt(0, 5);//выбор первого вопроса
-        int token3=difficulty == Problem.Difficulty.EASY ? randomInt(0, 3)
+        int token3 = difficulty == Difficulty.EASY ? randomInt(0, 3)
                 : randomInt(3, 5);
         int answer = ThreadLocalRandom.current().nextInt(0, 100);//загаданное число
         final int secondoperand = ThreadLocalRandom.current().nextInt(10, 100);//операнд второго действия
@@ -80,140 +86,144 @@ public class FromEndToBeginGenerator implements ProblemGenerator {
                 "На который день покрылось цветами 10% озера?"};
         times = new String[]{" раз", " раза"};
         String choice;
-        String text = null;//итоговый текст задачи
+        String text;//итоговый текст задачи
         int i = 10;
-        String hint = "";
-        switch (type) {
-            case 1:
-                for (; ; ) {
-                    if (token1 != token2) break;
-                    else token2 = ThreadLocalRandom.current().nextInt(0, 8);
+        String hint;
+        if (scenario.equals(DEFAULT_SCENARIO)) {
+
+            for (; ; ) {
+                if (token1 != token2) break;
+                else token2 = ThreadLocalRandom.current().nextInt(0, 8);
+            }
+            BigInteger bigInteger = BigInteger.valueOf(answer);
+            boolean probablePrime = bigInteger.isProbablePrime((int) Math.log(answer));
+            if (probablePrime)//первое действие
+            {
+                if (token1 % 2 == 0) {
+                    actionnumber1 = answer * 2;
+                    actions[0] = 3;
+                    operands[0] = "два";
+                } else {
+                    actionnumber1 = answer * 3;
+                    actions[0] = 3;
+                    operands[0] = "три";
                 }
-                BigInteger bigInteger = BigInteger.valueOf(answer);
-                boolean probablePrime = bigInteger.isProbablePrime((int) Math.log(answer));
-                if (probablePrime == true)//первое действие
+            } else if (answer % 2 == 0) {
+                if (answer % 4 == 0) {
+                    actionnumber1 = answer / 4;
+                    actions[0] = 2;
+                    operands[0] = "четыре";
+                } else if (answer % 6 == 0) {
+                    actionnumber1 = answer / 6;
+                    actions[0] = 2;
+                    operands[0] = "шесть";
+                } else if (answer % 10 == 0) {
+                    actionnumber1 = answer / 10;
+                    actions[0] = 2;
+                    operands[0] = "десять";
+                } else {
+                    actionnumber1 = answer / 2;
+                    actions[0] = 2;
+                    operands[0] = "два";
+                }
+            } else {
+                if (answer % 3 == 0) {
+                    actionnumber1 = answer / 3;
+                    actions[0] = 2;
+                    operands[0] = "три";
+                } else if (answer % 5 == 0) {
+                    actionnumber1 = answer / 5;
+                    actions[0] = 2;
+                    operands[0] = "пять";
+                } else if (answer % 7 == 0) {
+                    actionnumber1 = answer / 7;
+                    actions[0] = 2;
+                    operands[0] = "семь";
+                }
+            }
+            if (actionnumber1 < secondoperand) {
+                actionnumber2 = actionnumber1 + secondoperand;
+                actions[1] = 0;
+                operands[1] = Integer.toString(secondoperand);
+            }//второе действие
+            else {
+                actionnumber2 = actionnumber1 - secondoperand;
+                actions[1] = 1;
+                operands[1] = Integer.toString(secondoperand);
+            }
+            if (way == 2) {
+                if (actionnumber2 > 99)//третье действие
                 {
-                    if (token1 % 2 == 0) {
-                        actionnumber1 = answer * 2;
-                        actions[0] = 3;
-                        operands[0] = "два";
-                    } else {
-                        actionnumber1 = answer * 3;
-                        actions[0] = 3;
-                        operands[0] = "три";
+                    for (; ; ) {
+                        if (actionnumber2 % i == 0) {
+                            actionnumber3 = actionnumber2 / i;
+                            actions[2] = 2;
+                            operands[2] = Integer.toString(i);
+                            break;
+                        } else if (i == 0) break;
+                        else i--;
                     }
-                } else if (answer % 2 == 0) {
-                    if (answer % 4 == 0) {
-                        actionnumber1 = answer / 4;
-                        actions[0] = 2;
-                        operands[0] = "четыре";
-                    } else if (answer % 6 == 0) {
-                        actionnumber1 = answer / 6;
-                        actions[0] = 2;
-                        operands[0] = "шесть";
-                    } else if (answer % 10 == 0) {
-                        actionnumber1 = answer / 10;
-                        actions[0] = 2;
-                        operands[0] = "десять";
-                    } else {
-                        actionnumber1 = answer / 2;
-                        actions[0] = 2;
-                        operands[0] = "два";
-                    }
+                } else if (actionnumber2 < 50) {
+                    actionnumber3 = actionnumber2 * 3;
+                    actions[2] = 5;
+                    operands[2] = " ";
                 } else {
-                    if (answer % 3 == 0) {
-                        actionnumber1 = answer / 3;
-                        actions[0] = 2;
-                        operands[0] = "три";
-                    } else if (answer % 5 == 0) {
-                        actionnumber1 = answer / 5;
-                        actions[0] = 2;
-                        operands[0] = "пять";
-                    } else if (answer % 7 == 0) {
-                        actionnumber1 = answer / 7;
-                        actions[0] = 2;
-                        operands[0] = "семь";
-                    }
+                    actionnumber3 = actionnumber2 * 2;
+                    actions[2] = 4;
+                    operands[2] = " ";
                 }
-                if (actionnumber1 < secondoperand) {
-                    actionnumber2 = actionnumber1 + secondoperand;
-                    actions[1] = 0;
-                    operands[1] = Integer.toString(secondoperand);
-                }//второе действие
-                else {
-                    actionnumber2 = actionnumber1 - secondoperand;
-                    actions[1] = 1;
-                    operands[1] = Integer.toString(secondoperand);
-                }
-                if (way == 2) {
-                    if (actionnumber2 > 99)//третье действие
-                    {
-                        for (; ; ) {
-                            if (actionnumber2 % i == 0) {
-                                actionnumber3 = actionnumber2 / i;
-                                actions[2] = 2;
-                                operands[2] = Integer.toString(i);
-                                break;
-                            } else if (i == 0) break;
-                            else i--;
-                        }
-                    } else if (actionnumber2 < 50) {
-                        actionnumber3 = actionnumber2 * 3;
-                        actions[2] = 5;
-                        operands[2] = " ";
-                    } else {
-                        actionnumber3 = actionnumber2 * 2;
-                        actions[2] = 4;
-                        operands[2] = " ";
-                    }
+            } else {
+                if (actionnumber2 > thirdoperand) {
+                    actionnumber3 = actionnumber2 - thirdoperand;
+                    actions[2] = 1;
+                    operands[2] = Integer.toString(thirdoperand);
                 } else {
-                    if (actionnumber2 > thirdoperand) {
-                       actionnumber3=actionnumber2-thirdoperand;
-                       actions[2]=1;
-                       operands[2]=Integer.toString(thirdoperand);
-                    }
-                    else{
-                        actionnumber3=actionnumber2+thirdoperand;
-                        actions[2]=0;
-                        operands[2]=Integer.toString(thirdoperand);
-                    }
+                    actionnumber3 = actionnumber2 + thirdoperand;
+                    actions[2] = 0;
+                    operands[2] = Integer.toString(thirdoperand);
                 }
+            }
           /* text=beginning[token1]+Hero1[token1]+" загадал некоторое натуральное число "+hero2[token2]+". Затем он "+choiceofactions[actions[1]]+operands[1]+", получил "+Integer.toString(actionnumber1)+
            "."+"\n"+"После "+choiceofactions[actions[2]]+operands[2]+" и получил "+Integer.toString(actionnumber2)+". Подумав, наш"+hobbies[token1]+choiceofactions[actions[0]]+operands[0]+
                    "."+"\n"+"В итоге результатом стало число "+Integer.toString(actionnumber3)+". Какое число загадал "+Hero1[token1]+"?";*/
-                text = beginning[token1] + hero1[token1] + " загадал некоторое натуральное число " + hero2[token2] + ". Затем он " + choiceofactions[actions[0]] + operands[0] +
-                        "." + " После " + choiceofactions[actions[1]] + operands[1] + ". Подумав, наш" + hobbies[token1] + choiceofactions[actions[2]] + operands[2] +
-                        "." + " В итоге " + hero1[token1] + " сказал " + hero2[token2] + " результат, равный " + Integer.toString(actionnumber3) + ". Какое число было загадано?";
+            text = beginning[token1] + hero1[token1] + " загадал некоторое натуральное число " + hero2[token2] + ". Затем он " + choiceofactions[actions[0]] + operands[0] +
+                    "." + " После " + choiceofactions[actions[1]] + operands[1] + ". Подумав, наш" + hobbies[token1] + choiceofactions[actions[2]] + operands[2] +
+                    "." + " В итоге " + hero1[token1] + " сказал " + hero2[token2] + " результат, равный " + Integer.toString(actionnumber3) + ". Какое число было загадано?";
 
-               hint = "Подумайте, какое число было до того, как " + hero1[token1] + " " +  choiceofactions[actions[2]] + operands[2] + ". ";
+            hint = "Подумайте, какое число было до того, как " + hero1[token1] + " " + choiceofactions[actions[2]] + operands[2] + ". ";
 
-                break;
-            case 2:
-                for (; ; ) {
-                    if (day % 2 == 0) break;
-                    else day = ThreadLocalRandom.current().nextInt(10, 100);
-                }
+        } else if (scenario.equals(LILY_SCENARIO)) {
+            for (; ; ) {
+                if (day % 2 == 0) break;
+                else day = ThreadLocalRandom.current().nextInt(10, 100);
+            }
 
-                if (growing[token3] < 5) choice = times[1];
-                else choice = times[0];
-                answer = day - 1;
+            if (growing[token3] < 5) choice = times[1];
+            else choice = times[0];
+            answer = day - 1;
           /*  text="На озере расцвела одна лилия. Каждый день число её цветков становилось в "+Integer.toString(growing)+choice+" больше, а на "+day+
                     " день всё озеро покрылось цветами. "+"\n"+questions1[token3]+"\n"+Questions2[token4];*/
-                text = "На озере расцвела одна лилия. Каждый день число её цветков становилось в " + Integer.toString(growing[token3]) + choice + " больше, а на " + day +
-                        " день всё озеро покрылось цветами. " + questions1[token3];
-                // System.out.println(answer);
-                // System.out.print(text);
-                hint = "Подумайте, что было накануне дня, когда все озеро было покрыто цветами. ";
+            text = "На озере расцвела одна лилия. Каждый день число её цветков становилось в " + Integer.toString(growing[token3]) + choice + " больше, а на " + day +
+                    " день всё озеро покрылось цветами. " + questions1[token3];
+            // System.out.println(answer);
+            // System.out.print(text);
+            hint = "Подумайте, что было накануне дня, когда все озеро было покрыто цветами. ";
+        } else {
+            throw new IllegalArgumentException();
         }
         String possibleAnswer = Integer.toString(answer);//?
         final HashSet<String> possibleTextAnswers = Sets.newHashSet(Integer.toString(answer));//?
         possibleTextAnswers.add(possibleAnswer);//?
-        return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.FROM_END_TO_BEGIN, possibleTextAnswers, hint);//?
+        return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.FROM_END_TO_BEGIN, possibleTextAnswers, hint, scenario, difficulty);//?
     }
 
     @Override
-    public Set<Problem.Difficulty> getAvailableDifficulties() {
-        return Sets.newHashSet(EASY, Problem.Difficulty.MEDIUM);
+    public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Difficulty difficulty) {
+        if (difficulty == Difficulty.HARD) {
+            return null;
+        }
+        return GeneratorUtils.findAvailableScenario(difficulty, alreadySolvedProblems, SCENARIOS,
+                difficulty == Difficulty.MEDIUM ? Sets.newHashSet(SCENARIOS) : new HashSet<>());
     }
 
 

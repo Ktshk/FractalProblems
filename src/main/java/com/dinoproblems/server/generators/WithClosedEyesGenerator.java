@@ -1,23 +1,24 @@
 package com.dinoproblems.server.generators;
 
-import com.dinoproblems.server.Problem;
-import com.dinoproblems.server.ProblemGenerator;
-import com.dinoproblems.server.ProblemWithPossibleTextAnswers;
+import com.dinoproblems.server.*;
 import com.dinoproblems.server.utils.Adjective;
 import com.dinoproblems.server.utils.AdjectiveWithNoun;
 import com.dinoproblems.server.utils.GeneratorUtils;
 import com.dinoproblems.server.utils.Noun;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.stream.IntStream;
 
 import static com.dinoproblems.server.ProblemCollection.WITH_CLOSED_EYES;
 import static com.dinoproblems.server.utils.Dictionary.*;
 import static com.dinoproblems.server.utils.GeneratorUtils.Gender.MASCULINE;
-import static com.dinoproblems.server.utils.GeneratorUtils.getNumWithString;
-import static com.dinoproblems.server.utils.GeneratorUtils.randomInt;
+import static com.dinoproblems.server.utils.GeneratorUtils.*;
 
 /**
  * Created by Katushka on 27.02.2019.
@@ -30,34 +31,41 @@ public class WithClosedEyesGenerator implements ProblemGenerator {
     private static final Noun[] PAIRED_THINGS = {SHOE, GLOVE, SKATES};
     private static final String[] WHERE = {"коробке", "ящике", "сумке", "пакете"};
 
+    private final static ProblemScenario COUNT_ITEMS_HARD = new ProblemScenarioImpl(ProblemCollection.WITH_CLOSED_EYES + "_COUNT_ITEMS");
+    private final static ProblemScenario ANY_COLOR = new ProblemScenarioImpl(ProblemCollection.WITH_CLOSED_EYES + "_ANY_COLOR");
+    private final static ProblemScenario DIFFERENT_COLORS = new ProblemScenarioImpl(ProblemCollection.WITH_CLOSED_EYES + "_DIFFERENT_COLORS");
+    private final static ProblemScenario SPECIAL_COLOR = new ProblemScenarioImpl(ProblemCollection.WITH_CLOSED_EYES + "_SPECIAL_COLOR");
+    private final static ProblemScenario PAIRS = new ProblemScenarioImpl(ProblemCollection.WITH_CLOSED_EYES + "_PAIRS");
+
+    @Nonnull
     @Override
-    public Problem generateProblem(Problem.Difficulty difficulty) {
-        int scenario = randomInt(0, 4);
+    public Problem generateProblem(Problem.Difficulty difficulty, ProblemAvailability problemAvailability) {
+        ProblemScenario scenario = problemAvailability.getScenario();
         int answer;
         final HashSet<String> possibleTextAnswers = Sets.newHashSet();
         String where = WHERE[randomInt(0, WHERE.length)];
 
-        Noun[] things = (difficulty == Problem.Difficulty.HARD || scenario < 3) ? THINGS : PAIRED_THINGS;
+        Noun[] things = (difficulty == Problem.Difficulty.HARD || scenario != COUNT_ITEMS_HARD) ? THINGS : PAIRED_THINGS;
         int thing = randomInt(0, things.length);
 
         StringBuilder text = new StringBuilder("В " + where + " лежат " + things[thing].getPluralForm() + ": ");
 
         int[] count = difficulty == Problem.Difficulty.EASY ? new int[2] :
-                (difficulty == Problem.Difficulty.HARD ? new int[3] : new int[randomInt(2, scenario < 3 ? 5 : 4)]);
+                (difficulty == Problem.Difficulty.HARD ? new int[3] : new int[randomInt(2, scenario != PAIRS ? 5 : 4)]);
         Adjective[] chosenColors = GeneratorUtils.chooseRandom(COLORS, count.length, Adjective[]::new);
 
         int min = Integer.MAX_VALUE;
         int max = 0;
         for (int i = 0; i < count.length; i++) {
             count[i] = difficulty == Problem.Difficulty.EASY ? randomInt(4, 8) :
-                    (difficulty == Problem.Difficulty.HARD ? randomInt(3, 9) : randomInt(6, scenario < 3 ? 20 : 12));
+                    (difficulty == Problem.Difficulty.HARD ? randomInt(3, 9) : randomInt(6, scenario != PAIRS ? 20 : 12));
             min = Math.min(min, count[i]);
             max = Math.max(max, count[i]);
         }
 
         String hint;
 
-        if (difficulty == Problem.Difficulty.HARD) {
+        if (difficulty == Problem.Difficulty.HARD && scenario == COUNT_ITEMS_HARD) {
             for (int i = 0; i < count.length; i++) {
                 if (i == count.length - 1) {
                     text.append(" и ");
@@ -96,24 +104,24 @@ public class WithClosedEyesGenerator implements ProblemGenerator {
                 } else if (i > 0) {
                     text.append(", ");
                 }
-                text.append(count[i]).append(scenario < 3 ? " " : " пар ").append(chosenColors[i].getCountingForm());
+                text.append(count[i]).append(scenario != COUNT_ITEMS_HARD ? " " : " пар ").append(chosenColors[i].getCountingForm());
             }
 
-            if (scenario < 3) {
+            if (scenario != COUNT_ITEMS_HARD) {
 
-                int question = randomInt(scenario == 2 ? 1 : 2, min - 1);
+                int question = randomInt(scenario == SPECIAL_COLOR ? 1 : 2, min - 1);
 
                 text.append(". Какое наименьшее количество ")
                         .append(things[thing].getCountingForm())
                         .append(" нужно вытащить, не глядя, чтобы среди них обязательно ")
                         .append(question == 1 ? "оказался " : "оказалось ");
 
-                if (scenario == 0) {
+                if (scenario == ANY_COLOR) {
                     text.append(getNumWithString(question, things[thing]));
                     text.append(" одного (любого) цвета?");
                     answer = count.length * (question - 1) + 1;
                     hint = "Допустим, что сначала нам не повезет и мы будем вытаскивать шары разных цветов.";
-                } else if (scenario == 1) {
+                } else if (scenario == DIFFERENT_COLORS) {
                     text.append(getNumWithString(2, things[thing]));
                     text.append(" разных цветов?");
                     answer = max + 1;
@@ -146,11 +154,19 @@ public class WithClosedEyesGenerator implements ProblemGenerator {
                 hint = "Что если мы будем сначала доставать только левые " + things[thing].getPluralForm() + "? Но для пары нам нужен и левый, и правый. ";
             }
         }
-        return new ProblemWithPossibleTextAnswers(text.toString(), answer, WITH_CLOSED_EYES, possibleTextAnswers, hint);
+        return new ProblemWithPossibleTextAnswers(text.toString(), answer, WITH_CLOSED_EYES, possibleTextAnswers, hint, scenario, difficulty);
     }
 
-    @Override
-    public Set<Problem.Difficulty> getAvailableDifficulties() {
-        return Sets.newHashSet(Problem.Difficulty.EASY, Problem.Difficulty.MEDIUM);
+    @Nullable
+    public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty) {
+        if (difficulty == Problem.Difficulty.EASY) {
+            return null;
+        }
+        final HashSet<ProblemScenario> mediumScenarios = Sets.newHashSet(ANY_COLOR, DIFFERENT_COLORS, SPECIAL_COLOR, PAIRS);
+        if (difficulty == Problem.Difficulty.HARD) {
+            return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(COUNT_ITEMS_HARD), mediumScenarios);
+        } else {
+            return findAvailableScenario(difficulty, alreadySolvedProblems, new ArrayList<>(mediumScenarios), new HashSet<>());
+        }
     }
 }

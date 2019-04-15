@@ -18,8 +18,11 @@ public interface Problem {
 
     String getHint();
 
+    ProblemScenario getProblemScenario();
+
     /**
      * Text-to-speech. + means accent
+     *
      * @return tts for yandex dialog, null if not specified
      */
     default String getTTS() {
@@ -27,14 +30,30 @@ public interface Problem {
     }
 
     enum State {
-        NEW, HINT_GIVEN, ANSWER_GIVEN, SOLVED
+        NEW, HINT_GIVEN, ANSWER_GIVEN, SOLVED, SOLVED_WITH_HINT
     }
 
     enum Difficulty {
-        EASY, MEDIUM, HARD,EXPERT
+        EASY, MEDIUM, HARD, EXPERT
+
+        public Difficulty getPrevious() {
+            switch (this) {
+                case EASY:
+                    throw new IllegalStateException();
+                case MEDIUM:
+                    return EASY;
+                case HARD:
+                    return MEDIUM;
+                case EXPERT:
+                    return HARD;
+            }
+            throw new IllegalStateException();
+        }
     }
 
     State getState();//вынести в TaskResult с удалением из Problem
+
     Difficulty getDifficulty();
+
     void setState(State newState);
 }

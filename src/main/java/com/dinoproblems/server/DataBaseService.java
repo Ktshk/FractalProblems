@@ -24,7 +24,7 @@ public class DataBaseService {
                 String userName = System.getProperty("RDS_USERNAME");
                 String password = System.getProperty("RDS_PASSWORD");
                 String hostname = System.getProperty("RDS_HOSTNAME");
-                String port = System.getProperty("RDS_PORT");
+                String port = System.getProperty("RADS_PORT");
                 String jdbcUrl = "jdbc:postgresql://" + hostname + ":" + port + "/" + dbName + "?user=" + userName + "&password=" + password;
                 System.out.println("Getting remote connection with connection string from environment variables.");
                 Connection con = DriverManager.getConnection(jdbcUrl);

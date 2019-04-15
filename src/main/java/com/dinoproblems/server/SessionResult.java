@@ -20,7 +20,7 @@ public class SessionResult {
             if (problem.getState() == Problem.State.SOLVED) {
                 problemsSolved++;
             }
-            if (problem.getState() == Problem.State.HINT_GIVEN) {//в будущем поменять на SOLVED_WITH_HINTS
+            if (problem.getState() == Problem.State.SOLVED_WITH_HINT) {//в будущем поменять на SOLVED_WITH_HINTS
                 hintsGiven++;
             }
             if (problem.getState() == Problem.State.SOLVED ||

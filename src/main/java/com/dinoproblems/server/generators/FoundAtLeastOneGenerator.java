@@ -1,11 +1,12 @@
 package com.dinoproblems.server.generators;
 
-import com.dinoproblems.server.Problem;
-import com.dinoproblems.server.ProblemGenerator;
-import com.dinoproblems.server.ProblemWithPossibleTextAnswers;
+import com.dinoproblems.server.*;
 import com.dinoproblems.server.utils.*;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import javax.annotation.Nonnull;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,8 +18,11 @@ import static com.dinoproblems.server.utils.GeneratorUtils.*;
  */
 public class FoundAtLeastOneGenerator implements ProblemGenerator {
 
+    private final static ProblemScenario DEFAULT_SCENARIO = new ProblemScenarioImpl(ProblemCollection.AT_LEAST_ONE_FOUND);
+
+    @Nonnull
     @Override
-    public Problem generateProblem(Problem.Difficulty difficulty) {
+    public Problem generateProblem(Problem.Difficulty difficulty, ProblemAvailability problemAvailability) {
         int total = randomInt(20, 31);
 
         int count1 = randomInt(2, total - 2);
@@ -27,17 +31,17 @@ public class FoundAtLeastOneGenerator implements ProblemGenerator {
         String text = "";
         int answer = question == 0 ? count1 : count2;
 
-        int scenario = randomInt(0, 5);
+        int theme = randomInt(0, 5);
         Noun[] things = {Dictionary.FLOWER, Dictionary.FRUIT, Dictionary.CANDY, Dictionary.BALL, Dictionary.CHILD};
         AbstractNoun[][] particularThings = {{Dictionary.TULIP, Dictionary.ROSE, Dictionary.DAFFODIL, Dictionary.CAMOMILE},
                 Dictionary.FRUITS,
                 Dictionary.CANDIES,
                 {new AdjectiveWithNoun(Dictionary.RED, Dictionary.BALL), new AdjectiveWithNoun(Dictionary.GREEN, Dictionary.BALL), new AdjectiveWithNoun(Dictionary.BLUE, Dictionary.BALL), new AdjectiveWithNoun(Dictionary.YELLOW, Dictionary.BALL)},
                 {Dictionary.BOY, Dictionary.GIRL}};
-        AbstractNoun[] chosenParticularThings = chooseRandom(particularThings[scenario], 2, AbstractNoun[]::new);
+        AbstractNoun[] chosenParticularThings = chooseRandom(particularThings[theme], 2, AbstractNoun[]::new);
 
         String tts = "";
-        switch (scenario) {
+        switch (theme) {
             case 0:
                 text += "В вазе стоит ";
                 tts += "В вазе сто+ит ";
@@ -60,8 +64,8 @@ public class FoundAtLeastOneGenerator implements ProblemGenerator {
                 break;
         }
 
-        text += getNumWithString(total, things[scenario]) + ". Известно, что среди любых ";
-        tts += getNumWithString(total, things[scenario])+ ". Известно, что среди любых ";
+        text += getNumWithString(total, things[theme]) + ". Известно, что среди любых ";
+        tts += getNumWithString(total, things[theme])+ ". Известно, что среди любых ";
 
         text += (count1 + 1);
         tts += NumberWord.getStringForNumber(count1 + 1, things[0].getGender(), Case.GENITIVE);
@@ -72,14 +76,14 @@ public class FoundAtLeastOneGenerator implements ProblemGenerator {
                 + NumberWord.getStringForNumber(count2 + 1, chosenParticularThings[0].getGender(), Case.GENITIVE);;
 
         String textEnd = " найдется хотя бы " + getNumWithString(1, chosenParticularThings[0])
-                + ". Сколько " + chosenParticularThings[question].getCountingForm() + getWhere(scenario);
+                + ". Сколько " + chosenParticularThings[question].getCountingForm() + getWhere(theme);
         text += textEnd + "?";
         tts += textEnd + "?";
 
         final HashSet<String> possibleTextAnswers = Sets.newHashSet(getNumWithString(answer, chosenParticularThings[question]));
         final String hint = "Подумайте, может ли " + chosenParticularThings[0].getCountingForm() + " быть больше или равно " +
                 NumberWord.getStringForNumber(count1 + 1, chosenParticularThings[0].getGender(), Case.GENITIVE);
-        return new ProblemWithPossibleTextAnswers(text, tts, answer, AT_LEAST_ONE_FOUND, possibleTextAnswers, hint);
+        return new ProblemWithPossibleTextAnswers(text, tts, answer, AT_LEAST_ONE_FOUND, possibleTextAnswers, hint, problemAvailability.getScenario(), difficulty);
     }
 
     private String getWhere(int scenario) {
@@ -99,7 +103,12 @@ public class FoundAtLeastOneGenerator implements ProblemGenerator {
     }
 
     @Override
-    public Set<Problem.Difficulty> getAvailableDifficulties() {
-        return Sets.newHashSet(Problem.Difficulty.MEDIUM);
+    public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty) {
+        if (difficulty != Problem.Difficulty.MEDIUM) {
+            return null;
+        }
+
+        return GeneratorUtils.findAvailableScenario(difficulty, alreadySolvedProblems,
+                Lists.newArrayList(DEFAULT_SCENARIO), new HashSet<>());
     }
 }

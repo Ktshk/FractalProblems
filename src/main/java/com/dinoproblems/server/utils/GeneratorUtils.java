@@ -1,6 +1,13 @@
 package com.dinoproblems.server.utils;
 
-import java.util.Arrays;
+import com.dinoproblems.server.Problem;
+import com.dinoproblems.server.Problem.Difficulty;
+import com.dinoproblems.server.ProblemGenerator.ProblemAvailability;
+import com.dinoproblems.server.ProblemGenerator.ProblemAvailabilityType;
+import com.dinoproblems.server.ProblemScenario;
+
+import javax.annotation.Nonnull;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 
@@ -11,6 +18,7 @@ import static com.dinoproblems.server.utils.NumberWord.getStringForNumber;
  * Created by Katushka on 10.02.2019.
  */
 public class GeneratorUtils {
+
     public enum Gender {
         MASCULINE,
         FEMININE,
@@ -24,12 +32,6 @@ public class GeneratorUtils {
 
         // TODO: add other cases
     }
-
-    private static final String[] HUNDREDS = {"", "сто", "двести", "триста", "четыреста", "пятьсот", "шестьсот", "семьсот",
-            "восемьсот", "девятьсот"};
-    private static final String[] TENS = {"", "", "двадцать", "тридцать", "сорок", "пятьдесят", "шестьдесят", "семьдесят",
-            "восемьдесят", "девяносто"};
-    private static final String[] ONES = {"", "один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять"};
 
     private GeneratorUtils() {
 
@@ -98,5 +100,78 @@ public class GeneratorUtils {
             arrayCopy[i] = t;
         }
         return result;
+    }
+
+    public static <T> T chooseRandomElement(T[] array) {
+        return array[randomInt(0, array.length)];
+    }
+
+    public static <T> T chooseRandomElement(List<T> list) {
+        return list.get(randomInt(0, list.size()));
+    }
+
+    public static <T> T chooseRandomElement(Collection<T> collection) {
+        if (collection instanceof List) {
+            return chooseRandomElement((List<T>) collection);
+        }
+        List<T> list = new ArrayList<>(collection);
+        return chooseRandomElement(list);
+    }
+
+    public static ProblemAvailability findAvailableScenario(Difficulty difficulty, @Nonnull Collection<Problem> alreadySolvedProblems,
+                                                            @Nonnull Collection<ProblemScenario> availableScenarios,
+                                                            @Nonnull Collection<ProblemScenario> easierScenarios) {
+        Map<ProblemScenario, ProblemAvailabilityType> scenarioToProblemAvailability = new HashMap<>();
+        for (ProblemScenario problemScenario : availableScenarios) {
+            scenarioToProblemAvailability.put(problemScenario, ProblemAvailabilityType.newScenarioProblem);
+        }
+
+        if (alreadySolvedProblems.isEmpty()) {
+            return new ProblemAvailability(ProblemAvailabilityType.newProblem, chooseRandomElement(availableScenarios));
+        }
+
+        for (Problem problem : alreadySolvedProblems) {
+            if (problem.getState() == Problem.State.SOLVED) {
+                if (problem.getDifficulty().compareTo(difficulty) < 0) {
+                    if (scenarioToProblemAvailability.get(problem.getProblemScenario()) != ProblemAvailabilityType.minorScenarioChanges) {
+                        scenarioToProblemAvailability.put(problem.getProblemScenario(), ProblemAvailabilityType.trainProblem);
+                    }
+                } else {
+                    scenarioToProblemAvailability.put(problem.getProblemScenario(), ProblemAvailabilityType.minorScenarioChanges);
+                }
+            } else if (problem.getState() == Problem.State.SOLVED_WITH_HINT || problem.getState() == Problem.State.ANSWER_GIVEN) {
+                final ProblemAvailabilityType availabilityType = scenarioToProblemAvailability.get(problem.getProblemScenario());
+                if (availabilityType == ProblemAvailabilityType.newScenarioProblem) {
+                    if (!easierScenarios.isEmpty()) {
+                        scenarioToProblemAvailability.put(problem.getProblemScenario(), ProblemAvailabilityType.easierProblem);
+                    }
+                }
+            }
+        }
+
+        List<ProblemScenario> bestChoice = new ArrayList<>();
+        List<ProblemScenario> otherChoices = new ArrayList<>();
+        for (ProblemScenario problemScenario : scenarioToProblemAvailability.keySet()) {
+            if (scenarioToProblemAvailability.get(problemScenario).equals(ProblemAvailabilityType.minorScenarioChanges)) {
+                otherChoices.add(problemScenario);
+            } else {
+                bestChoice.add(problemScenario);
+            }
+        }
+
+        ProblemScenario scenario;
+        if (!bestChoice.isEmpty()) {
+            scenario = chooseRandomElement(bestChoice);
+        } else {
+            scenario = chooseRandomElement(otherChoices);
+        }
+
+        final ProblemAvailabilityType type = scenarioToProblemAvailability.get(scenario);
+        if (type == ProblemAvailabilityType.easierProblem) {
+            if (!easierScenarios.contains(scenario)) {
+                scenario = chooseRandomElement(easierScenarios);
+            }
+        }
+        return new ProblemAvailability(type, scenario);
     }
 }

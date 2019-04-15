@@ -14,19 +14,22 @@ public class ProblemWithPossibleTextAnswers implements Problem {
     private Set<String> possibleTextAnswers;
     private State state = State.NEW;
     private String hint;
-    private Difficulty difficulty=Difficulty.EASY;
+    private final Difficulty difficulty;
+    private final ProblemScenario scenario;
 
-    public ProblemWithPossibleTextAnswers(String text, int answer, String theme, Set<String> possibleTextAnswers, String hint) {
-        this(text, null, answer, theme, possibleTextAnswers, hint);
+    public ProblemWithPossibleTextAnswers(String text, int answer, String theme, Set<String> possibleTextAnswers, String hint, ProblemScenario scenario, Difficulty difficulty) {
+        this(text, null, answer, theme, possibleTextAnswers, hint, scenario, difficulty);
     }
 
-    public ProblemWithPossibleTextAnswers(String text, String tts, int answer, String theme, Set<String> possibleTextAnswers, String hint) {
+    public ProblemWithPossibleTextAnswers(String text, String tts, int answer, String theme, Set<String> possibleTextAnswers, String hint, ProblemScenario scenario, Difficulty difficulty) {
         this.text = text;
         this.tts = tts;
         this.answer = answer;
         this.theme = theme;
         this.possibleTextAnswers = possibleTextAnswers;
         this.hint = hint;
+        this.scenario = scenario;
+        this.difficulty = difficulty;
     }
 
     public String getText() {
@@ -36,6 +39,11 @@ public class ProblemWithPossibleTextAnswers implements Problem {
     @Override
     public String getHint() {
         return hint;
+    }
+
+    @Override
+    public ProblemScenario getProblemScenario() {
+        return scenario;
     }
 
     @Override
@@ -66,8 +74,9 @@ public class ProblemWithPossibleTextAnswers implements Problem {
     public State getState() {
         return state;
     }
+
     @Override
-    public Difficulty getDifficulty(){
+    public Difficulty getDifficulty() {
         return difficulty;
     }
 

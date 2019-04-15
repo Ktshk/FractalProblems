@@ -1,13 +1,16 @@
 package com.dinoproblems.server.generators;
 
-import com.dinoproblems.server.Problem;
-import com.dinoproblems.server.ProblemGenerator;
-import com.dinoproblems.server.ProblemWithPossibleTextAnswers;
+import com.dinoproblems.server.*;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import com.dinoproblems.server.utils.*;
+
+import javax.annotation.Nonnull;
+
 import static com.dinoproblems.server.ProblemCollection.SUM_DIFFERENCE;
 import static com.dinoproblems.server.utils.GeneratorUtils.randomInt;
 import static com.dinoproblems.server.Problem.Difficulty.EASY;
@@ -16,8 +19,11 @@ Created by Simar 10.03.19
   */
 
 public class SumDifferenceGenerator implements ProblemGenerator {
+    private final static ProblemScenario DEFAULT_SCENARIO = new ProblemScenarioImpl(ProblemCollection.AT_LEAST_ONE_FOUND);
+
+    @Nonnull
     @Override
-    public Problem generateProblem(Problem.Difficulty difficulty) {
+    public Problem generateProblem(Problem.Difficulty difficulty, ProblemAvailability problemAvailability) {
         final String[] hero;//владельцы вкусняшек
         //кол-во вкусняшек у первого
         int first = difficulty == EASY ? randomInt(10, 26) : randomInt(26, 51);
@@ -83,11 +89,16 @@ public class SumDifferenceGenerator implements ProblemGenerator {
         hint = "Что если отнять у " + hero[token3] + " его превосходящее количество " + things[token1].getCountingForm() +
                 ", теперь поровну " + things[token1].getCountingForm() + " между нашими героями.";
         final HashSet<String> possibleTextAnswers = Sets.newHashSet(Integer.toString(first));
-        return new ProblemWithPossibleTextAnswers(text, first, SUM_DIFFERENCE, possibleTextAnswers, hint);
+        return new ProblemWithPossibleTextAnswers(text, first, SUM_DIFFERENCE, possibleTextAnswers, hint, DEFAULT_SCENARIO, difficulty);
     }
 
     @Override
-    public Set<Problem.Difficulty> getAvailableDifficulties() {
-        return Sets.newHashSet(EASY, Problem.Difficulty.MEDIUM);
+    public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty) {
+        if (difficulty == Problem.Difficulty.HARD) {
+            return null;
+        }
+
+        return GeneratorUtils.findAvailableScenario(difficulty, alreadySolvedProblems,
+                Lists.newArrayList(DEFAULT_SCENARIO), difficulty == EASY ? new HashSet<>() : Sets.newHashSet(DEFAULT_SCENARIO));
     }
 }

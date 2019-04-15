@@ -1,7 +1,10 @@
 package com.dinoproblems.server;
 
-import java.util.HashSet;
-import java.util.Set;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Katushka on 10.02.2019.
@@ -9,7 +12,7 @@ import java.util.Set;
 public class Session {
     private final String sessionId;
     private Problem currentProblem;
-    private Set<Problem> solvedProblems = new HashSet<>();
+    private Multimap<String, Problem> solvedProblemsByTheme = HashMultimap.create();
     private Problem.Difficulty currentDifficulty = null;
 
     public Session(String sessionId) {
@@ -23,7 +26,7 @@ public class Session {
     public void setCurrentProblem(Problem currentProblem) {
         this.currentProblem = currentProblem;
         if (currentProblem != null) {
-            solvedProblems.add(currentProblem);
+            solvedProblemsByTheme.put(currentProblem.getTheme(), currentProblem);
         }
     }
 
@@ -35,8 +38,8 @@ public class Session {
         this.currentDifficulty = currentDifficulty;
     }
 
-    public Set<Problem> getSolvedProblems() {
-        return solvedProblems;
+    public Multimap<String, Problem> getSolvedProblems() {
+        return solvedProblemsByTheme;
     }
 
     @Override
@@ -61,7 +64,8 @@ public class Session {
                 ", currentProblem=" + currentProblem +
                 '}';
     }
+
     public SessionResult getSessionResult(){
-        return new SessionResult(solvedProblems);//должно быть TaskResult
+        return new SessionResult(solvedProblemsByTheme.values());//должно быть TaskResult
     }
 }

@@ -1,17 +1,20 @@
 package com.dinoproblems.server.generators;
 
-import com.dinoproblems.server.Problem;
-import com.dinoproblems.server.ProblemGenerator;
-import com.dinoproblems.server.ProblemWithPossibleTextAnswers;
+import com.dinoproblems.server.*;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.dinoproblems.server.utils.NumberWord;
 import com.dinoproblems.server.utils.ProblemTextBuilder;
 import com.dinoproblems.server.utils.OrdinalNumber;
 
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 import com.dinoproblems.server.utils.*;
+
+import javax.annotation.Nonnull;
 
 import static com.dinoproblems.server.ProblemCollection.RANGE;
 import static com.dinoproblems.server.utils.Dictionary.PAGE;
@@ -28,8 +31,16 @@ import static com.dinoproblems.server.Problem.Difficulty.EASY;
 
 public class RangeGenerator implements ProblemGenerator {
 
+    private final static ProblemScenario NUMBERS = new ProblemScenarioImpl(ProblemCollection.RANGE + "_" + "NUMBERS");
+    private final static ProblemScenario READ_PAGES = new ProblemScenarioImpl(ProblemCollection.RANGE + "_" + "READ_PAGES");
+    private final static ProblemScenario TORN_OUT_PAGES = new ProblemScenarioImpl(ProblemCollection.RANGE + "_" + "TORN_OUT_PAGES");
+    private final static ProblemScenario DATES = new ProblemScenarioImpl(ProblemCollection.RANGE + "_" + "DATES");
+
+    private static final ProblemScenario[] SCENARIOS = {NUMBERS, READ_PAGES, TORN_OUT_PAGES, DATES};
+
+    @Nonnull
     @Override
-    public Problem generateProblem(Problem.Difficulty difficulty) {
+    public Problem generateProblem(Problem.Difficulty difficulty, ProblemAvailability problemAvailability) {
         final String[] heroes = new String[]{"Катя", "Маша", "Настя", "Полина", "Лиза", "Саша", "Карина", "Кристина"};
 
         final int answer;
@@ -40,8 +51,8 @@ public class RangeGenerator implements ProblemGenerator {
 
         int first;
         int second;
-        int scenario = GeneratorUtils.randomInt(0, 4);
-        if (scenario == 0) {
+        ProblemScenario scenario = problemAvailability.getScenario();
+        if (scenario.equals(NUMBERS)) {
 
             first = difficulty == EASY ? randomInt(1, 7) : randomInt(1, 11);
             second = difficulty == EASY ? randomInt(11, 20) : randomInt(28, 40);
@@ -53,7 +64,7 @@ public class RangeGenerator implements ProblemGenerator {
             text.append(" до ");
             text.append(String.valueOf(second),NumberWord.getStringForNumber(second, NEUTER, GeneratorUtils.Case.GENITIVE)).append("?");
             hint = "Попробуйте отнять от второго числа первое, но не забывайте, что первое число тоже входит в диапазон чисел.";
-        } else if (scenario == 1) {
+        } else if (scenario.equals(READ_PAGES)) {
 
             hero = heroes[randomInt(0, heroes.length)];
             first = difficulty == EASY ? randomInt(1, 8) : randomInt(1, 11);
@@ -66,7 +77,7 @@ public class RangeGenerator implements ProblemGenerator {
                     ". На какой странице " + hero + " закончила?");
             hint = "Попробуйте сложить страницы, но не забывайте, что страница, с которой " + hero +
                     " начала читать тоже входит в количество прочитанных страниц.";
-        } else if (scenario == 2) {
+        } else if (scenario.equals(TORN_OUT_PAGES)) {
             String[] booksource = new String[]{" в библиотеке ", " у подруги ", " у друга ", " у учителя "};
             String book = booksource[randomInt(0, booksource.length)];
             hero = heroes[randomInt(0, heroes.length)];
@@ -105,12 +116,17 @@ public class RangeGenerator implements ProblemGenerator {
             hint = "Попробуйте из количества дней в" + monthsInstr[monthIndex] + "вычесть дату начала отпуска. " +
                     "Не забывайте, что день начала и день конца отпуска входят в количество дней в отпуске.";
         }
-        return new ProblemWithPossibleTextAnswers(text.getText(), text.getTTS(), answer, RANGE, possibleTextAnswers, hint);
+        return new ProblemWithPossibleTextAnswers(text.getText(), text.getTTS(), answer, RANGE, possibleTextAnswers, hint, scenario, difficulty);
     }
 
     @Override
-    public Set<Problem.Difficulty> getAvailableDifficulties() {
-        return Sets.newHashSet(Problem.Difficulty.EASY, Problem.Difficulty.MEDIUM);
+    public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty) {
+        if (difficulty == Problem.Difficulty.HARD) {
+            return null;
+        }
+
+        return GeneratorUtils.findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(SCENARIOS),
+                difficulty == Problem.Difficulty.MEDIUM ? Sets.newHashSet(SCENARIOS) : new HashSet<>());
     }
 }
 		

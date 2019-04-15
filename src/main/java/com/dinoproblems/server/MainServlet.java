@@ -184,7 +184,11 @@ public class MainServlet extends HttpServlet {
         if (correctAnswer) {
             responseJson.addProperty("text", chooseRandomElement(praises) + " " + chooseRandomElement(oneMoreQuestion));
             responseJson.addProperty("tts", chooseRandomElement(soundPraises) + " " + responseJson.get("text")); //Попытка добавления звуков
-            problem.setState(Problem.State.SOLVED);
+            if (problem.getState() == Problem.State.HINT_GIVEN) {
+                problem.setState(Problem.State.SOLVED_WITH_HINT);
+            } else {
+                problem.setState(Problem.State.SOLVED);
+            }
             session.setCurrentProblem(null);
         } else {
             responseJson.addProperty("text", chooseRandomElement(almostCorrect ? almost : wrongAnswer) + " " + chooseRandomElement(notAnAnswer));

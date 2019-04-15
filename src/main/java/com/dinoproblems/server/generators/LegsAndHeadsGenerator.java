@@ -2,8 +2,11 @@ package com.dinoproblems.server.generators;
 
 import com.dinoproblems.server.*;
 import com.dinoproblems.server.utils.GeneratorUtils;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import javax.annotation.Nonnull;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,8 +19,17 @@ import static com.dinoproblems.server.utils.GeneratorUtils.randomInt;
  * Created by Katushka on 10.02.2019.
  */
 public class LegsAndHeadsGenerator implements ProblemGenerator {
+
+    private final static ProblemScenario ANIMALS = new ProblemScenarioImpl(ProblemCollection.LEGS_AND_HEADS + "_" + "ANIMALS");
+    private final static ProblemScenario EGGS = new ProblemScenarioImpl(ProblemCollection.LEGS_AND_HEADS + "_" + "EGGS");
+    private final static ProblemScenario INSECTS = new ProblemScenarioImpl(ProblemCollection.LEGS_AND_HEADS + "_" + "INSECTS");
+
+    private static final ProblemScenario[] SCENARIOS = {ANIMALS, EGGS, INSECTS};
+
+    @Nonnull
     @Override
-    public Problem generateProblem(Problem.Difficulty difficulty) {
+    public Problem generateProblem(Problem.Difficulty difficulty, ProblemAvailability problemAvailability) {
+        final ProblemScenario scenario = problemAvailability.getScenario();
         int heads = difficulty == Problem.Difficulty.EASY ? randomInt(3, 5)
                 : randomInt(5, 10);
         int ducks = randomInt(1, heads);
@@ -36,9 +48,8 @@ public class LegsAndHeadsGenerator implements ProblemGenerator {
         final int quest2 = quest == 0 ? i2 : i4;
 
         final String text;
-        final int i = randomInt(0, 3);
         final String hint;
-        if (i == 0) {
+        if (scenario.equals(ANIMALS)) {
             animals = new String[][]{{"куры", "утки", "петухи"},
                     {"коровы", "овцы", "козы"}};
             animalGender = new GeneratorUtils.Gender[][]{{FEMININE, FEMININE, MASCULINE},
@@ -62,7 +73,7 @@ public class LegsAndHeadsGenerator implements ProblemGenerator {
                     + ". У них вместе " + GeneratorUtils.getNumWithString(heads, "голова", "головы", "голов", FEMININE)
                     + " и " + getLegsString((ducks * 2 + cows * 4)) + ". "
                     + "Сколько " + animals5more[quest][quest2] + " гуляет во дворе?";
-        } else if (i == 1) {
+        } else if (scenario.equals(EGGS)) {
             animals = new String[][]{{"цыплята", "утята", "страусы"},
                     {"ящерицы", "утконосы", "крокодилы"}};
             animalGender = new GeneratorUtils.Gender[][]{{MASCULINE, MASCULINE, MASCULINE},
@@ -122,12 +133,17 @@ public class LegsAndHeadsGenerator implements ProblemGenerator {
         final HashSet<String> possibleTextAnswers = new HashSet<>();
         possibleTextAnswers.add(possibleAnswer);
 
-        return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.LEGS_AND_HEADS, possibleTextAnswers, hint);
+        return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.LEGS_AND_HEADS, possibleTextAnswers, hint, scenario, difficulty);
     }
 
     @Override
-    public Set<Problem.Difficulty> getAvailableDifficulties() {
-        return Sets.newHashSet(Problem.Difficulty.EASY, Problem.Difficulty.MEDIUM);
+    public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty){
+        if (difficulty == Problem.Difficulty.HARD) {
+            return null;
+        }
+
+        return GeneratorUtils.findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(SCENARIOS),
+                difficulty == Problem.Difficulty.MEDIUM ? Sets.newHashSet(SCENARIOS) : new HashSet<>());
     }
 
     private static String getLegsString(int legs) {

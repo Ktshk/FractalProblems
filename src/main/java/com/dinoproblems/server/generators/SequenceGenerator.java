@@ -1,12 +1,13 @@
 package com.dinoproblems.server.generators;
 
-import com.dinoproblems.server.Problem;
-import com.dinoproblems.server.ProblemCollection;
-import com.dinoproblems.server.ProblemGenerator;
-import com.dinoproblems.server.ProblemWithPossibleTextAnswers;
+import com.dinoproblems.server.*;
+import com.dinoproblems.server.utils.GeneratorUtils;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import javax.annotation.Nonnull;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,8 +19,11 @@ Created by Simar 16.03.19
 Modified by Simar 14.04.19
   */
 public class SequenceGenerator implements ProblemGenerator {
+
+    private final static ProblemScenario DEFAULT_SCENARIO = new ProblemScenarioImpl(ProblemCollection.SEQUENCE);
+
     @Override
-    public Problem generateProblem(Problem.Difficulty difficulty) {
+    public Problem generateProblem(Problem.Difficulty difficulty, ProblemAvailability problemAvailability) {
         int type=randomInt(1,3);//определение типа задач
         //1-арифметическиа дейстивия с константой, 2-взаимодействие с исходными элементами последовательности
         int[] sequence = new int[7];//данная последовательность из 7 натуральных чисел;
@@ -73,13 +77,17 @@ public class SequenceGenerator implements ProblemGenerator {
         String possibleAnswer = Integer.toString(answer);//?
         final HashSet<String> possibleTextAnswers = Sets.newHashSet(Integer.toString(answer));//?
         possibleTextAnswers.add(possibleAnswer);//?
-        return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.SEQUENCE, possibleTextAnswers, hint);
-
+        return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.SEQUENCE, possibleTextAnswers, hint, DEFAULT_SCENARIO, difficulty);
     }
 
     @Override
-    public Set<Problem.Difficulty> getAvailableDifficulties() {
-        return Sets.newHashSet(EASY, Problem.Difficulty.MEDIUM);
+    public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty) {
+        if (difficulty != Problem.Difficulty.MEDIUM) {
+            return null;
+        }
+
+        return GeneratorUtils.findAvailableScenario(difficulty, alreadySolvedProblems,
+                Lists.newArrayList(DEFAULT_SCENARIO), new HashSet<>());
     }
 
 }
