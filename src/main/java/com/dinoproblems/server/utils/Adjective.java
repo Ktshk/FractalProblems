@@ -14,6 +14,7 @@ public class Adjective {
     private final String genitiveFeminine;
     private final String pluralForm;
 
+
     public Adjective(String nominativeMasculine, String nominativeFeminine, String nominativeNeuter, String countingForm, String genitiveMasculine, String genitiveFeminine, String pluralForm) {
         this.nominativeMasculine = nominativeMasculine;
         this.nominativeFeminine = nominativeFeminine;
@@ -34,6 +35,14 @@ public class Adjective {
 
     public String getNominativeNeuter() {
         return nominativeNeuter;
+    }
+
+    public String getGenitiveMasculine() {
+        return genitiveMasculine;
+    }
+
+    public String getGenitiveFeminine() {
+        return genitiveFeminine;
     }
 
     public String getCountingForm() {
