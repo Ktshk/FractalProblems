@@ -31,7 +31,7 @@ public interface Problem {
     }
 
     enum Difficulty {
-        EASY, MEDIUM, HARD
+        EASY, MEDIUM, HARD,EXPERT
     }
 
     State getState();//вынести в TaskResult с удалением из Problem

@@ -3,7 +3,7 @@ package com.dinoproblems.server.utils;
 /**
  * Created by Katushka on 16.03.2019.
  */
-public class ProblemTextBuilder {
+public class ProblemTextBuilder {//текст один, речь другая
     private StringBuilder text;
     private StringBuilder tts = null;
 

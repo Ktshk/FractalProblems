@@ -1,5 +1,5 @@
 import com.dinoproblems.server.Problem;
-import com.dinoproblems.server.generators.RangeGenerator;
+import com.dinoproblems.server.generators.SequenceGenerator;
 import org.junit.Test;
 
 import java.util.Set;
@@ -9,7 +9,7 @@ import java.util.Set;
  */
 public class TestProblemGenerator {
 
-    public static final RangeGenerator GENERATOR = new RangeGenerator();
+    public static final SequenceGenerator GENERATOR = new SequenceGenerator();
 
     @Test
     public void testGenerateProblem() {

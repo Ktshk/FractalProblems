@@ -229,7 +229,7 @@ public class EilerCirclesGenerator implements ProblemGenerator {
 
         final String hint = "Нарисуйте схему. В один круг поместите всех детей, которые любят " + chosenSubjects[0].getAccusativePluralForm() +
                 ", а в в другой всех детей, которые любят " + chosenSubjects[1].getAccusativePluralForm();
-        return new ProblemWithPossibleTextAnswers(text.getText(), text.getTTS(), answer, EILER_CIRCLES, possibleTextAnswers, hint);
+        return new ProblemWithPossibleTextAnswers(text.getText(), text.getTTS(), answer, EILER_CIRCLES, possibleTextAnswers, hint);//пример TTS
 
     }
 
