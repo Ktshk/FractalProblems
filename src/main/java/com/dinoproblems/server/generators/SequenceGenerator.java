@@ -9,10 +9,9 @@ import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Set;
 
-import static com.dinoproblems.server.utils.GeneratorUtils.randomInt;
 import static com.dinoproblems.server.Problem.Difficulty.EASY;
+import static com.dinoproblems.server.utils.GeneratorUtils.randomInt;
 
 /*
 Created by Simar 16.03.19
@@ -22,23 +21,24 @@ public class SequenceGenerator implements ProblemGenerator {
 
     private final static ProblemScenario DEFAULT_SCENARIO = new ProblemScenarioImpl(ProblemCollection.SEQUENCE);
 
+    @Nonnull
     @Override
     public Problem generateProblem(Problem.Difficulty difficulty, ProblemAvailability problemAvailability) {
-        int type=randomInt(1,3);//определение типа задач
+        int type = randomInt(1, 3);//определение типа задач
         //1-арифметическиа дейстивия с константой, 2-взаимодействие с исходными элементами последовательности
         int[] sequence = new int[7];//данная последовательность из 7 натуральных чисел;
         int[] sequenceShow = new int[6];//выводимая в условие последовательность
-        int first =difficulty==EASY ? randomInt(1, 5):randomInt(5,15);//определение первого элемента последовательности
+        int first = difficulty == EASY ? randomInt(1, 5) : randomInt(5, 15);//определение первого элемента последовательности
         int i = 0;
-        int operand1 = difficulty==EASY ? randomInt(2, 10):randomInt(10,30);//операнд для сложения/вычитания
-        int operand2 = difficulty==EASY ? randomInt(2, 4):randomInt(2,6);//операнд для произвдения/второй операнд для типа 2
+        int operand1 = difficulty == EASY ? randomInt(2, 10) : randomInt(10, 30);//операнд для сложения/вычитания
+        int operand2 = difficulty == EASY ? randomInt(2, 4) : randomInt(2, 6);//операнд для произвдения/второй операнд для типа 2
         sequence[0] = first;
         String text = null;//итоговый текст задачи
         int answer = 0;
         String hint = null;
         switch (type) {
             case 1:
-                if (sequence[0]==1) {
+                if (sequence[0] == 1) {
                     for (i = 1; i <= 6; i++) sequence[i] = sequence[i - 1] * operand2;
                 }
 
@@ -56,7 +56,7 @@ public class SequenceGenerator implements ProblemGenerator {
                 hint = "Посмотрите, как второе число отличается от первого и как третье от второго";
                 break;
             case 2:
-                if (sequence[0]==2) {
+                if (sequence[0] == 2) {
                     for (i = 1; i <= 6; i++) sequence[i] = sequence[i - 1] * sequence[0];
                 } else if (sequence[0] < 20) {
                     sequence[1] = sequence[0];
@@ -82,7 +82,7 @@ public class SequenceGenerator implements ProblemGenerator {
 
     @Override
     public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty) {
-        if (difficulty != Problem.Difficulty.MEDIUM) {
+        if (difficulty == Problem.Difficulty.HARD) {
             return null;
         }
 

@@ -34,7 +34,7 @@ public interface Problem {
     }
 
     enum Difficulty {
-        EASY, MEDIUM, HARD, EXPERT
+        EASY, MEDIUM, HARD, EXPERT;
 
         public Difficulty getPrevious() {
             switch (this) {
