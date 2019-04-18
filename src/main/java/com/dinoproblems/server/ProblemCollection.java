@@ -26,6 +26,7 @@ public class ProblemCollection {
     public static final String EILER_CIRCLES = "Eiler Circles";
     public static final String SEQUENCE = "Sequence";
     public static final String RANGE = "Range";
+    public static final String SHARE_WITH_FRIENDS = "Share with friends";
 
     private BiMap<String, ProblemGenerator> generators = HashBiMap.create();
 
@@ -41,7 +42,7 @@ public class ProblemCollection {
         generators.put(EILER_CIRCLES, new EilerCirclesGenerator());
         generators.put(SEQUENCE, new SequenceGenerator());
         generators.put(RANGE, new RangeGenerator());
-
+        generators.put(SHARE_WITH_FRIENDS, new ShareWithFriendsGenerator());
     }
 
     public Problem generateProblem(Session session) {

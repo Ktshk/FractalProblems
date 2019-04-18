@@ -1,9 +1,6 @@
 package com.dinoproblems.server;
 
-import com.dinoproblems.server.generators.FromEndToBeginGenerator;
-import com.dinoproblems.server.generators.SnailGenerator;
-import com.dinoproblems.server.generators.SpacesGenerator;
-import com.dinoproblems.server.generators.WithClosedEyesGenerator;
+import com.dinoproblems.server.generators.*;
 import org.junit.Test;
 
 import java.util.HashSet;
@@ -14,7 +11,7 @@ import java.util.Set;
  */
 public class TestProblemGenerator {
 
-    public static final ProblemGenerator GENERATOR = new SpacesGenerator();
+    public static final ProblemGenerator GENERATOR = new ShareWithFriendsGenerator();
 
     @Test
     public void testAllGenerators() {
