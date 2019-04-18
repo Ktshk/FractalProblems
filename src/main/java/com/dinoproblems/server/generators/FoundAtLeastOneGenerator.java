@@ -104,7 +104,7 @@ public class FoundAtLeastOneGenerator implements ProblemGenerator {
 
     @Override
     public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty) {
-        if (difficulty != Problem.Difficulty.MEDIUM) {
+        if (difficulty != Problem.Difficulty.DIFFICULT) {
             return null;
         }
 

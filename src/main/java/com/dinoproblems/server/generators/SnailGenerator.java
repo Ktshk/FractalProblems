@@ -34,7 +34,7 @@ public class SnailGenerator implements ProblemGenerator {
         int tree = randomInt(0, trees.length);
 
         String hint;
-        if (difficulty == Difficulty.HARD) {
+        if (difficulty == Difficulty.EXPERT) {
             final String text = "Однажды улитка заползла на вершину бамбука, который растет так, что каждая его точка поднимается вверх с одной и той же скоростью. " +
                     "Путь вверх занял у улитки 7 часов. Отдохнув на вершине бамбука ровно час, она спустилась на землю за 8 часов. " +
                     "Во сколько раз скорость улитки больше скорости роста бамбука?";
@@ -43,11 +43,11 @@ public class SnailGenerator implements ProblemGenerator {
                     Sets.newHashSet("в 16 раз", "16 раз", "в 16 раз больше"), hint, problemAvailability.getScenario(), difficulty);
         }
 
-        int d = difficulty == Difficulty.EASY ? randomInt(2, 5) :
+        int d = difficulty == Difficulty.MEDIUM ? randomInt(2, 5) :
                 randomInt(3, 6);
         int n = randomInt(1, d);
-        int answer = difficulty == Difficulty.EASY ? randomInt(4, 7) : randomInt(5, 11);
-        int h = answer * (d - n) + 2 * n - d + 1 + (difficulty == Difficulty.EASY ? (d - n - 1) : randomInt(0, d - n));
+        int answer = difficulty == Difficulty.MEDIUM ? randomInt(4, 7) : randomInt(5, 11);
+        int h = answer * (d - n) + 2 * n - d + 1 + (difficulty == Difficulty.MEDIUM ? (d - n - 1) : randomInt(0, d - n));
         String text = heroes[hero] + " ползет по " + trees[tree] + " высотой " + getMetersString(h) + ". "
                 + "За день " + (hero == 0 ? "она" : "он") + " поднимается на " + getMetersString(d) + ", а за ночь опускается на " + getMetersString(n) + ". "
                 + "Сколько дней " + (hero == 0 ? "ей" : "ему") + " потребуется, чтобы подняться на вершину?";
@@ -62,11 +62,20 @@ public class SnailGenerator implements ProblemGenerator {
 
     @Override
     public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Difficulty difficulty) {
-        if (difficulty == Difficulty.HARD) {
-            return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(HARD_SCENARIO), Sets.newHashSet(MEDIUM_AND_EASY_SCENARIO));
-        } else {
-            return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(MEDIUM_AND_EASY_SCENARIO),
-                    difficulty == Difficulty.EASY ? new HashSet<>() : Sets.newHashSet(MEDIUM_AND_EASY_SCENARIO));
+        switch (difficulty) {
+            case EASY:
+                return null;
+            case MEDIUM:
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(MEDIUM_AND_EASY_SCENARIO), new HashSet<>());
+            case DIFFICULT:
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(MEDIUM_AND_EASY_SCENARIO),
+                        Sets.newHashSet(MEDIUM_AND_EASY_SCENARIO));
+            case EXPERT:
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(HARD_SCENARIO),
+                        Sets.newHashSet(MEDIUM_AND_EASY_SCENARIO));
+
         }
+
+        throw new IllegalArgumentException();
     }
 }

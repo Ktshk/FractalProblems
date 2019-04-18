@@ -16,11 +16,13 @@ import com.dinoproblems.server.utils.*;
 
 import javax.annotation.Nonnull;
 
+import static com.dinoproblems.server.Problem.Difficulty.MEDIUM;
 import static com.dinoproblems.server.ProblemCollection.RANGE;
 import static com.dinoproblems.server.utils.Dictionary.PAGE;
 import static com.dinoproblems.server.utils.GeneratorUtils.Gender.MASCULINE;
 import static com.dinoproblems.server.utils.GeneratorUtils.Gender.NEUTER;
 import static com.dinoproblems.server.utils.GeneratorUtils.Gender.FEMININE;
+import static com.dinoproblems.server.utils.GeneratorUtils.findAvailableScenario;
 import static com.dinoproblems.server.utils.GeneratorUtils.getNumWithString;
 import static com.dinoproblems.server.utils.GeneratorUtils.randomInt;
 import static com.dinoproblems.server.Problem.Difficulty.EASY;
@@ -60,9 +62,9 @@ public class RangeGenerator implements ProblemGenerator {
             final String numsWithText = getNumWithString(answer, "число", "числа", "чисел", NEUTER);
             possibleTextAnswers = Sets.newHashSet(numsWithText);
             text.append("Сколько чисел от ");
-            text.append(String.valueOf(first),NumberWord.getStringForNumber(first, NEUTER, GeneratorUtils.Case.GENITIVE));
+            text.append(String.valueOf(first), NumberWord.getStringForNumber(first, NEUTER, GeneratorUtils.Case.GENITIVE));
             text.append(" до ");
-            text.append(String.valueOf(second),NumberWord.getStringForNumber(second, NEUTER, GeneratorUtils.Case.GENITIVE)).append("?");
+            text.append(String.valueOf(second), NumberWord.getStringForNumber(second, NEUTER, GeneratorUtils.Case.GENITIVE)).append("?");
             hint = "Попробуйте отнять от второго числа первое, но не забывайте, что первое число тоже входит в диапазон чисел.";
         } else if (scenario.equals(READ_PAGES)) {
 
@@ -81,12 +83,12 @@ public class RangeGenerator implements ProblemGenerator {
             String[] booksource = new String[]{" в библиотеке ", " у подруги ", " у друга ", " у учителя "};
             String book = booksource[randomInt(0, booksource.length)];
             hero = heroes[randomInt(0, heroes.length)];
-            first = difficulty == EASY ? randomInt(1, 7) : randomInt(1, 12);
-            if(first % 2 != 0) {
+            first = difficulty == MEDIUM ? randomInt(1, 7) : randomInt(1, 12);
+            if (first % 2 != 0) {
                 first++;
             }
-            second = difficulty == EASY ? randomInt(11, 20) : randomInt(28, 41);
-            if(second % 2 == 0) {
+            second = difficulty == MEDIUM ? randomInt(11, 20) : randomInt(28, 41);
+            if (second % 2 == 0) {
                 second++;
             }
             answer = second - first - 1;
@@ -104,14 +106,14 @@ public class RangeGenerator implements ProblemGenerator {
             hero = heroes[randomInt(0, heroes.length)];
             String beginMonth = months[monthIndex];
             String endMonth = nextMonths[monthIndex];
-            first = difficulty == EASY ? randomInt(10, 20) : randomInt(10, 15);
-            second = difficulty == EASY ? randomInt(1, 6) : randomInt(10, 18);
+            first = difficulty == MEDIUM ? randomInt(10, 20) : randomInt(10, 15);
+            second = difficulty == MEDIUM ? randomInt(1, 6) : randomInt(10, 18);
             answer = 31 - first + second + 1;
             final String daysWithText = getNumWithString(answer, "день", "дня", "дней", MASCULINE);
             possibleTextAnswers = Sets.newHashSet(daysWithText);
             text.append("На дверях библиотеки " + hero + " прочла: «С ");
-            text.append(String.valueOf(first),OrdinalNumber.getOrdinalTwoDigitNum(first).getGenitiveForm(MASCULINE));
-            text.append(beginMonth + "по ").append(String.valueOf(second),  OrdinalNumber.getOrdinalTwoDigitNum(second).getNominative(NEUTER));
+            text.append(String.valueOf(first), OrdinalNumber.getOrdinalTwoDigitNum(first).getGenitiveForm(MASCULINE));
+            text.append(beginMonth + "по ").append(String.valueOf(second), OrdinalNumber.getOrdinalTwoDigitNum(second).getNominative(NEUTER));
             text.append(endMonth + "библиотека не работает». Сколько дней отпуск у библиотекаря? (В" + monthsInstr[monthIndex] + "31 день)");
             hint = "Попробуйте из количества дней в" + monthsInstr[monthIndex] + "вычесть дату начала отпуска. " +
                     "Не забывайте, что день начала и день конца отпуска входят в количество дней в отпуске.";
@@ -121,12 +123,18 @@ public class RangeGenerator implements ProblemGenerator {
 
     @Override
     public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty) {
-        if (difficulty == Problem.Difficulty.HARD) {
-            return null;
+        switch (difficulty) {
+            case EASY:
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(NUMBERS, READ_PAGES), new HashSet<>());
+            case MEDIUM:
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(SCENARIOS), Sets.newHashSet(NUMBERS, READ_PAGES));
+            case DIFFICULT:
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(TORN_OUT_PAGES, DATES), Sets.newHashSet(SCENARIOS));
+            case EXPERT:
+                return null;
+
         }
 
-        return GeneratorUtils.findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(SCENARIOS),
-                difficulty == Problem.Difficulty.MEDIUM ? Sets.newHashSet(SCENARIOS) : new HashSet<>());
+        throw new IllegalArgumentException();
     }
 }
-		

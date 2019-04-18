@@ -14,6 +14,7 @@ public class Dictionary {
     public final static Noun SHOE = new NounBuilder().nom("ботинок").gen("ботинка").counting("ботинок").plural("ботинки").gender(MASCULINE).createNoun();
     public final static Noun PEAR = new NounBuilder().nom("груша").gen("груши").counting("груш").plural("груши").gender(FEMININE).createNoun();
     public final static Noun GIRL = new NounBuilder().nom("девочка").gen("девочки").counting("девочек").plural("девочки").gender(FEMININE).createNoun();
+    public final static Noun STAR = new NounBuilder().nom("звёздочка").gen("звёздочки").counting("звёздочек").plural("звёздочки").acc("звёздочку").gender(FEMININE).createNoun();
     public final static Noun HISTORY = new NounBuilder().nom("история").gen("истории").instr("историей").acc("историю").gender(FEMININE).createNoun();
     public final static Noun PENCIL = new NounBuilder().nom("карандаш").gen("карандаша").counting("карандашей").plural("карандаши").gender(MASCULINE).createNoun();
     public final static Noun CANDY = new NounBuilder().nom("конфета").gen("конфеты").counting("конфет").plural("конфеты").gender(FEMININE).createNoun();
@@ -22,11 +23,14 @@ public class Dictionary {
     public final static Noun BOY = new NounBuilder().nom("мальчик").gen("мальчика").counting("мальчиков").plural("мальчики").gender(MASCULINE).createNoun();
     public final static Noun JELLY_CANDY = new NounBuilder().nom("мармеладная конфета").gen("мармеладных конфеты").counting("мармеладных конфет").instr("мармеладными конфетами").plural("мармеладные конфеты").gender(FEMININE).createNoun();
     public final static Noun MATH = new NounBuilder().nom("математика").gen("математики").instr("математикой").acc("математику").gender(FEMININE).createNoun();
+    public final static Noun COIN = new NounBuilder().nom("монета").gen("монеты").counting("монет").plural("монеты").acc("монету").gender(FEMININE).createNoun();
     public final static Noun MUSIC = new NounBuilder().nom("музыка").gen("музыки").instr("музыкой").acc("музыку").gender(FEMININE).createNoun();
     public final static Noun DAFFODIL = new NounBuilder().nom("нарцисс").gen("нарцисса").counting("нарциссов").plural("нарциссы").gender(MASCULINE).createNoun();
     public final static Noun SOCK = new NounBuilder().nom("носок").gen("носка").counting("носков").plural("носки").gender(MASCULINE).createNoun();
+    public final static Noun STICK = new NounBuilder().nom("палочка").gen("палочки").counting("палочек").plural("палочки").acc("палочку").gender(FEMININE).createNoun();
     public final static Noun GLOVE = new NounBuilder().nom("перчатка").gen("перчатки").counting("перчаток").plural("перчатки").gender(FEMININE).createNoun();
     public final static Noun SUBJECT = new NounBuilder().nom("предмет").gen("предмета").acc("предмет").instr("предметом").counting("предметов").plural("предметы").gender(FEMININE).createNoun();
+    public final static Noun BUTTON = new NounBuilder().nom("пуговица").gen("пуговицы").counting("пуговиц").plural("пуговицы").acc("пуговицу").gender(FEMININE).createNoun();
     public final static Noun CHILD = new NounBuilder().nom("ребенок").gen("ребенка").counting("детей").plural("дети").gender(MASCULINE).createNoun();
     public final static Noun ROSE = new NounBuilder().nom("роза").gen("розы").counting("роз").plural("розы").gender(FEMININE).createNoun();
     public final static Noun CAMOMILE = new NounBuilder().nom("ромашка").gen("ромашки").counting("ромашек").plural("ромашки").gender(FEMININE).createNoun();

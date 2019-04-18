@@ -37,7 +37,7 @@ public class BrickAndHalfGenerator implements ProblemGenerator {
         if (scenario.equals(WAY)) {
             final String text = "Миша прошёл " + n * 100 + " метров и ещё " + getPartString(k) + " пути. Какова длина пути?";
             return new ProblemWithPossibleTextAnswers(text, answer * 100, ProblemCollection.BRICK_AND_HALF,
-                    Sets.newHashSet(answer + " м", answer * 100 + " метров"),
+                    Sets.newHashSet(answer * 100 + " м", answer * 100 + " метров"),
                     "Подумайте, какую часть пути составляют " + n * 100 + " метров.", scenario, difficulty);
         } else {
             String[] things1 = new String[]{"Кирпич", "Арбуз", "Мешок картошки"};
@@ -75,7 +75,7 @@ public class BrickAndHalfGenerator implements ProblemGenerator {
     }
 
     public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Difficulty difficulty) {
-        if (difficulty == Difficulty.HARD) {
+        if (difficulty == Difficulty.DIFFICULT || difficulty == Difficulty.EXPERT) {
             return null;
         }
 

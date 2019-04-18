@@ -82,7 +82,7 @@ public class SequenceGenerator implements ProblemGenerator {
 
     @Override
     public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty) {
-        if (difficulty == Problem.Difficulty.HARD) {
+        if (difficulty == Problem.Difficulty.DIFFICULT) {
             return null;
         }
 

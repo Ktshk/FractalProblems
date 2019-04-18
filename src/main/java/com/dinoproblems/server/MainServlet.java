@@ -224,7 +224,7 @@ public class MainServlet extends HttpServlet {
         } else if (checkAnswer(command, Sets.newHashSet("средняя", "среднюю"), yesAnswers)) {
             return Problem.Difficulty.MEDIUM;
         } else if (checkAnswer(command, Sets.newHashSet("сложная", "сложную"), yesAnswers)) {
-            return Problem.Difficulty.HARD;
+            return Problem.Difficulty.DIFFICULT;
         } else {
             return null;
         }

@@ -1,19 +1,22 @@
 package com.dinoproblems.server.generators;
 
 import com.dinoproblems.server.*;
+import com.dinoproblems.server.utils.AbstractNoun;
 import com.dinoproblems.server.utils.GeneratorUtils;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import javax.annotation.Nonnull;
 import java.util.*;
 
-import static com.dinoproblems.server.utils.GeneratorUtils.*;
+import static com.dinoproblems.server.utils.Dictionary.*;
 import static com.dinoproblems.server.utils.GeneratorUtils.Case.ACCUSATIVE;
-import static com.dinoproblems.server.utils.GeneratorUtils.Gender.FEMININE;
 import static com.dinoproblems.server.utils.GeneratorUtils.Gender.MASCULINE;
+import static com.dinoproblems.server.utils.GeneratorUtils.*;
 
 /**
- * Created by Katushka on 24.02.2019.
+ * Created by Katushka
+ * on 24.02.2019.
  */
 public class SpacesGenerator implements ProblemGenerator {
     private static final String LOG = "LOG";
@@ -23,7 +26,7 @@ public class SpacesGenerator implements ProblemGenerator {
     private static final List<ProblemScenario> SCENARIOS;
 
     static {
-        SCENARIOS  = new ArrayList<>();
+        SCENARIOS = new ArrayList<>();
         for (String theme : THEMES) {
             SCENARIOS.add(new SpacesScenario(theme, true));
             SCENARIOS.add(new SpacesScenario(theme, false));
@@ -34,7 +37,9 @@ public class SpacesGenerator implements ProblemGenerator {
     @Nonnull
     public Problem generateProblem(Problem.Difficulty difficulty, ProblemAvailability problemAvailability) {
         int spaces = difficulty == Problem.Difficulty.EASY ? GeneratorUtils.randomInt(7, 15) : GeneratorUtils.randomInt(10, 25);
-        int blocks = difficulty == Problem.Difficulty.EASY ? 1 : GeneratorUtils.randomInt(1, 5);
+        int blocks = difficulty == Problem.Difficulty.EASY ? 1 :
+                difficulty == Problem.Difficulty.MEDIUM ? GeneratorUtils.randomInt(1, 5)
+                : GeneratorUtils.randomInt(3, 7);
         int pieces = spaces + 1;
         int total = spaces + pieces;
 
@@ -48,9 +53,9 @@ public class SpacesGenerator implements ProblemGenerator {
         switch (scenario.getTheme()) {
             case LOG:
                 final String spaceWithText = getNumWithString(spaces, "распил", "распила", "распилов", MASCULINE);
-                final String piecesWithText = getNumWithString(pieces, "кусок", "куска", "кусков", MASCULINE);
 
                 if (difficulty == Problem.Difficulty.EASY) {
+                    String piecesWithText = getNumWithString(pieces, "кусок", "куска", "кусков", MASCULINE);
                     if (scenario.isDirectTask()) {
                         text = "Бобер пилил бревна. На одном бревне он сделал "
                                 + spaceWithText
@@ -60,12 +65,13 @@ public class SpacesGenerator implements ProblemGenerator {
                     } else {
                         text = "Бобер пилил бревна. Из одного бревна у него получилось "
                                 + piecesWithText
-                                + ". Сколько разрубов он сделал?";
+                                + ". Сколько распилов он сделал?";
                         possibleTextAnswers = Sets.newHashSet(spaceWithText);
                         answer = spaces;
                     }
                 } else {
                     pieces = spaces + blocks;
+                    String piecesWithText = getNumWithString(pieces, "кусок", "куска", "кусков", MASCULINE);
                     if (scenario.isDirectTask()) {
                         text = "Бобер пилил бревна. На " + getBlocksStringNa(blocks) + " он сделал "
                                 + spaceWithText
@@ -73,7 +79,7 @@ public class SpacesGenerator implements ProblemGenerator {
                         possibleTextAnswers = Sets.newHashSet(piecesWithText);
                         answer = pieces;
                     } else {
-                        text = "Бобер пилил бревна. Из " + getBlocksStringIz(blocks) + " бревна у него получилось "
+                        text = "Бобер пилил бревна. Из " + getBlocksStringIz(blocks) + " у него получилось "
                                 + piecesWithText
                                 + ". Сколько распилов он сделал?";
                         possibleTextAnswers = Sets.newHashSet(spaceWithText);
@@ -84,33 +90,30 @@ public class SpacesGenerator implements ProblemGenerator {
                 break;
             case DRAWING:
                 String[] heroes = new String[]{"Миша", "Дима", "Коля", "Вася", "Рома", "Сережа"};
-                String[][] things = {{"палочку", "палочки", "палочек"},
-                        {"звёздочку", "звёздочки", "звёздочек"},
-                        {"пуговицу", "пуговицы", "пуговиц"},
-                        {"монету", "монеты", "монет"}};
+                AbstractNoun[] things = {STICK, STAR, BUTTON, COIN};
                 int thing = GeneratorUtils.randomInt(0, things.length);
-                if (difficulty == Problem.Difficulty.EASY) {
+                if (difficulty == Problem.Difficulty.EASY || (difficulty == Problem.Difficulty.MEDIUM && !scenario.isDirectTask())) {
                     String[] chosenHeroes = chooseRandomString(heroes, 2);
 
                     if (scenario.isDirectTask()) {
                         text = chosenHeroes[0] + (thing < 2 ? " нарисовал на доске " : " выложил в ряд ")
-                                + getNumWithString(pieces, things[thing][0], things[thing][1], things[thing][2], FEMININE, ACCUSATIVE)
+                                + getNumWithString(pieces, things[thing], ACCUSATIVE)
                                 + ". " + chosenHeroes[1] + " между каждыми двумя "
                                 + (thing < 2 ? " нарисовал " : " выложил ") + " ещё по одной. "
-                                + "Сколько " + things[thing][2] + (thing < 2 ? " нарисовал " : " выложил ") + chosenHeroes[1] + "?";
-                        possibleTextAnswers = Sets.newHashSet(getNumWithString(spaces, things[thing][0], things[thing][1], things[thing][2], FEMININE, ACCUSATIVE));
+                                + "Сколько " + things[thing].getCountingForm() + (thing < 2 ? " нарисовал " : " выложил ") + chosenHeroes[1] + "?";
+                        possibleTextAnswers = Sets.newHashSet(getNumWithString(spaces, things[thing], ACCUSATIVE));
                         answer = spaces;
                     } else {
                         text = chosenHeroes[0] + (thing < 2 ? " нарисовал на доске " : " выложил в ряд ")
-                                + "несколько " + things[thing][2]
+                                + "несколько " + things[thing].getCountingForm()
                                 + ". " + chosenHeroes[1] + " между каждыми двумя "
                                 + (thing < 2 ? " нарисовал " : " выложил ") + " ещё по одной. "
-                                + "Всего получилось " + getNumWithString(total, things[thing], FEMININE)
-                                + ".  Сколько " + things[thing][2] + (thing < 2 ? " нарисовал " : " выложил ") + chosenHeroes[0] + "?";
-                        possibleTextAnswers = Sets.newHashSet(getNumWithString(spaces, things[thing][0], things[thing][1], things[thing][2], FEMININE, ACCUSATIVE));
+                                + "Всего получилось " + getNumWithString(total, things[thing])
+                                + ".  Сколько " + things[thing].getCountingForm() + (thing < 2 ? " нарисовал " : " выложил ") + chosenHeroes[0] + "?";
+                        possibleTextAnswers = Sets.newHashSet(getNumWithString(spaces, things[thing], ACCUSATIVE));
                         answer = pieces;
                     }
-                    hint = "Подумайте, насколько меньше " + things[thing][2] + (thing < 2 ? " нарисовал " : " выложил ") + chosenHeroes[1] + ". ";
+                    hint = "Подумайте, насколько меньше " + things[thing].getCountingForm() + (thing < 2 ? " нарисовал " : " выложил ") + chosenHeroes[1] + ". ";
                 } else {
                     int spaces2 = total - 1;
                     int total2 = total + spaces2;
@@ -119,11 +122,11 @@ public class SpacesGenerator implements ProblemGenerator {
 
                     if (!scenario.isDirectTask()) {
                         text = chosenHeroes[0] + (thing < 2 ? " нарисовал на доске " : " выложил в ряд ")
-                                + "несколько " + things[thing][2]
+                                + "несколько " + things[thing].getCountingForm()
                                 + ". ";
                     } else {
                         text = chosenHeroes[0] + (thing < 2 ? " нарисовал на доске " : " выложил в ряд ")
-                                + getNumWithString(pieces, things[thing][0], things[thing][1], things[thing][2], FEMININE, ACCUSATIVE)
+                                + getNumWithString(pieces, things[thing], ACCUSATIVE)
                                 + ". ";
                     }
 
@@ -132,16 +135,16 @@ public class SpacesGenerator implements ProblemGenerator {
                             + "Потом пришёл " + chosenHeroes[2] + " и сделал то же самое. ";
 
                     if (!scenario.isDirectTask()) {
-                        text += "Всего получилось " + getNumWithString(total2, things[thing], FEMININE)
-                                + ". Сколько " + things[thing][2] + (thing < 2 ? " нарисовал " : " выложил ") + chosenHeroes[0] + "?";
-                        possibleTextAnswers = Sets.newHashSet(getNumWithString(spaces, things[thing][0], things[thing][1], things[thing][2], FEMININE, ACCUSATIVE));
+                        text += "Всего получилось " + getNumWithString(total2, things[thing])
+                                + ". Сколько " + things[thing].getCountingForm() + (thing < 2 ? " нарисовал " : " выложил ") + chosenHeroes[0] + "?";
+                        possibleTextAnswers = Sets.newHashSet(getNumWithString(pieces, things[thing], ACCUSATIVE));
                         answer = pieces;
                     } else {
-                        text += "Сколько " + things[thing][2] + (thing < 2 ? " нарисовал " : " выложил ") + chosenHeroes[2] + "?";
-                        possibleTextAnswers = Sets.newHashSet(getNumWithString(spaces, things[thing][0], things[thing][1], things[thing][2], FEMININE, ACCUSATIVE));
+                        text += "Сколько " + things[thing].getCountingForm() + (thing < 2 ? " нарисовал " : " выложил ") + chosenHeroes[2] + "?";
+                        possibleTextAnswers = Sets.newHashSet(getNumWithString(spaces, things[thing], ACCUSATIVE));
                         answer = spaces2;
                     }
-                    hint = "Подумайте, насколько меньше " + things[thing][2] + (thing < 2 ? " нарисовал " : " выложил ") + chosenHeroes[2] + ", чем до этого было.";
+                    hint = "Подумайте, насколько меньше " + things[thing].getCountingForm() + (thing < 2 ? " нарисовал " : " выложил ") + chosenHeroes[2] + ", чем до этого было.";
                 }
                 break;
             case FENCE:
@@ -215,11 +218,27 @@ public class SpacesGenerator implements ProblemGenerator {
 
     @Override
     public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty) {
-        if (difficulty == Problem.Difficulty.HARD) {
-            return null;
+        switch (difficulty) {
+            case EASY:
+                final ArrayList<ProblemScenario> easyScenarios = new ArrayList<>(SCENARIOS);
+                easyScenarios.remove(new SpacesScenario(DRAWING, false));
+                return findAvailableScenario(difficulty, alreadySolvedProblems, easyScenarios, new HashSet<>());
+            case MEDIUM: {
+                final ArrayList<ProblemScenario> mediumScenarios = new ArrayList<>(SCENARIOS);
+                mediumScenarios.remove(new SpacesScenario(LOG, false));
+                return findAvailableScenario(difficulty, alreadySolvedProblems, mediumScenarios, Sets.newHashSet(SCENARIOS));
+            }
+            case DIFFICULT:
+                final Set<ProblemScenario> mediumScenarios = new HashSet<>(SCENARIOS);
+                mediumScenarios.remove(new SpacesScenario(LOG, false));
+                return findAvailableScenario(difficulty, alreadySolvedProblems,
+                        Lists.newArrayList(new SpacesScenario(DRAWING, false), new SpacesScenario(LOG, false)), mediumScenarios);
+            case EXPERT:
+                return null;
+
         }
-        return findAvailableScenario(difficulty, alreadySolvedProblems, SCENARIOS,
-                difficulty == Problem.Difficulty.EASY ? new HashSet<>() : SCENARIOS);
+
+        throw new IllegalArgumentException();
     }
 
     private static class SpacesScenario extends ProblemScenarioImpl {

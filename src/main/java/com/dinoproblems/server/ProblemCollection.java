@@ -5,10 +5,8 @@ import com.dinoproblems.server.ProblemGenerator.ProblemAvailabilityType;
 import com.dinoproblems.server.generators.*;
 import com.dinoproblems.server.utils.GeneratorUtils;
 import com.google.common.collect.*;
-import javafx.util.Pair;
 
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 /**
