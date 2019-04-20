@@ -20,6 +20,7 @@ import java.util.Set;
 
 import static com.dinoproblems.server.utils.GeneratorUtils.randomInt;
 
+
 /**
  * Created by Katushka on 07.01.2019.
  */
@@ -81,8 +82,11 @@ public class MainServlet extends HttpServlet {
 
             final Session session = currentProblems.computeIfAbsent(sessionId, Session::new);
 
+
+
             if (newSession) {
                 responseJson.addProperty("text", "Это закрытый навык. Я предлагаю вам решить логическую задачу. Какую хотите: простую, среднюю или сложную?");
+                session.setLastServerResponse("Это закрытый навык. Я предлагаю вам решить логическую задачу. Какую хотите: простую, среднюю или сложную?");
                 responseJson.add("buttons", createDifficultyButtons());
 
                 responseJson.addProperty("end_session", false);
@@ -96,6 +100,10 @@ public class MainServlet extends HttpServlet {
             } else if (session.getCurrentProblem() == null && session.getCurrentDifficulty() == null) {
                 final Problem.Difficulty currentDifficulty = parseDifficulty(command);
                 if (currentDifficulty == null) {
+
+                    dataBaseService.updateMiscAnswersTable(command, "", session.getLastServerResponse());
+
+                    session.setLastServerResponse("Не поняла вас. Выберите пожалуйста сложность задач");
                     responseJson.addProperty("text", "Не поняла вас. Выберите пожалуйста сложность задач");
                     responseJson.add("buttons", createDifficultyButtons());
                     responseJson.addProperty("end_session", false);
@@ -114,23 +122,31 @@ public class MainServlet extends HttpServlet {
                 final Problem problem = session.getCurrentProblem();
 
                 if (problem == null) {
+
+                    dataBaseService.updateMiscAnswersTable(command, "", session.getLastServerResponse());
+
+                    session.setLastServerResponse("Не поняла вас. Хотите решить задачу?");
                     responseJson.addProperty("text", "Не поняла вас. Хотите решить задачу?");
                     result.add("response", responseJson);
                 } else if (checkAnswer(command, askHint, yesAnswers)) {
                     if (problem.getState() == Problem.State.HINT_GIVEN) {
                         responseJson.addProperty("text", "Я уже давала вам подсказку. " + problem.getHint());
+                        session.setLastServerResponse("Я уже давала вам подсказку. " + problem.getHint());
                     } else {
                         responseJson.addProperty("text", problem.getHint());
+                        session.setLastServerResponse(problem.getHint());
                     }
                     result.add("response", responseJson);
                     problem.setState(Problem.State.HINT_GIVEN);
                     addProblemButtons(responseJson);
                 } else if (checkAnswer(command, askToRepeat, yesAnswers)) {
                     responseJson.addProperty("text", problem.getText());
+                    session.setLastServerResponse(problem.getText());
                     result.add("response", responseJson);
                     addProblemButtons(responseJson);
                 } else if (checkAnswer(command, askAnswer, yesAnswers)) {
                     responseJson.addProperty("text", "Правильный ответ " + problem.getTextAnswer() + ". Хотите еще задачу?");
+                    session.setLastServerResponse("Правильный ответ " + problem.getTextAnswer() + ". Хотите еще задачу?");
                     result.add("response", responseJson);
                     problem.setState(Problem.State.ANSWER_GIVEN);
                     session.setCurrentProblem(null);

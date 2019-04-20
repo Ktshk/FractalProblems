@@ -14,6 +14,7 @@ public class Session {
     private Problem currentProblem;
     private Multimap<String, Problem> solvedProblemsByTheme = HashMultimap.create();
     private Problem.Difficulty currentDifficulty = null;
+    private String lastServerResponse;
 
     public Session(String sessionId) {
         this.sessionId = sessionId;
@@ -36,6 +37,14 @@ public class Session {
 
     public void setCurrentDifficulty(Problem.Difficulty currentDifficulty) {
         this.currentDifficulty = currentDifficulty;
+    }
+
+    public String getLastServerResponse() {
+        return lastServerResponse;
+    }
+
+    public void setLastServerResponse(String lastServerResponse) {
+        this.lastServerResponse = lastServerResponse;
     }
 
     public Multimap<String, Problem> getSolvedProblems() {

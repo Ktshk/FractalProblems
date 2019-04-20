@@ -23,7 +23,7 @@ public class OrdinalNumber extends Adjective {
     public static final OrdinalNumber FIFTH = new OrdinalNumber(5, "пятый", "пятая", "пятое",
             "5", "пятого", "пятой", "5");
     public static final OrdinalNumber SIXTH = new OrdinalNumber(6, "шестой", "шестая", "шестое",
-            "6", "шестого", "шестой", "5");
+            "6", "шестого", "шестой", "6");
     public static final OrdinalNumber SEVENTH = new OrdinalNumber(7, "седьмой", "седьмая", "седьмое",
             "7", "седьмого", "седьмой", "7");
     public static final OrdinalNumber EIGHTH = new OrdinalNumber(8, "восьмой", "восьмая", "восьмое",
@@ -53,7 +53,7 @@ public class OrdinalNumber extends Adjective {
     public static final OrdinalNumber TWENTIETH = new OrdinalNumber(20, "двадцатый", "двадцатая", "двадцатое",
             "20", "двадцатого", "двадцатой", "20");
     public static final OrdinalNumber THIRTIETH = new OrdinalNumber(30, "тридцатый", "тридцатая", "тридцатое",
-            "30", "тридцатого", "тридцатой", "20");
+            "30", "тридцатого", "тридцатой", "30");
     public static final OrdinalNumber FORTIETH = new OrdinalNumber(40, "сороковой", "сороковая", "сороковое",
             "40", "сорокового", "сороковой", "40");
 
