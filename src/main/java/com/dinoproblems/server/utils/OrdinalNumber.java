@@ -56,6 +56,8 @@ public class OrdinalNumber extends Adjective {
             "30", "тридцатого", "тридцатой", "30");
     public static final OrdinalNumber FORTIETH = new OrdinalNumber(40, "сороковой", "сороковая", "сороковое",
             "40", "сорокового", "сороковой", "40");
+    public static final OrdinalNumber FIFTIETH = new OrdinalNumber(50, "пятидесятиый", "пятидесятая", "пятидесятое",
+            "50", "пятидесятого", "пятидесятой", "50");
 
     private static final String[] TENS = {"", "", "двадцать", "тридцать", "сорок", "пятьдесят", "шестьдесят", "семьдесят",
             "восемьдесят", "девяносто"};
