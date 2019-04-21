@@ -50,7 +50,16 @@ public class GeneratorUtils {
     }
 
     public static String getNumWithString(int count, AbstractNoun noun, Case wordCase) {
-        return getNumWithString(count, noun.getNominative(), noun.getCountingGenitive(), noun.getCountingForm(), noun.getGender(), wordCase);
+        switch (wordCase) {
+            case NOMINATIVE:
+                return getNumWithString(count, noun.getNominative(), noun.getCountingGenitive(), noun.getCountingForm(), noun.getGender(), wordCase);
+            case ACCUSATIVE:
+                return getNumWithString(count, noun.getAccusativeForm(), noun.getCountingGenitive(), noun.getCountingForm(), noun.getGender(), wordCase);
+            case GENITIVE:
+                return getNumWithString(count, noun.getGenitive(), noun.getCountingGenitive(), noun.getCountingForm(), noun.getGender(), wordCase);
+        }
+
+        throw new IllegalArgumentException();
     }
 
     public static String getNumWithString(int count, final String[] wordForms, Gender gender) {
@@ -131,22 +140,38 @@ public class GeneratorUtils {
         }
 
         for (Problem problem : alreadySolvedProblems) {
+            final ProblemScenario problemScenario = problem.getProblemScenario();
+            if (!scenarioToProblemAvailability.containsKey(problemScenario)) {
+                continue;
+            }
             if (problem.getState() == Problem.State.SOLVED) {
                 if (problem.getDifficulty().compareTo(difficulty) < 0) {
-                    if (scenarioToProblemAvailability.get(problem.getProblemScenario()) != ProblemAvailabilityType.minorScenarioChanges) {
-                        scenarioToProblemAvailability.put(problem.getProblemScenario(), ProblemAvailabilityType.trainProblem);
+                    if (scenarioToProblemAvailability.get(problemScenario) != ProblemAvailabilityType.minorScenarioChanges) {
+                        scenarioToProblemAvailability.put(problemScenario, ProblemAvailabilityType.trainProblem);
                     }
                 } else {
-                    scenarioToProblemAvailability.put(problem.getProblemScenario(), ProblemAvailabilityType.minorScenarioChanges);
+                    if (problemScenario.isSingleProblem()) {
+                        scenarioToProblemAvailability.remove(problemScenario);
+                    } else {
+                        scenarioToProblemAvailability.put(problemScenario, ProblemAvailabilityType.minorScenarioChanges);
+                    }
                 }
             } else if (problem.getState() == Problem.State.SOLVED_WITH_HINT || problem.getState() == Problem.State.ANSWER_GIVEN) {
-                final ProblemAvailabilityType availabilityType = scenarioToProblemAvailability.get(problem.getProblemScenario());
+                final ProblemAvailabilityType availabilityType = scenarioToProblemAvailability.get(problemScenario);
                 if (availabilityType == ProblemAvailabilityType.newScenarioProblem) {
                     if (!easierScenarios.isEmpty()) {
-                        scenarioToProblemAvailability.put(problem.getProblemScenario(), ProblemAvailabilityType.easierProblem);
+                        scenarioToProblemAvailability.put(problemScenario, ProblemAvailabilityType.easierProblem);
+                    } else {
+                        if (problemScenario.isSingleProblem()) {
+                            scenarioToProblemAvailability.remove(problemScenario);
+                        }
                     }
                 }
             }
+        }
+
+        if (scenarioToProblemAvailability.isEmpty()) {
+            return null;
         }
 
         List<ProblemScenario> bestChoice = new ArrayList<>();

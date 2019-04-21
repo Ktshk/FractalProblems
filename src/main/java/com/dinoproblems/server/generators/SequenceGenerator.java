@@ -113,7 +113,7 @@ public class SequenceGenerator implements ProblemGenerator {
                         break;
                 }
                 break;
-            case HARD:
+            case DIFFICULT:
                 type = randomInt(1, 6);
                 operand1 = randomInt(3, 5);
                 operand2 = randomInt(5, 10);
@@ -208,12 +208,16 @@ public class SequenceGenerator implements ProblemGenerator {
 
     @Override
     public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty) {
-        if (difficulty == Problem.Difficulty.HARD) {
-            return null;//?
+
+
+
+            if (difficulty == Problem.Difficulty.DIFFICULT) {
+                return null;
+
+            }
+
+            return GeneratorUtils.findAvailableScenario(difficulty, alreadySolvedProblems,
+                    Lists.newArrayList(DEFAULT_SCENARIO), new HashSet<>());
         }
 
-        return GeneratorUtils.findAvailableScenario(difficulty, alreadySolvedProblems,
-                Lists.newArrayList(DEFAULT_SCENARIO), new HashSet<>());
     }
-
-}

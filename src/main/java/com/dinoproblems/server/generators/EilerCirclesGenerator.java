@@ -17,7 +17,8 @@ import static com.dinoproblems.server.utils.Dictionary.*;
 import static com.dinoproblems.server.utils.GeneratorUtils.*;
 
 /**
- * Created by Katushka on 07.03.2019.
+ * Created by Katushka
+ * on 07.03.2019.
  */
 public class EilerCirclesGenerator implements ProblemGenerator {
 
@@ -93,12 +94,15 @@ public class EilerCirclesGenerator implements ProblemGenerator {
     @Nonnull
     @Override
     public Problem generateProblem(Problem.Difficulty difficulty, ProblemAvailability problemAvailability) {
+        if (difficulty == Problem.Difficulty.EXPERT) {
+            throw new IllegalArgumentException();
+        }
+
         final EilerCirclesScenario scenario = (EilerCirclesScenario) problemAvailability.getScenario();
 
-        int x = difficulty == Problem.Difficulty.EASY ? randomInt(1, 6) : randomInt(8, 16);
-        int z = difficulty == Problem.Difficulty.EASY ? randomInt(1, 6) : randomInt(8, 16);
-        int y = difficulty == Problem.Difficulty.EASY ? randomInt(Math.max(1, 8 - x - z), Math.min(8, 13 - x - z)) :
-                randomInt(5, Math.min(16, 40 - x - z));
+        int x = difficulty == Problem.Difficulty.DIFFICULT ? randomInt(8, 16) : randomInt(1, 6);
+        int z = difficulty == Problem.Difficulty.DIFFICULT ? randomInt(8, 16) : randomInt(1, 6);
+        int y = difficulty == Problem.Difficulty.DIFFICULT ? randomInt(5, Math.min(16, 40 - x - z)) : randomInt(Math.max(1, 8 - x - z), Math.min(8, 13 - x - z));
 
         int total = x + y + z;
 
@@ -230,7 +234,7 @@ public class EilerCirclesGenerator implements ProblemGenerator {
                 text.append(startSentence ? "Среди " : "среди ").append(Integer.toString(y + z), NumberWord.getStringForNumber(y + z, Gender.MASCULINE, Case.GENITIVE))
                         .append(" детей, которые ").append(verb.getPlural()).append(" ").append(GOVERN_FORM.get(verb).apply(chosenSubjects[1]))
                         .append(", ").append(conditions.get(X_Y).getTextWithCount(y, selectVerb(THEMES[theme], verbCount++)));
-                chosenVariables.remove(X_Y);
+                chosenVariables.remove(Y);
             } else {
                 text.append(conditions.get(Y_Z).getTextWithCount(selectVerb(THEMES[theme], verbCount++)));
             }
@@ -323,7 +327,7 @@ public class EilerCirclesGenerator implements ProblemGenerator {
             this.bothObjects = bothObjects;
         }
 
-        public Condition(int count, String text) {
+        Condition(int count, String text) {
             this(count, text, null, null, false);
         }
 
@@ -426,14 +430,19 @@ public class EilerCirclesGenerator implements ProblemGenerator {
     @Nullable
     @Override
     public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty) {
-        if (difficulty == Problem.Difficulty.HARD) {
-            return null;
+        switch (difficulty) {
+            case EASY:
+                return findAvailableScenario(difficulty, alreadySolvedProblems, EASY_SCENARIOS, new HashSet<>());
+            case MEDIUM:
+                return findAvailableScenario(difficulty, alreadySolvedProblems, SCENARIOS, Sets.newHashSet(EASY_SCENARIOS));
+            case DIFFICULT:
+                return findAvailableScenario(difficulty, alreadySolvedProblems, SCENARIOS, Sets.newHashSet(SCENARIOS));
+            case EXPERT:
+                return null;
+
         }
 
-        return GeneratorUtils.findAvailableScenario(difficulty, alreadySolvedProblems,
-                difficulty == Problem.Difficulty.MEDIUM ? SCENARIOS : EASY_SCENARIOS,
-                difficulty == Problem.Difficulty.MEDIUM ? Sets.newHashSet(EASY_SCENARIOS) : new HashSet<>());
-
+        throw new IllegalArgumentException();
     }
 
     private static class EilerCirclesScenario extends ProblemScenarioImpl {
@@ -461,7 +470,7 @@ public class EilerCirclesGenerator implements ProblemGenerator {
             return var3;
         }
 
-        public Set<String> getVars() {
+        Set<String> getVars() {
             return Sets.newHashSet(var1, var2, var3);
         }
     }

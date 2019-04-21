@@ -6,7 +6,7 @@ import com.google.common.collect.Sets;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Set;
+
 import com.dinoproblems.server.utils.*;
 
 import javax.annotation.Nonnull;
@@ -94,7 +94,7 @@ public class SumDifferenceGenerator implements ProblemGenerator {
 
     @Override
     public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty) {
-        if (difficulty == Problem.Difficulty.HARD) {
+        if (difficulty == Problem.Difficulty.DIFFICULT) {
             return null;
         }
 

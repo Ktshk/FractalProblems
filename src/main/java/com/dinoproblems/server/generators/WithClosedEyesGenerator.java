@@ -45,34 +45,34 @@ public class WithClosedEyesGenerator implements ProblemGenerator {
         final HashSet<String> possibleTextAnswers = Sets.newHashSet();
         String where = WHERE[randomInt(0, WHERE.length)];
 
-        Noun[] things = (difficulty == Problem.Difficulty.HARD || scenario != COUNT_ITEMS_HARD) ? THINGS : PAIRED_THINGS;
+        Noun[] things = !scenario.equals(PAIRS) ? THINGS : PAIRED_THINGS;
         int thing = randomInt(0, things.length);
 
         StringBuilder text = new StringBuilder("В " + where + " лежат " + things[thing].getPluralForm() + ": ");
 
-        int[] count = difficulty == Problem.Difficulty.EASY ? new int[2] :
-                (difficulty == Problem.Difficulty.HARD ? new int[3] : new int[randomInt(2, scenario != PAIRS ? 5 : 4)]);
+        int[] count = difficulty == Problem.Difficulty.MEDIUM ? new int[2] :
+                (difficulty == Problem.Difficulty.EXPERT ? new int[3] : new int[randomInt(2, scenario != PAIRS ? 5 : 4)]);
         Adjective[] chosenColors = GeneratorUtils.chooseRandom(COLORS, count.length, Adjective[]::new);
 
         int min = Integer.MAX_VALUE;
         int max = 0;
         for (int i = 0; i < count.length; i++) {
-            count[i] = difficulty == Problem.Difficulty.EASY ? randomInt(4, 8) :
-                    (difficulty == Problem.Difficulty.HARD ? randomInt(3, 9) : randomInt(6, scenario != PAIRS ? 20 : 12));
+            count[i] = difficulty == Problem.Difficulty.MEDIUM ? randomInt(4, 8) :
+                    (difficulty == Problem.Difficulty.EXPERT ? randomInt(3, 9) : randomInt(6, scenario != PAIRS ? 20 : 12));
             min = Math.min(min, count[i]);
             max = Math.max(max, count[i]);
         }
 
         String hint;
 
-        if (difficulty == Problem.Difficulty.HARD && scenario == COUNT_ITEMS_HARD) {
+        if (difficulty == Problem.Difficulty.EXPERT && scenario == COUNT_ITEMS_HARD) {
             for (int i = 0; i < count.length; i++) {
                 if (i == count.length - 1) {
                     text.append(" и ");
                 } else if (i > 0) {
                     text.append(", ");
                 }
-                text.append(count[i]).append(" ").append(chosenColors[i].getGenitiveForm(MASCULINE));
+                text.append(chosenColors[i].getGenitiveForm(MASCULINE));
             }
             text.append(" цвета. Чтобы вытащить 1 ").append(chosenColors[0].getNominative(MASCULINE)).append(" ").append(things[thing].getNominative());
             text.append(", нужно взять наугад ").append(getNumWithString(count[1] + count[2] + 1, things[thing]));
@@ -159,14 +159,20 @@ public class WithClosedEyesGenerator implements ProblemGenerator {
 
     @Nullable
     public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty) {
-        if (difficulty == Problem.Difficulty.EASY) {
-            return null;
-        }
         final HashSet<ProblemScenario> mediumScenarios = Sets.newHashSet(ANY_COLOR, DIFFERENT_COLORS, SPECIAL_COLOR, PAIRS);
-        if (difficulty == Problem.Difficulty.HARD) {
-            return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(COUNT_ITEMS_HARD), mediumScenarios);
-        } else {
-            return findAvailableScenario(difficulty, alreadySolvedProblems, new ArrayList<>(mediumScenarios), new HashSet<>());
+
+        switch (difficulty) {
+            case EASY:
+                return null;
+            case MEDIUM:
+                return findAvailableScenario(difficulty, alreadySolvedProblems, new ArrayList<>(mediumScenarios), new HashSet<>());
+            case DIFFICULT:
+                return findAvailableScenario(difficulty, alreadySolvedProblems, new ArrayList<>(mediumScenarios), new HashSet<>(mediumScenarios));
+            case EXPERT:
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(COUNT_ITEMS_HARD), mediumScenarios);
+
         }
+
+        throw new IllegalArgumentException();
     }
 }

@@ -219,7 +219,7 @@ public class FromEndToBeginGenerator implements ProblemGenerator {
 
     @Override
     public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Difficulty difficulty) {
-        if (difficulty == Difficulty.HARD) {
+        if (difficulty == Difficulty.DIFFICULT) {
             return null;
         }
         return GeneratorUtils.findAvailableScenario(difficulty, alreadySolvedProblems, SCENARIOS,

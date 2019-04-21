@@ -1,18 +1,18 @@
 package com.dinoproblems.server;
 
-import com.dinoproblems.server.generators.RangeGenerator;
-import com.dinoproblems.server.generators.SequenceGenerator;
+import com.dinoproblems.server.generators.*;
 import org.junit.Test;
 
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Created by Katushka on 13.03.2019.
+ * Created by Katushka
+ * on 13.03.2019.
  */
 public class TestProblemGenerator {
 
-    public static final ProblemGenerator GENERATOR = new SequenceGenerator();
+    private static final ProblemGenerator GENERATOR = new SequenceGenerator();
 
     @Test
     public void testAllGenerators() {
@@ -43,6 +43,32 @@ public class TestProblemGenerator {
         }
     }
 
+    @Test
+    public void testDifferentProblemsCount() {
+        for (Problem.Difficulty difficulty : Problem.Difficulty.values()) {
+            System.out.println("************* " + difficulty);
+            Set<Problem> solvedProblems = new HashSet<>();
+            int count = 0;
+            for (ProblemGenerator generator : ProblemCollection.INSTANCE.getGenerators()) {
+//                System.out.println("************* Generator: " + generator);
+                int i = 0;
+                for (; i < 100; i++) {
+                    final ProblemGenerator.ProblemAvailability problemAvailability = generator.hasProblem(solvedProblems, difficulty);
+                    if (problemAvailability == null || problemAvailability.getType() == ProblemGenerator.ProblemAvailabilityType.minorScenarioChanges) {
+                        break;
+                    }
+                    final Problem problem = generator.generateProblem(difficulty, problemAvailability);
+                    problem.setState(Problem.State.SOLVED);
+                    solvedProblems.add(problem);
+                }
+//                System.out.println("Count: " + i);
+                count += i;
+            }
+            System.out.println("Total: " + count);
+        }
+    }
+
+
     private void solveProblem(ProblemCollection problemCollection, Session session, Problem.State state) {
         final Problem problem = problemCollection.generateProblem(session);
         session.setCurrentProblem(problem);
@@ -71,6 +97,7 @@ public class TestProblemGenerator {
                 }
                 final Problem problem = generator.generateProblem(difficulty, problemAvailability);
                 System.out.println("Problem " + (i + 1) + ": " + problem.getText());
+                System.out.println("Hint: " + problem.getHint());
                 System.out.println("Answer: " + problem.getTextAnswer());
                 System.out.println("*** ");
 

@@ -4,9 +4,7 @@ import com.dinoproblems.server.ProblemGenerator.ProblemAvailability;
 import com.dinoproblems.server.ProblemGenerator.ProblemAvailabilityType;
 import com.dinoproblems.server.generators.*;
 import com.dinoproblems.server.utils.GeneratorUtils;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-import com.google.common.collect.Multimap;
+import com.google.common.collect.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,6 +26,10 @@ public class ProblemCollection {
     public static final String EILER_CIRCLES = "Eiler Circles";
     public static final String SEQUENCE = "Sequence";
     public static final String RANGE = "Range";
+    public static final String SHARE_WITH_FRIENDS = "Share with friends";
+    public static final String FIND_NUMBER = "Find number";
+    public static final String COMBINATORICS = "Combinatorics";
+    public static final String BROTHERS_AND_SISTERS = "Brothers and sisters";
 
     private BiMap<String, ProblemGenerator> generators = HashBiMap.create();
 
@@ -43,7 +45,10 @@ public class ProblemCollection {
         generators.put(EILER_CIRCLES, new EilerCirclesGenerator());
         generators.put(SEQUENCE, new SequenceGenerator());
         generators.put(RANGE, new RangeGenerator());
-
+        generators.put(SHARE_WITH_FRIENDS, new ShareWithFriendsGenerator());
+        generators.put(FIND_NUMBER, new FindNumberGenerator());
+        generators.put(COMBINATORICS, new CombinatoricsGenerator());
+        generators.put(BROTHERS_AND_SISTERS, new BrothersAndSistersGenerator());
     }
 
     public Problem generateProblem(Session session) {
