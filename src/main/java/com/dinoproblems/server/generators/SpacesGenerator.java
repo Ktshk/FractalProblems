@@ -3,6 +3,7 @@ package com.dinoproblems.server.generators;
 import com.dinoproblems.server.*;
 import com.dinoproblems.server.utils.AbstractNoun;
 import com.dinoproblems.server.utils.GeneratorUtils;
+import com.dinoproblems.server.utils.OrdinalNumber;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -22,8 +23,17 @@ public class SpacesGenerator implements ProblemGenerator {
     private static final String LOG = "LOG";
     private static final String DRAWING = "DRAWING";
     private static final String FENCE = "FENCE";
+    private static final String CAKES = "CAKES";
+    private static final String ELEVATOR = "ELEVATOR";
+    private static final String PILLS = "PILLS";
+
     private static final String[] THEMES = {LOG, DRAWING, FENCE};
+
     private static final List<ProblemScenario> SCENARIOS;
+    private static  final ArrayList<ProblemScenario> EASY_SCENARIOS;
+    private static final ArrayList<ProblemScenario> MEDIUM_SCENARIOS;
+
+    private static final String[] HEROES = {"Миша", "Дима", "Коля", "Вася", "Рома", "Сережа"};
 
     static {
         SCENARIOS = new ArrayList<>();
@@ -31,6 +41,16 @@ public class SpacesGenerator implements ProblemGenerator {
             SCENARIOS.add(new SpacesScenario(theme, true));
             SCENARIOS.add(new SpacesScenario(theme, false));
         }
+
+        EASY_SCENARIOS = new ArrayList<>(SCENARIOS);
+        EASY_SCENARIOS.remove(new SpacesScenario(DRAWING, false));
+        EASY_SCENARIOS.add(new SpacesScenario(CAKES, true));
+        EASY_SCENARIOS.add(new SpacesScenario(ELEVATOR, true));
+        EASY_SCENARIOS.add(new SpacesScenario(PILLS, true));
+
+        MEDIUM_SCENARIOS = new ArrayList<>(SCENARIOS);
+        MEDIUM_SCENARIOS.remove(new SpacesScenario(LOG, false));
+        MEDIUM_SCENARIOS.add(new SpacesScenario(ELEVATOR, true));
     }
 
     @Override
@@ -51,6 +71,31 @@ public class SpacesGenerator implements ProblemGenerator {
 
         String hint;
         switch (scenario.getTheme()) {
+            case CAKES:
+                String hero = HEROES[randomInt(0, HEROES.length)];
+                text = hero + " выложил в круг на столе " + pieces + " кремовых пирожных. " +
+                        "Пришла мама и положила между каждыми двумя соседними пирожными по одной корзиночке с фруктами. " +
+                        "Сколько всего сладостей стало на столе?";
+                answer = pieces * 2;
+                hint = "Нарисуйте картинку и посчитатйе, сколько корзиночек положила мама.";
+                possibleTextAnswers = Sets.newHashSet(getNumWithString(answer, SWEETS));
+                break;
+            case PILLS:
+                int pills = randomInt(4, 10);
+                text = "Совунья прописала Крошу " + pills + " таблеток, которые нужно принимать по одной каждый час. Сколько времени займёт лечение?";
+                answer = pills - 1;
+                hint = "Подумайте, сколько пройдет времени, когда Крош примет вторую таблетку? А когда третью?";
+                possibleTextAnswers = Sets.newHashSet(answer + " часов");
+                break;
+            case ELEVATOR:
+                int firstFloor = difficulty == Problem.Difficulty.EASY ? 1 : randomInt(2, 10);
+                int lastFloor = difficulty == Problem.Difficulty.EASY ? randomInt(5, 8) : randomInt(firstFloor + 3, firstFloor + 7);
+                text = "Лифт поднимается с 1 на 3 этаж за 6 секунд. За какое время лифт поднимется с " +
+                        OrdinalNumber.number(firstFloor).getGenitiveMasculine() + " на " + OrdinalNumber.number(lastFloor).getAccusativeForm(MASCULINE) + " этаж?";
+                answer = 3 * (lastFloor - firstFloor);
+                hint = "Подумайте хорошенько, за сколько лифт поднимается с одного этажа на другой, например, с первого на второй.";
+                possibleTextAnswers = Sets.newHashSet("За " + getNumWithString(answer, SECOND), getNumWithString(answer, SECOND));
+                break;
             case LOG:
                 final String spaceWithText = getNumWithString(spaces, "распил", "распила", "распилов", MASCULINE);
 
@@ -89,11 +134,10 @@ public class SpacesGenerator implements ProblemGenerator {
                 hint = "Подумайте, сколько стало кусков после первого распила, и насколько меняется число кусков после каждого следующего распила";
                 break;
             case DRAWING:
-                String[] heroes = new String[]{"Миша", "Дима", "Коля", "Вася", "Рома", "Сережа"};
                 AbstractNoun[] things = {STICK, STAR, BUTTON, COIN};
                 int thing = GeneratorUtils.randomInt(0, things.length);
                 if (difficulty == Problem.Difficulty.EASY || (difficulty == Problem.Difficulty.MEDIUM && !scenario.isDirectTask())) {
-                    String[] chosenHeroes = chooseRandomString(heroes, 2);
+                    String[] chosenHeroes = chooseRandomString(HEROES, 2);
 
                     if (scenario.isDirectTask()) {
                         text = chosenHeroes[0] + (thing < 2 ? " нарисовал на доске " : " выложил в ряд ")
@@ -118,7 +162,7 @@ public class SpacesGenerator implements ProblemGenerator {
                     int spaces2 = total - 1;
                     int total2 = total + spaces2;
 
-                    String[] chosenHeroes = chooseRandomString(heroes, 3);
+                    String[] chosenHeroes = chooseRandomString(HEROES, 3);
 
                     if (!scenario.isDirectTask()) {
                         text = chosenHeroes[0] + (thing < 2 ? " нарисовал на доске " : " выложил в ряд ")
@@ -198,8 +242,12 @@ public class SpacesGenerator implements ProblemGenerator {
                 return "трёх брёвнах";
             case 4:
                 return "четырёх брёвнах";
+            case 5:
+                return "пяти брёвнах";
+            case 6:
+                return "шести брёвнах";
         }
-        throw new IllegalArgumentException();
+        throw new IllegalArgumentException(Integer.toString(count));
     }
 
     private String getBlocksStringIz(int count) {
@@ -212,27 +260,27 @@ public class SpacesGenerator implements ProblemGenerator {
                 return "трёх бревен";
             case 4:
                 return "четырёх бревен";
+            case 5:
+                return "пяти бревен";
+            case 6:
+                return "шести бревен";
         }
-        throw new IllegalArgumentException();
+        throw new IllegalArgumentException(Integer.toString(count));
     }
 
     @Override
     public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty) {
+
+
         switch (difficulty) {
             case EASY:
-                final ArrayList<ProblemScenario> easyScenarios = new ArrayList<>(SCENARIOS);
-                easyScenarios.remove(new SpacesScenario(DRAWING, false));
-                return findAvailableScenario(difficulty, alreadySolvedProblems, easyScenarios, new HashSet<>());
-            case MEDIUM: {
-                final ArrayList<ProblemScenario> mediumScenarios = new ArrayList<>(SCENARIOS);
-                mediumScenarios.remove(new SpacesScenario(LOG, false));
-                return findAvailableScenario(difficulty, alreadySolvedProblems, mediumScenarios, Sets.newHashSet(SCENARIOS));
-            }
+                return findAvailableScenario(difficulty, alreadySolvedProblems, EASY_SCENARIOS, new HashSet<>());
+            case MEDIUM:
+                return findAvailableScenario(difficulty, alreadySolvedProblems, MEDIUM_SCENARIOS, Sets.newHashSet(EASY_SCENARIOS));
             case DIFFICULT:
-                final Set<ProblemScenario> mediumScenarios = new HashSet<>(SCENARIOS);
-                mediumScenarios.remove(new SpacesScenario(LOG, false));
                 return findAvailableScenario(difficulty, alreadySolvedProblems,
-                        Lists.newArrayList(new SpacesScenario(DRAWING, false), new SpacesScenario(LOG, false)), mediumScenarios);
+                        Lists.newArrayList(new SpacesScenario(DRAWING, false), new SpacesScenario(LOG, false)),
+                        Sets.newHashSet(MEDIUM_SCENARIOS));
             case EXPERT:
                 return null;
 

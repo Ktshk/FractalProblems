@@ -38,7 +38,7 @@ public class ShareWithFriendsGenerator implements ProblemGenerator {
         final ProblemScenario scenario = problemAvailability.getScenario();
 
         if (scenario.equals(DEFAULT_SCENARIO)) {
-            int candies = randomInt(2, 6);
+            int candies = randomInt(2, 7);
             ProblemTextBuilder text = new ProblemTextBuilder();
             text.append("У ").append(hero1[1]).append(" и ").append(hero2[1]).append(" было поровну конфет. ")
                     .append(hero1[0]).append(" отдал ").append(hero2[2]).append(" ").append(getNumWithString(candies, CANDY, Case.ACCUSATIVE)).append(". ")

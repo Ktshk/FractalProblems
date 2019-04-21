@@ -24,6 +24,18 @@ public class SnailGenerator implements ProblemGenerator {
     private final static ProblemScenario HARD_SCENARIO = new ProblemScenarioImpl(ProblemCollection.SNAIL + "_" + "HARD", true);
     private final static ProblemScenario MEDIUM_AND_EASY_SCENARIO = new ProblemScenarioImpl(ProblemCollection.SNAIL + "_" + "MEDIUM_AND_EASY");
 
+    private final static Problem HARD_PROBLEM;
+
+    static {
+        final String text = "Однажды улитка заползла на вершину бамбука, который растет так, что каждая его точка поднимается вверх с одной и той же скоростью. " +
+                "Путь вверх занял у улитки 7 часов. Отдохнув на вершине бамбука ровно час, она спустилась на землю за 8 часов. " +
+                "Во сколько раз скорость улитки больше скорости роста бамбука?";
+        final String hint = "Подумайте, насколько вырос бамбук, пока улитка отдыхала.";
+        HARD_PROBLEM = new ProblemWithPossibleTextAnswers(text, 16, ProblemCollection.SNAIL,
+                Sets.newHashSet("в 16 раз", "16 раз", "в 16 раз больше"), hint, HARD_SCENARIO, Difficulty.EXPERT);
+
+    }
+
     @Nonnull
     @Override
     public Problem generateProblem(Difficulty difficulty, ProblemAvailability problemAvailability) {
@@ -35,12 +47,7 @@ public class SnailGenerator implements ProblemGenerator {
 
         String hint;
         if (difficulty == Difficulty.EXPERT) {
-            final String text = "Однажды улитка заползла на вершину бамбука, который растет так, что каждая его точка поднимается вверх с одной и той же скоростью. " +
-                    "Путь вверх занял у улитки 7 часов. Отдохнув на вершине бамбука ровно час, она спустилась на землю за 8 часов. " +
-                    "Во сколько раз скорость улитки больше скорости роста бамбука?";
-            hint = "Подумайте, насколько вырос бамбук, пока улитка отдыхала.";
-            return new ProblemWithPossibleTextAnswers(text, 16, ProblemCollection.SNAIL,
-                    Sets.newHashSet("в 16 раз", "16 раз", "в 16 раз больше"), hint, problemAvailability.getScenario(), difficulty);
+            return HARD_PROBLEM;
         }
 
         int d = difficulty == Difficulty.MEDIUM ? randomInt(2, 5) :

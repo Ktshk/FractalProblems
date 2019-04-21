@@ -161,6 +161,10 @@ public class GeneratorUtils {
                 if (availabilityType == ProblemAvailabilityType.newScenarioProblem) {
                     if (!easierScenarios.isEmpty()) {
                         scenarioToProblemAvailability.put(problemScenario, ProblemAvailabilityType.easierProblem);
+                    } else {
+                        if (problemScenario.isSingleProblem()) {
+                            scenarioToProblemAvailability.remove(problemScenario);
+                        }
                     }
                 }
             }
