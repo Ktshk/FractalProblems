@@ -19,7 +19,7 @@ Created by Simar 10.03.19
   */
 
 public class SumDifferenceGenerator implements ProblemGenerator {
-    private final static ProblemScenario DEFAULT_SCENARIO = new ProblemScenarioImpl(ProblemCollection.AT_LEAST_ONE_FOUND);
+    private final static ProblemScenario DEFAULT_SCENARIO = new ProblemScenarioImpl(ProblemCollection.SUM_DIFFERENCE);
 
     @Nonnull
     @Override

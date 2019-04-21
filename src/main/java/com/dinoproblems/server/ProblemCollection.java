@@ -4,11 +4,11 @@ import com.dinoproblems.server.ProblemGenerator.ProblemAvailability;
 import com.dinoproblems.server.ProblemGenerator.ProblemAvailabilityType;
 import com.dinoproblems.server.generators.*;
 import com.dinoproblems.server.utils.GeneratorUtils;
-import com.google.common.collect.*;
-import javafx.util.Pair;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+import com.google.common.collect.Multimap;
 
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 /**

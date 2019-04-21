@@ -1,6 +1,7 @@
 package com.dinoproblems.server;
 
 import com.dinoproblems.server.generators.RangeGenerator;
+import com.dinoproblems.server.generators.SequenceGenerator;
 import org.junit.Test;
 
 import java.util.HashSet;
@@ -11,7 +12,7 @@ import java.util.Set;
  */
 public class TestProblemGenerator {
 
-    public static final ProblemGenerator GENERATOR = new RangeGenerator();
+    public static final ProblemGenerator GENERATOR = new SequenceGenerator();
 
     @Test
     public void testAllGenerators() {
