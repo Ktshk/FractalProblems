@@ -3,8 +3,8 @@ package com.dinoproblems.server;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
-import java.util.HashMap;
-import java.util.Map;
+import javax.annotation.Nullable;
+import java.util.*;
 
 /**
  * Created by Katushka on 10.02.2019.
@@ -13,6 +13,7 @@ public class Session {
     private final String sessionId;
     private Problem currentProblem;
     private Multimap<String, Problem> solvedProblemsByTheme = HashMultimap.create();
+    private List<Problem> variousProblems;
     private Problem.Difficulty currentDifficulty = null;
     private String lastServerResponse;
 
@@ -76,5 +77,25 @@ public class Session {
 
     public SessionResult getSessionResult(){
         return new SessionResult(solvedProblemsByTheme.values());//должно быть TaskResult
+    }
+
+    @Nullable
+    public Problem getRandomVariousProblem(Collection<Problem> allVariousProblems) {
+        if (variousProblems == null) {
+            variousProblems = new ArrayList<>(allVariousProblems);
+            Collections.shuffle(variousProblems);
+        }
+        if (variousProblems.isEmpty()) {
+            return null;
+        }
+        return variousProblems.remove(variousProblems.size() - 1);
+    }
+
+    public boolean hasVariousProblems(Collection<Problem> allVariousProblems) {
+        if (variousProblems == null) {
+            variousProblems = new ArrayList<>(allVariousProblems);
+            Collections.shuffle(variousProblems);
+        }
+        return !variousProblems.isEmpty();
     }
 }

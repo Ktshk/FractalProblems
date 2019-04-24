@@ -4,6 +4,7 @@ import com.dinoproblems.server.*;
 import com.dinoproblems.server.Problem.Difficulty;
 import com.dinoproblems.server.utils.GeneratorUtils;
 import com.dinoproblems.server.utils.OrdinalNumber;
+import com.dinoproblems.server.utils.ProblemTextBuilder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -23,22 +24,40 @@ public class SnailGenerator implements ProblemGenerator {
 
     private final static ProblemScenario HARD_SCENARIO = new ProblemScenarioImpl(ProblemCollection.SNAIL + "_" + "HARD", true);
     private final static ProblemScenario MEDIUM_AND_EASY_SCENARIO = new ProblemScenarioImpl(ProblemCollection.SNAIL + "_" + "MEDIUM_AND_EASY");
+    private final static Problem TEREMOK;
+    private final static ProblemScenario TEREMOK_SCENARIO = new ProblemScenarioImpl(ProblemCollection.SNAIL + "_" + "TEREMOK", true);
 
     private final static Problem HARD_PROBLEM;
 
     static {
-        final String text = "Однажды улитка заползла на вершину бамбука, который растет так, что каждая его точка поднимается вверх с одной и той же скоростью. " +
+        ProblemTextBuilder text = new ProblemTextBuilder();
+        text.append("Однажды улитка заползла на вершину бамбука, который растет так, что каждая его точка поднимается вверх с одной и той же скоростью. " +
                 "Путь вверх занял у улитки 7 часов. Отдохнув на вершине бамбука ровно час, она спустилась на землю за 8 часов. " +
-                "Во сколько раз скорость улитки больше скорости роста бамбука?";
-        final String hint = "Подумайте, насколько вырос бамбук, пока улитка отдыхала.";
-        HARD_PROBLEM = new ProblemWithPossibleTextAnswers(text, 16, ProblemCollection.SNAIL,
+                "Во сколько раз скорость улитки больше скорости роста бамбука?");
+        String hint = "Подумайте, насколько вырос бамбук, пока улитка отдыхала.";
+        HARD_PROBLEM = new ProblemWithPossibleTextAnswers(text.getText(), text.getTTS(), 16, ProblemCollection.SNAIL,
                 Sets.newHashSet("в 16 раз", "16 раз", "в 16 раз больше"), hint, HARD_SCENARIO, Difficulty.EXPERT);
+
+        text = new ProblemTextBuilder();
+        text.append("Мышка, Заяц и Ежик строили один общий восемнадцатиэтажный теремок. За день Мышка ")
+                .append("строила", "стр+оила").append(" один этаж, Ежик - два ").append("этажа", "этаж+а")
+                .append(", а Заяц - три. Каждую ночь  приходил Серый Волк и начисто ломал два верхних этажа. На какой день Теремок будет достроен?");
+        hint = "До какого этажа достроят теремок звери за три дня? Подумайте, что будет потом";
+        TEREMOK = new ProblemWithPossibleTextAnswers(text.getText(), text.getTTS(), 4, ProblemCollection.SNAIL,
+                Sets.newHashSet("4 дня", "За 4 дня"), hint, TEREMOK_SCENARIO, Difficulty.MEDIUM);
 
     }
 
     @Nonnull
     @Override
     public Problem generateProblem(Difficulty difficulty, ProblemAvailability problemAvailability) {
+        if (difficulty == Difficulty.EXPERT) {
+            return HARD_PROBLEM;
+        }
+        if (problemAvailability.getScenario().equals(TEREMOK_SCENARIO)) {
+            return TEREMOK;
+        }
+
         String[] heroes = {"Улитка", "Червяк", "Муравей", "Паучок"};
         String[] heroesLowCase = {"улитка", "червяк", "муравей", "паучок"};
         String[] trees = {"столбу", "стволу липы", "стволу яблони", "водосточной трубе"};
@@ -46,9 +65,6 @@ public class SnailGenerator implements ProblemGenerator {
         int tree = randomInt(0, trees.length);
 
         String hint;
-        if (difficulty == Difficulty.EXPERT) {
-            return HARD_PROBLEM;
-        }
 
         int d = difficulty == Difficulty.MEDIUM ? randomInt(2, 5) :
                 randomInt(3, 6);
@@ -73,7 +89,7 @@ public class SnailGenerator implements ProblemGenerator {
             case EASY:
                 return null;
             case MEDIUM:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(MEDIUM_AND_EASY_SCENARIO), new HashSet<>());
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(MEDIUM_AND_EASY_SCENARIO, TEREMOK_SCENARIO), new HashSet<>());
             case DIFFICULT:
                 return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(MEDIUM_AND_EASY_SCENARIO),
                         Sets.newHashSet(MEDIUM_AND_EASY_SCENARIO));

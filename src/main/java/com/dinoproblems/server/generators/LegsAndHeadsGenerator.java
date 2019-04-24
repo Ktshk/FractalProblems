@@ -30,7 +30,7 @@ public class LegsAndHeadsGenerator implements ProblemGenerator {
     @Override
     public Problem generateProblem(Problem.Difficulty difficulty, ProblemAvailability problemAvailability) {
         final ProblemScenario scenario = problemAvailability.getScenario();
-        int heads = difficulty == Problem.Difficulty.DIFFICULT ? randomInt(5, 10) : randomInt(3, 5);
+        int heads = difficulty == Problem.Difficulty.EASY ? randomInt(3, 5) : randomInt(5, 10);
         int ducks = randomInt(1, heads);
         int cows = heads - ducks;
         final int quest = randomInt(0, 2);
@@ -52,22 +52,22 @@ public class LegsAndHeadsGenerator implements ProblemGenerator {
 
             if (scenario.equals(ANIMALS)) {
                 animals = new String[][]{{"куры", "утки", "петухи"},
-                        {"коровы", "овцы", "козы"}};
+                        {"коровы", "овцы", "бараны"}};
                 animalGender = new GeneratorUtils.Gender[][]{{FEMININE, FEMININE, MASCULINE},
-                        {FEMININE, FEMININE, FEMININE}};
+                        {FEMININE, FEMININE, MASCULINE}};
                 animals5more = new String[][]{{"кур", "уток", "петухов"},
-                        {"коров", "овец", "коз"}};
+                        {"коров", "овец", "баранов"}};
                 String[][] animalsAcc = new String[][]{{"курицу", "утку", "петуха"},
-                        {"корову", "овцу", "козу"}};
+                        {"корову", "овцу", "барана"}};
                 String[][] animalsDat = new String[][]{{"курице", "утке", "петуху"},
-                        {"корове", "овце", "козе"}};
+                        {"корове", "овце", "барану"}};
                 animals1 = new String[][]{{"курица", "утка", "петух"},
-                        {"корова", "овца", "коза"}};
+                        {"корова", "овца", "баран"}};
                 animals4less = new String[][]{{"курицы", "утки", "петуха"},
-                        {"коровы", "овцы", "козы"}};
+                        {"коровы", "овцы", "барана"}};
 
                 hint = "Предположим, что все животные во дворе - это " + animals[0][i2]
-                        + ". А потом подумайте, сколько ног надо добавить " + animalsDat[0][i2] + ", чтобы превратить " + (i2 < 2 ? "её" : "его")
+                        + ", сколько тогда у них ног? А сколько ног надо добавить " + animalsDat[0][i2] + ", чтобы превратить " + (i2 < 2 ? "её" : "его")
                         + " в " + animalsAcc[1][i4] + ". ";
 
                 text = "Во дворе гуляют " + animals[0][i2] + " и " + animals[1][i4]

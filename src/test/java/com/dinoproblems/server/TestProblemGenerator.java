@@ -12,7 +12,7 @@ import java.util.Set;
  */
 public class TestProblemGenerator {
 
-    private static final ProblemGenerator GENERATOR = new SequenceGenerator();
+    private static final ProblemGenerator GENERATOR = new LegsAndHeadsGenerator();
 
     @Test
     public void testAllGenerators() {
@@ -48,7 +48,7 @@ public class TestProblemGenerator {
         for (Problem.Difficulty difficulty : Problem.Difficulty.values()) {
             System.out.println("************* " + difficulty);
             Set<Problem> solvedProblems = new HashSet<>();
-            int count = 0;
+            int count = VariousProblems.INSTANCE.getProblems(difficulty).size();
             for (ProblemGenerator generator : ProblemCollection.INSTANCE.getGenerators()) {
 //                System.out.println("************* Generator: " + generator);
                 int i = 0;
@@ -71,6 +71,10 @@ public class TestProblemGenerator {
 
     private void solveProblem(ProblemCollection problemCollection, Session session, Problem.State state) {
         final Problem problem = problemCollection.generateProblem(session);
+        if (problem == null) {
+            System.out.println("NO MORE PROBLEMS");
+            return;
+        }
         session.setCurrentProblem(problem);
 
         System.out.println("Problem: " + problem.getText());

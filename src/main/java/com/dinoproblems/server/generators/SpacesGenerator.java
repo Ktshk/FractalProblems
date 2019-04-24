@@ -4,6 +4,7 @@ import com.dinoproblems.server.*;
 import com.dinoproblems.server.utils.AbstractNoun;
 import com.dinoproblems.server.utils.GeneratorUtils;
 import com.dinoproblems.server.utils.OrdinalNumber;
+import com.dinoproblems.server.utils.ProblemTextBuilder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -65,7 +66,7 @@ public class SpacesGenerator implements ProblemGenerator {
 
         SpacesScenario scenario = (SpacesScenario) problemAvailability.getScenario();
 
-        String text;
+        ProblemTextBuilder text = new ProblemTextBuilder();
         int answer;
         Set<String> possibleTextAnswers;
 
@@ -73,16 +74,16 @@ public class SpacesGenerator implements ProblemGenerator {
         switch (scenario.getTheme()) {
             case CAKES:
                 String hero = HEROES[randomInt(0, HEROES.length)];
-                text = hero + " выложил в круг на столе " + pieces + " кремовых пирожных. " +
-                        "Пришла мама и положила между каждыми двумя соседними пирожными по одной корзиночке с фруктами. " +
-                        "Сколько всего сладостей стало на столе?";
+                text.append(hero).append(" выложил в круг на столе ").append(Integer.toString(pieces)).append(" кремовых пирожных. ")
+                        .append("Пришла мама и положила между каждыми двумя соседними пирожными по одной корзиночке с фруктами. ")
+                        .append("Сколько всего сладостей стало на столе?");
                 answer = pieces * 2;
                 hint = "Нарисуйте картинку и посчитатйе, сколько корзиночек положила мама.";
                 possibleTextAnswers = Sets.newHashSet(getNumWithString(answer, SWEETS));
                 break;
             case PILLS:
                 int pills = randomInt(4, 10);
-                text = "Совунья прописала Крошу " + pills + " таблеток, которые нужно принимать по одной каждый час. Сколько времени займёт лечение?";
+                text.append("Совунья прописала Крошу ").append(Integer.toString(pills)).append(" таблеток, которые нужно принимать по одной каждый час. Сколько времени займёт лечение?");
                 answer = pills - 1;
                 hint = "Подумайте, сколько пройдет времени, когда Крош примет вторую таблетку? А когда третью?";
                 possibleTextAnswers = Sets.newHashSet(answer + " часов");
@@ -90,10 +91,11 @@ public class SpacesGenerator implements ProblemGenerator {
             case ELEVATOR:
                 int firstFloor = difficulty == Problem.Difficulty.EASY ? 1 : randomInt(2, 10);
                 int lastFloor = difficulty == Problem.Difficulty.EASY ? randomInt(5, 8) : randomInt(firstFloor + 3, firstFloor + 7);
-                text = "Лифт поднимается с 1 на 3 этаж за 6 секунд. За какое время лифт поднимется с " +
-                        OrdinalNumber.number(firstFloor).getGenitiveMasculine() + " на " + OrdinalNumber.number(lastFloor).getAccusativeForm(MASCULINE) + " этаж?";
+                text.append("Лифт поднимается с 1 на 3 этаж за 6 секунд. За какое время лифт поднимется с ")
+                        .append(OrdinalNumber.number(firstFloor).getGenitiveMasculine()).append(" на ")
+                        .append(OrdinalNumber.number(lastFloor).getAccusativeForm(MASCULINE)).append(" этаж?");
                 answer = 3 * (lastFloor - firstFloor);
-                hint = "Подумайте хорошенько, за сколько лифт поднимается с одного этажа на другой, например, с первого на второй.";
+                hint = "Подумайте, за сколько лифт поднимается с одного этажа на другой, например, с первого на второй.";
                 possibleTextAnswers = Sets.newHashSet("За " + getNumWithString(answer, SECOND), getNumWithString(answer, SECOND));
                 break;
             case LOG:
@@ -102,15 +104,14 @@ public class SpacesGenerator implements ProblemGenerator {
                 if (difficulty == Problem.Difficulty.EASY) {
                     String piecesWithText = getNumWithString(pieces, "кусок", "куска", "кусков", MASCULINE);
                     if (scenario.isDirectTask()) {
-                        text = "Бобер пилил бревна. На одном бревне он сделал "
-                                + spaceWithText
-                                + ". Сколько кусков бревна у него получилось?";
+                        text.append("Бобер пилил бревно. На одном бревне он сделал ")
+                                .append(spaceWithText)
+                                .append(". Сколько кусков ").append("бревна", "бревн+а").append(" у него получилось?");
                         possibleTextAnswers = Sets.newHashSet(piecesWithText);
                         answer = pieces;
                     } else {
-                        text = "Бобер пилил бревна. Из одного бревна у него получилось "
-                                + piecesWithText
-                                + ". Сколько распилов он сделал?";
+                        text.append("Бобёр пилил бревно. У него получилось ")
+                                .append(piecesWithText).append(". Сколько распилов он сделал?");
                         possibleTextAnswers = Sets.newHashSet(spaceWithText);
                         answer = spaces;
                     }
@@ -118,15 +119,15 @@ public class SpacesGenerator implements ProblemGenerator {
                     pieces = spaces + blocks;
                     String piecesWithText = getNumWithString(pieces, "кусок", "куска", "кусков", MASCULINE);
                     if (scenario.isDirectTask()) {
-                        text = "Бобер пилил бревна. На " + getBlocksStringNa(blocks) + " он сделал "
-                                + spaceWithText
-                                + ". Сколько кусков бревна у него получилось?";
+                        text.append("Бобер пилил брёвна. На ").append(getBlocksStringNa(blocks)).append(" он сделал ")
+                                .append(spaceWithText)
+                                .append(". Сколько кусков ").append("бревна", "бревна+").append(" у него получилось?");
                         possibleTextAnswers = Sets.newHashSet(piecesWithText);
                         answer = pieces;
                     } else {
-                        text = "Бобер пилил бревна. Из " + getBlocksStringIz(blocks) + " у него получилось "
-                                + piecesWithText
-                                + ". Сколько распилов он сделал?";
+                        text.append("Бобер пилил бревна. Из ").append(getBlocksStringIz(blocks)).append(" у него получилось ")
+                                .append(piecesWithText)
+                                .append(". Сколько распилов он сделал?");
                         possibleTextAnswers = Sets.newHashSet(spaceWithText);
                         answer = spaces;
                     }
@@ -140,20 +141,21 @@ public class SpacesGenerator implements ProblemGenerator {
                     String[] chosenHeroes = chooseRandomString(HEROES, 2);
 
                     if (scenario.isDirectTask()) {
-                        text = chosenHeroes[0] + (thing < 2 ? " нарисовал на доске " : " выложил в ряд ")
-                                + getNumWithString(pieces, things[thing], ACCUSATIVE)
-                                + ". " + chosenHeroes[1] + " между каждыми двумя "
-                                + (thing < 2 ? " нарисовал " : " выложил ") + " ещё по одной. "
-                                + "Сколько " + things[thing].getCountingForm() + (thing < 2 ? " нарисовал " : " выложил ") + chosenHeroes[1] + "?";
+                        text.append(chosenHeroes[0]).append(thing < 2 ? " нарисовал на доске " : " выложил в ряд ")
+                                .append(getNumWithString(pieces, things[thing], ACCUSATIVE))
+                                .append(". ").append(chosenHeroes[1]).append(" между каждыми двумя ")
+                                .append(thing < 2 ? " нарисовал " : " выложил ").append(" ещё по одной. ")
+                                .append("Сколько ").append(things[thing].getCountingForm())
+                                .append(thing < 2 ? " нарисовал " : " выложил ").append(chosenHeroes[1]).append("?");
                         possibleTextAnswers = Sets.newHashSet(getNumWithString(spaces, things[thing], ACCUSATIVE));
                         answer = spaces;
                     } else {
-                        text = chosenHeroes[0] + (thing < 2 ? " нарисовал на доске " : " выложил в ряд ")
+                        text.append(chosenHeroes[0] + (thing < 2 ? " нарисовал на доске " : " выложил в ряд ")
                                 + "несколько " + things[thing].getCountingForm()
                                 + ". " + chosenHeroes[1] + " между каждыми двумя "
                                 + (thing < 2 ? " нарисовал " : " выложил ") + " ещё по одной. "
                                 + "Всего получилось " + getNumWithString(total, things[thing])
-                                + ".  Сколько " + things[thing].getCountingForm() + (thing < 2 ? " нарисовал " : " выложил ") + chosenHeroes[0] + "?";
+                                + ".  Сколько " + things[thing].getCountingForm() + (thing < 2 ? " нарисовал " : " выложил ") + chosenHeroes[0] + "?");
                         possibleTextAnswers = Sets.newHashSet(getNumWithString(spaces, things[thing], ACCUSATIVE));
                         answer = pieces;
                     }
@@ -165,26 +167,26 @@ public class SpacesGenerator implements ProblemGenerator {
                     String[] chosenHeroes = chooseRandomString(HEROES, 3);
 
                     if (!scenario.isDirectTask()) {
-                        text = chosenHeroes[0] + (thing < 2 ? " нарисовал на доске " : " выложил в ряд ")
+                        text.append(chosenHeroes[0] + (thing < 2 ? " нарисовал на доске " : " выложил в ряд ")
                                 + "несколько " + things[thing].getCountingForm()
-                                + ". ";
+                                + ". ");
                     } else {
-                        text = chosenHeroes[0] + (thing < 2 ? " нарисовал на доске " : " выложил в ряд ")
+                        text.append(chosenHeroes[0] + (thing < 2 ? " нарисовал на доске " : " выложил в ряд ")
                                 + getNumWithString(pieces, things[thing], ACCUSATIVE)
-                                + ". ";
+                                + ". ");
                     }
 
-                    text += chosenHeroes[1] + " между каждыми двумя "
+                    text.append(chosenHeroes[1] + " между каждыми двумя "
                             + (thing < 2 ? " нарисовал " : " выложил ") + " ещё по одной. "
-                            + "Потом пришёл " + chosenHeroes[2] + " и сделал то же самое. ";
+                            + "Потом пришёл " + chosenHeroes[2] + " и сделал то же самое. ");
 
                     if (!scenario.isDirectTask()) {
-                        text += "Всего получилось " + getNumWithString(total2, things[thing])
-                                + ". Сколько " + things[thing].getCountingForm() + (thing < 2 ? " нарисовал " : " выложил ") + chosenHeroes[0] + "?";
+                        text.append("Всего получилось " + getNumWithString(total2, things[thing])
+                                + ". Сколько " + things[thing].getCountingForm() + (thing < 2 ? " нарисовал " : " выложил ") + chosenHeroes[0] + "?");
                         possibleTextAnswers = Sets.newHashSet(getNumWithString(pieces, things[thing], ACCUSATIVE));
                         answer = pieces;
                     } else {
-                        text += "Сколько " + things[thing].getCountingForm() + (thing < 2 ? " нарисовал " : " выложил ") + chosenHeroes[2] + "?";
+                        text.append("Сколько " + things[thing].getCountingForm() + (thing < 2 ? " нарисовал " : " выложил ") + chosenHeroes[2] + "?");
                         possibleTextAnswers = Sets.newHashSet(getNumWithString(spaces, things[thing], ACCUSATIVE));
                         answer = spaces2;
                     }
@@ -196,14 +198,14 @@ public class SpacesGenerator implements ProblemGenerator {
 
                 if (difficulty == Problem.Difficulty.EASY) {
                     if (!scenario.isDirectTask()) {
-                        text = "Забор крепится на столбы через каждый метр. " +
+                        text.append("Забор крепится на столбы через каждый метр. " +
                                 "Сколько нужно врыть столбов, чтобы установить забор длиной " +
-                                GeneratorUtils.getMetersString(spaces) + "?";
+                                GeneratorUtils.getMetersString(spaces) + "?");
                         answer = pieces;
                         possibleTextAnswers = Sets.newHashSet(postsString);
                     } else {
-                        text = "Забор крепится на столбы через каждый метр. " +
-                                "Какой длины забор, если в нем " + postsString + "?";
+                        text.append("Забор крепится на столбы через каждый метр. " +
+                                "Какой длины забор, если в нем " + postsString + "?");
                         answer = spaces;
                         possibleTextAnswers = Sets.newHashSet(GeneratorUtils.getMetersString(spaces));
                     }
@@ -211,14 +213,14 @@ public class SpacesGenerator implements ProblemGenerator {
                 } else {
                     int meters = randomInt(2, 5);
                     if (!scenario.isDirectTask()) {
-                        text = "Забор крепится на столбы через каждые " + getMetersString(meters) + ". " +
+                        text.append("Забор крепится на столбы через каждые " + getMetersString(meters) + ". " +
                                 "Сколько нужно врыть столбов, чтобы установить забор длиной " +
-                                getMetersString(spaces * meters) + "?";
+                                getMetersString(spaces * meters) + "?");
                         answer = pieces;
                         possibleTextAnswers = Sets.newHashSet(postsString);
                     } else {
-                        text = "Забор крепится на столбы через каждые " + getMetersString(meters) + ". " +
-                                "Какой длины забор, если в нем " + postsString + "?";
+                        text.append("Забор крепится на столбы через каждые " + getMetersString(meters) + ". " +
+                                "Какой длины забор, если в нем " + postsString + "?");
                         answer = spaces * meters;
                         possibleTextAnswers = Sets.newHashSet(getMetersString(spaces * meters));
                     }
@@ -229,7 +231,7 @@ public class SpacesGenerator implements ProblemGenerator {
                 throw new IllegalArgumentException();
         }
 
-        return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.SPACES, possibleTextAnswers, hint, scenario, difficulty);
+        return new ProblemWithPossibleTextAnswers(text.getText(), text.getTTS(), answer, ProblemCollection.SPACES, possibleTextAnswers, hint, scenario, difficulty);
     }
 
     private String getBlocksStringNa(int count) {

@@ -27,27 +27,27 @@ import static com.dinoproblems.server.utils.GeneratorUtils.randomInt;
 @WebServlet("/DemoServlet")
 public class MainServlet extends HttpServlet {
 
+    private final ProblemCollection instance = ProblemCollection.INSTANCE;
+
     private Map<String, Session> currentProblems = new HashMap<>();
 
-    private Set<String> yesAnswers = Sets.newHashSet("да", "давай", "ну давай", "хочу", "валяй", "можно", "ага", "угу");
+    private Set<String> yesAnswers = Sets.newHashSet("да", "давай", "давайте", "ну давай", "хочу", "валяй", "можно", "ага", "угу");
     private Set<String> noAnswers = Sets.newHashSet("нет", "не хочу", "хватит", "не надо");
     private Set<String> endSessionAnswers = Sets.newHashSet("хватит", "больше не хочу", "давай закончим", "надоело");
     private Set<String> askAnswer = Sets.newHashSet("ответ", "сдаюсь", "сказать ответ", "скажи ответ");
-    private Set<String> askHint = Sets.newHashSet("подсказка", "подсказку", "сказать подсказку", "дать подсказку", "дай", "дай подсказку");
+    private Set<String> askHint = Sets.newHashSet("подсказка", "подсказку", "сказать подсказку", "дать подсказку", "дай", "давай", "дай подсказку", "подскажи");
     private Set<String> askToRepeat = Sets.newHashSet("повтори", "повторить", "повтори задачу", "повтори условие");
     private String[] praises = {"Молодец!", "Это правильный ответ.", "Ну конечно! Так и есть.",
-            "У вас отлично получается решать задачи.", "Я не сомневалась, что у вас получится.", "Правильно."};
+            "У вас отлично получается.", "Я не сомневалась, что у вас получится.", "Правильно."};
     private String[] soundPraises = {"<speaker audio=\"alice-sounds-game-8-bit-coin-1.opus\">",
             "<speaker audio=\"alice-sounds-game-win-1.opus\">", "<speaker audio=\"alice-sounds-game-win-2.opus\">",
             "<speaker audio=\"alice-sounds-game-win-3.opus\">"};//Попытка добавления звуков
     private String[] oneMoreQuestion = {"Хотите ещё задачу?", "Ещё задачу?", "Решаем дальше?",
-            "Ещё одну?", "Давайте решим еще одну?"};
+            "Ещё одну?", "Давайте решим еще одну!", "Предлагаю решить ещё одну"};
     private String[] wrongAnswer = {"Нет, это неверно.", "Неверно.", "Это неправильный ответ.", "Нет.", "Нет, это точно неправильно."};
     private String[] notAnAnswer = {"Хотите скажу подсказку или повторю задачу?", "Я могу повторить задачу.", "Могу дать вам подсказку.",
             "Задача не из простых, но я могу помочь", "Я могу подсказать."};
     private String[] almost = {"Почти.", "Почти верно.", "Близко, но нет."};
-
-
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         final DataBaseService dataBaseService = DataBaseService.INSTANCE;
@@ -81,8 +81,6 @@ public class MainServlet extends HttpServlet {
             result.add("session", bodyJson.get("session"));
 
             final Session session = currentProblems.computeIfAbsent(sessionId, Session::new);
-
-
 
             if (newSession) {
                 responseJson.addProperty("text", "Это закрытый навык. Я предлагаю вам решить логическую задачу. Какую хотите: простую, среднюю или сложную?");
@@ -217,7 +215,7 @@ public class MainServlet extends HttpServlet {
     }
 
     private void addProblemTextToResponse(JsonObject responseJson, Session session) {
-        final Problem problem = ProblemCollection.INSTANCE.generateProblem(session);
+        final Problem problem = instance.generateProblem(session);
         session.setCurrentProblem(problem);
         responseJson.addProperty("text", problem.getText());
         addProblemButtons(responseJson);
@@ -241,6 +239,8 @@ public class MainServlet extends HttpServlet {
             return Problem.Difficulty.MEDIUM;
         } else if (checkAnswer(command, Sets.newHashSet("сложная", "сложную"), yesAnswers)) {
             return Problem.Difficulty.DIFFICULT;
+        } else if (checkAnswer(command, Sets.newHashSet("эксперт", "экспертная"), yesAnswers)) {
+            return Problem.Difficulty.EXPERT;
         } else {
             return null;
         }
@@ -251,6 +251,7 @@ public class MainServlet extends HttpServlet {
         buttons.add(createButton("простая"));
         buttons.add(createButton("средняя"));
         buttons.add(createButton("сложная"));
+        buttons.add(createButton("эксперт"));
         return buttons;
     }
 

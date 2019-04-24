@@ -6,9 +6,12 @@ import com.dinoproblems.server.generators.*;
 import com.dinoproblems.server.utils.GeneratorUtils;
 import com.google.common.collect.*;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
+
+import static com.dinoproblems.server.utils.GeneratorUtils.randomInt;
 
 /**
  * Created by Katushka on 10.02.2019.
@@ -34,6 +37,8 @@ public class ProblemCollection {
 
     private BiMap<String, ProblemGenerator> generators = HashBiMap.create();
 
+    private VariousProblems variousProblems = VariousProblems.INSTANCE;
+
     private ProblemCollection() {
         generators.put(SUM_DIFFERENCE, new SumDifferenceGenerator());
         generators.put(LEGS_AND_HEADS, new LegsAndHeadsGenerator());
@@ -52,7 +57,11 @@ public class ProblemCollection {
         generators.put(BROTHERS_AND_SISTERS, new BrothersAndSistersGenerator());
     }
 
+    @Nullable
     public Problem generateProblem(Session session) {
+        if (session.hasVariousProblems(variousProblems.getProblems(session.getCurrentDifficulty())) && randomInt(0, 3) == 0) {
+            return session.getRandomVariousProblem(variousProblems.getProblems(session.getCurrentDifficulty()));
+        }
         final Map<ProblemAvailabilityType, Map<ProblemGenerator, ProblemAvailability>> availabilityTypeToGenerator =
                 new TreeMap<>(Comparator.comparingInt(problemAvailabilityType -> -problemAvailabilityType.getWeight()));
         final Multimap<String, Problem> solvedProblems = session.getSolvedProblems();
@@ -68,6 +77,9 @@ public class ProblemCollection {
             }
         }
 
+        if (availabilityTypeToGenerator.isEmpty()) {
+            return session.getRandomVariousProblem(variousProblems.getProblems(session.getCurrentDifficulty()));
+        }
         final Map<ProblemGenerator, ProblemAvailability> bestGenerators = availabilityTypeToGenerator.get(availabilityTypeToGenerator.keySet().iterator().next());
 
         final Map<ProblemGenerator, Set<Problem>> bestSolvedProblems = new HashMap<>();

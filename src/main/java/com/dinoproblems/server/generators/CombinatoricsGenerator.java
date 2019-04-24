@@ -12,9 +12,8 @@ import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.HashSet;
 
-import static com.dinoproblems.server.utils.Dictionary.BOUQUET;
-import static com.dinoproblems.server.utils.Dictionary.FLOWERS;
-import static com.dinoproblems.server.utils.Dictionary.PARTY;
+import static com.dinoproblems.server.utils.Dictionary.*;
+import static com.dinoproblems.server.utils.Dictionary.PEOPLE;
 import static com.dinoproblems.server.utils.GeneratorUtils.*;
 import static com.dinoproblems.server.utils.GeneratorUtils.Case.GENITIVE;
 import static com.dinoproblems.server.utils.GeneratorUtils.Gender.MASCULINE;
@@ -26,17 +25,46 @@ public class CombinatoricsGenerator implements ProblemGenerator {
     private static final ProblemScenario FLOWERS_SCENARIO = new ProblemScenarioImpl(ProblemCollection.COMBINATORICS + "_" + "FLOWERS", true);
     private static final ProblemScenario CHESS_SCENARIO = new ProblemScenarioImpl(ProblemCollection.COMBINATORICS + "_" + "CHESS", true);
     private static final ProblemScenario NUMBER_SAME_DIGITS = new ProblemScenarioImpl(ProblemCollection.COMBINATORICS + "_" + "NUMBER_SAME_DIGITS", false);
+    private static final ProblemScenario CARS = new ProblemScenarioImpl(ProblemCollection.COMBINATORICS + "_" + "CARS", true);
+    private static final ProblemScenario DANCING = new ProblemScenarioImpl(ProblemCollection.COMBINATORICS + "_" + "DANCING", true);
 
-    private static final Collection<ProblemScenario> EASY_SCENARIOS = Lists.newArrayList(FLOWERS_SCENARIO, CHESS_SCENARIO, NUMBER_SAME_DIGITS);
-    private static final Collection<ProblemScenario> MEDIUM_SCENARIOS = Lists.newArrayList(FLOWERS_SCENARIO, CHESS_SCENARIO, NUMBER_SAME_DIGITS);
+    private static final Collection<ProblemScenario> EASY_SCENARIOS = Lists.newArrayList(CARS, FLOWERS_SCENARIO, CHESS_SCENARIO, NUMBER_SAME_DIGITS, DANCING);
+    private static final Collection<ProblemScenario> MEDIUM_SCENARIOS = Lists.newArrayList(FLOWERS_SCENARIO, CHESS_SCENARIO, NUMBER_SAME_DIGITS, DANCING);
     private static final Collection<ProblemScenario> DIFFICULT_SCENARIOS = Lists.newArrayList(FLOWERS_SCENARIO, NUMBER_SAME_DIGITS);
-    private static final String[] HEROES = {"Миша", "Вася", "Петя", "Витя", "Андрей", "Лёша", "Саша", "Ваня"};
+    private static final String[] HEROES = {"Миша", "Вася", "Петя", "Витя", "Андрей", "Лёша", "Ваня"};
+    private static final String[] HEROES_GENITIVE = {"Миши", "Васи", "Пети", "Вити", "Андрея", "Лёши", "Вани"};
+    private static final String[] HEROES_GIRLS = {"Маша", "Вика", "Лена", "Наташа", "Алина", "Света", "Лиза"};
 
     @Nonnull
     @Override
     public Problem generateProblem(Problem.Difficulty difficulty, ProblemAvailability problemAvailability) {
         final ProblemScenario scenario = problemAvailability.getScenario();
-        if (scenario.equals(FLOWERS_SCENARIO)) {
+        if (scenario.equals(CARS)) {
+            int heroIndex = randomInt(0, HEROES.length);
+            String text = "У " + HEROES_GENITIVE[heroIndex] + " есть две красные машинки, черная и желтая. " +
+                    "Сколькими способами " + HEROES[heroIndex] + " может составить их в ряд? ";
+            String hint = "Если первая машинка будет красной, то какой может быть вторая третья и четвертая? А если первая машинка жёлтая или чёрная?";
+            int answer = 12;
+            return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.COMBINATORICS,
+                    Sets.newHashSet("12 способов"), hint, CARS, difficulty);
+        } else if (scenario.equals(DANCING)) {
+            int n = randomInt(4, 6);
+            String[] heroes = chooseRandomString(HEROES, n);
+            String[] heroesGirls = chooseRandomString(HEROES_GIRLS, n);
+            String text = "В кружок бального танца записались ";
+            for (String hero : heroes) {
+                text += hero + ", ";
+            }
+            for (int i = 0; i < heroesGirls.length; i++) {
+                String heroesGirl = heroesGirls[i];
+                text += heroesGirl + (i < heroesGirls.length - 1 ? ", " : ". ");
+            }
+            text += " Сколько танцевальных пар девочка - мальчик может образоваться?";
+            String hint = "Подумайте, если первым в паре будет " + heroes[0] + ", то сколько для него есть партнерш. А если первым будет " + heroes[1] + "?";
+            int answer = n * n;
+            return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.COMBINATORICS,
+                    Sets.newHashSet(getNumWithString(answer, PAIR)), hint, scenario, difficulty);
+        } else if (scenario.equals(FLOWERS_SCENARIO)) {
             int k = difficulty == Problem.Difficulty.MEDIUM || difficulty == Problem.Difficulty.EASY
                     ? 3
                     : (randomInt(1, 3) * 2 + 1);
@@ -91,16 +119,16 @@ public class CombinatoricsGenerator implements ProblemGenerator {
             int num = difficulty == Problem.Difficulty.EASY
                     ? randomInt(2, 4)
                     : difficulty == Problem.Difficulty.MEDIUM
-                        ? 3
-                        : randomInt(4, 6);
+                    ? 3
+                    : randomInt(4, 6);
             boolean hasZero = (difficulty == Problem.Difficulty.EASY && num == 3) || (difficulty != Problem.Difficulty.EASY && randomInt(0, 2) == 0);
             String[] chosenDigits = chooseRandomString(digits, difficulty == Problem.Difficulty.EASY ? 2 : 3);
             String text = "Сколько существует " + getDigitsAdjective(num) + " чисел, состоящих только из цифр ";
             for (int i = 0; i < chosenDigits.length; i++) {
                 text += chosenDigits[i];
                 if (i < chosenDigits.length - 2 || (hasZero && i < chosenDigits.length - 1)) {
-                   text += ", ";
-                } else if ( i < chosenDigits.length - 1 || (hasZero && i == chosenDigits.length - 1)) {
+                    text += ", ";
+                } else if (i < chosenDigits.length - 1 || (hasZero && i == chosenDigits.length - 1)) {
                     text += " и ";
                 }
             }
@@ -122,11 +150,16 @@ public class CombinatoricsGenerator implements ProblemGenerator {
 
     private String getDigitsAdjective(int num) {
         switch (num) {
-            case 2: return "двухзначных";
-            case 3: return "трехзначных";
-            case 4: return "четырехзначных";
-            case 5: return "пятизначных";
-            case 6: return "шестизначных";
+            case 2:
+                return "двухзначных";
+            case 3:
+                return "трехзначных";
+            case 4:
+                return "четырехзначных";
+            case 5:
+                return "пятизначных";
+            case 6:
+                return "шестизначных";
         }
         throw new IllegalArgumentException();
     }

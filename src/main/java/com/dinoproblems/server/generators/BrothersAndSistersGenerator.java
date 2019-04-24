@@ -21,6 +21,7 @@ import static com.dinoproblems.server.utils.GeneratorUtils.randomInt;
  */
 public class BrothersAndSistersGenerator implements ProblemGenerator {
     private static ProblemScenario COUNT_CHILDREN = new ProblemScenarioImpl(ProblemCollection.BROTHERS_AND_SISTERS + "_COUNT_CHILDREN");
+    private static ProblemScenario BROTHERS_SISTERS_DIFFERENCE = new ProblemScenarioImpl(ProblemCollection.BROTHERS_AND_SISTERS + "_" + "BROTHERS_SISTERS_DIFFERENCE", true);
 
     @Nonnull
     @Override
@@ -36,6 +37,14 @@ public class BrothersAndSistersGenerator implements ProblemGenerator {
                     ", то и у ее сестры столько же братьев. И это одни и те же мальчики.";
             return new ProblemWithPossibleTextAnswers(text, sisters + brothers, ProblemCollection.FIND_NUMBER,
                     Sets.newHashSet(getNumWithString(sisters + brothers, CHILD)), hint, COUNT_CHILDREN, Problem.Difficulty.EASY);
+        } else if (problemAvailability.getScenario().equals(BROTHERS_SISTERS_DIFFERENCE)) {
+            int sistersDifference = difficulty == Problem.Difficulty.EASY ? 3 : randomInt(4, 8);
+            int childrenDifference = sistersDifference - 1;
+
+            final String text = "Сестёр у Гоши на " + sistersDifference + " больше, чем братьев. На сколько в этой семье девочек больше, чем мальчиков?";
+            final String hint = "Мальчики в этой семье - это братья Гоши и ещё сам Гоша.";
+            return new ProblemWithPossibleTextAnswers(text, childrenDifference, ProblemCollection.FIND_NUMBER,
+                    Sets.newHashSet("На " + childrenDifference), hint, BROTHERS_SISTERS_DIFFERENCE, difficulty);
         } else {
             throw new IllegalArgumentException();
         }
@@ -46,8 +55,9 @@ public class BrothersAndSistersGenerator implements ProblemGenerator {
     public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty) {
         switch (difficulty) {
             case EASY:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(COUNT_CHILDREN), new HashSet<>());
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(COUNT_CHILDREN, BROTHERS_SISTERS_DIFFERENCE), new HashSet<>());
             case MEDIUM:
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(BROTHERS_SISTERS_DIFFERENCE), Sets.newHashSet(COUNT_CHILDREN, BROTHERS_SISTERS_DIFFERENCE));
             case DIFFICULT:
             case EXPERT:
                 return null;

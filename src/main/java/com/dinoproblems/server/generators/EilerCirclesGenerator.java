@@ -12,6 +12,8 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.dinoproblems.server.Problem.Difficulty.DIFFICULT;
+import static com.dinoproblems.server.Problem.Difficulty.MEDIUM;
 import static com.dinoproblems.server.ProblemCollection.EILER_CIRCLES;
 import static com.dinoproblems.server.utils.Dictionary.*;
 import static com.dinoproblems.server.utils.GeneratorUtils.*;
@@ -52,6 +54,9 @@ public class EilerCirclesGenerator implements ProblemGenerator {
 
     private static final Map<Verb, Function<AbstractNoun, String>> GOVERN_FORM = new HashMap<>();
 
+    private static final ProblemScenario CANDIES_STORE_SCENARIO = new ProblemScenarioImpl(ProblemCollection.EILER_CIRCLES + "_" + "CANDIES_STORE");
+    private static final ProblemScenario CUBES_SCENARIO = new ProblemScenarioImpl(ProblemCollection.EILER_CIRCLES + "_" + "CUBES");
+
     static {
         final Set<Set<String>> incorrectCombinations = Sets.newHashSet(Sets.newHashSet(X, Y_Z, TOTAL),
                 Sets.newHashSet(Z, X_Y, TOTAL),
@@ -61,6 +66,8 @@ public class EilerCirclesGenerator implements ProblemGenerator {
 
         populateScenarios(incorrectCombinations, VARIABLES, SCENARIOS);
         populateScenarios(incorrectCombinations, EASY_VARIABLES, EASY_SCENARIOS);
+
+        EASY_SCENARIOS.add(CUBES_SCENARIO);
 
         THEME_OBJECTS.put(CLASS, SUBJECTS);
         THEME_OBJECTS.put(CAMP, SUBJECTS);
@@ -72,8 +79,8 @@ public class EilerCirclesGenerator implements ProblemGenerator {
         GOVERN_FORM.put(LIKE, AbstractNoun::getInstrumentalForm);
         GOVERN_FORM.put(BUSY_ONESELF, AbstractNoun::getInstrumentalForm);
         GOVERN_FORM.put(BE_INTERESTED, AbstractNoun::getInstrumentalForm);
-        GOVERN_FORM.put(EAT, AbstractNoun::getAccusativePluralForm);
-        GOVERN_FORM.put(GET, AbstractNoun::getAccusativePluralForm);
+        GOVERN_FORM.put(EAT, AbstractNoun::getAccusativeForm);
+        GOVERN_FORM.put(GET, AbstractNoun::getAccusativeForm);
         GOVERN_FORM.put(TREAT, AbstractNoun::getInstrumentalForm);
     }
 
@@ -98,11 +105,40 @@ public class EilerCirclesGenerator implements ProblemGenerator {
             throw new IllegalArgumentException();
         }
 
+        if (problemAvailability.getScenario().equals(CANDIES_STORE_SCENARIO)) {
+            int cakes = randomInt(40, 61);
+            int candies = randomInt(30, 51);
+            int intersection = randomInt(10, 20);
+            int answer = cakes + candies - intersection;
+            String text = "В кондитерском отделе супермаркета посетители обычно покупают либо один торт, " +
+                    "либо одну коробку конфет, либо один торт и одну коробку конфет. В один из дней было продано " +
+                    getNumWithString(cakes, CAKE) + " и " + getNumWithString(candies, CANDY_BOX)+ ". Сколько было покупателей, если " +
+                    getNumWithString(intersection, PEOPLE) + " купили и торт, и коробку конфет?";
+            String hint = "Нарисуйте схему из двух кругов. В один круг поместите людей, которые купили торты, а в другой тех, " +
+                    "кто купил коробки конфет. Не забудьте, что " + getNumWithString(intersection, PEOPLE) + " купили и торт, и коробку конфет.";
+            return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.EILER_CIRCLES,
+                    Sets.newHashSet(getNumWithString(answer, BUYER), getNumWithString(answer, PEOPLE)), hint, CANDIES_STORE_SCENARIO, difficulty);
+        } else if (problemAvailability.getScenario().equals(CUBES_SCENARIO)) {
+            int red = randomInt(4, 10);
+            int blue = randomInt(4, 10);
+            int intersection = randomInt(2, Math.min(red, blue) - 1);
+            int total = red + blue - intersection;
+            String text = "У Лизы есть " + getNumWithString(total, BRICK) + " с красными и синими буквами. " +
+                    blue + " из них c синими буквами, а " + red + " – с красными. На скольких кубиках написаны буквы двух цветов?";
+            String hint = "Нарисуйте " + getNumWithString(total, BRICK) + " и попробуйте отметить, на каких синие буквы, а на каких красные, " +
+                    "но только так, чтобы на каждом кубике была хотя бы одна красная или синяя буква.";
+            return new ProblemWithPossibleTextAnswers(text, intersection, ProblemCollection.EILER_CIRCLES,
+                    Sets.newHashSet("На " + NumberWord.getStringForNumber(intersection, Gender.MASCULINE, Case.GENITIVE) + " кубиках"), hint, CUBES_SCENARIO, difficulty);
+        }
+
         final EilerCirclesScenario scenario = (EilerCirclesScenario) problemAvailability.getScenario();
 
-        int x = difficulty == Problem.Difficulty.DIFFICULT ? randomInt(8, 16) : randomInt(1, 6);
-        int z = difficulty == Problem.Difficulty.DIFFICULT ? randomInt(8, 16) : randomInt(1, 6);
-        int y = difficulty == Problem.Difficulty.DIFFICULT ? randomInt(5, Math.min(16, 40 - x - z)) : randomInt(Math.max(1, 8 - x - z), Math.min(8, 13 - x - z));
+        int x = difficulty == MEDIUM ? randomInt(8, 13) :
+                difficulty == DIFFICULT ? randomInt(12, 20) : randomInt(1, 6);
+        int z = difficulty == MEDIUM ? randomInt(8, 13) :
+                difficulty == DIFFICULT ? randomInt(12, 20) : randomInt(1, 6);
+        int y = difficulty == MEDIUM ? randomInt(5, Math.min(13, 30 - x - z)) :
+                difficulty == DIFFICULT ? randomInt(10, Math.max(16, 45 - x - z)) : randomInt(Math.max(1, 8 - x - z), Math.min(8, 13 - x - z));
 
         int total = x + y + z;
 
@@ -111,9 +147,6 @@ public class EilerCirclesGenerator implements ProblemGenerator {
                 {"Миша", "Мишином", "Мише"},
                 {"Саша", "Сашином", "Саше"}};
         boolean excludeHero = randomInt(0, 2) == 0;
-        if (excludeHero) {
-            total = total + 1;
-        }
         String[] hero = heroes[randomInt(0, heroes.length)];
 
         int theme = randomInt(0, THEMES.length);
@@ -137,25 +170,29 @@ public class EilerCirclesGenerator implements ProblemGenerator {
         if (chosenVariables.contains(TOTAL)) {
             switch (THEMES[theme]) {
                 case CLASS:
-                    text.append("В ").append(hero[1]).append(" классе ").append(getNumWithString(total, STUDENT));
+                    text.append("В ").append(hero[1]).append(" классе ");
                     if (!excludeHero) {
-                        text.append(" ");
+                        text.append(getNumWithString(total, STUDENT)).append(" и все ");
+                    } else {
+                        text.append(getNumWithString(total + 1, STUDENT));
                     }
                     startSentence = true;
                     break;
                 case CAMP:
-                    text.append("В лагерь приехали ").append(getNumWithString(total, CHILD));
+                    text.append("В лагерь приехали ");
                     if (!excludeHero) {
-                        text.append(" и ");
+                        text.append(getNumWithString(total, CHILD)).append(" и ");
+                    } else {
+                        text.append(getNumWithString(total + 1, CHILD));
                     }
                     startSentence = true;
                     break;
                 case PARTY:
-                    text.append("На день рождения к ").append(hero[2]).append(" пришли ").append(getNumWithString(total - 1, CHILD));
+                    text.append("На день рождения к ").append(hero[2]).append(" пришли ");
                     if (excludeHero) {
-                        text.append(", и ").append(hero[0]).append(" угостил всех конфетами");
+                        text.append(getNumWithString(total, CHILD)).append(", и ").append(hero[0]).append(" угостил всех конфетами");
                     } else {
-                        text.append(" и на праздничном столе все дети ели конфеты");
+                        text.append(getNumWithString(total - 1, CHILD)).append(" и на праздничном столе все дети ели конфеты");
                     }
                     startSentence = true;
                     break;
@@ -207,14 +244,14 @@ public class EilerCirclesGenerator implements ProblemGenerator {
                 chosenVariables.remove(Y_Z);
             } else if (chosenVariables.contains(X)) {
                 text.append(startSentence ? "Среди " : "среди ").append(Integer.toString(x + y), NumberWord.getStringForNumber(x + y, Gender.MASCULINE, Case.GENITIVE))
-                        .append(" детей, которые ").append(verb.getPlural()).append(" ").append(GOVERN_FORM.get(verb).apply(chosenSubjects[0]))
+                        .append((x + y) % 10 == 1 ? " ребенка" : " детей").append(", которые ").append(verb.getPlural()).append(" ").append(GOVERN_FORM.get(verb).apply(chosenSubjects[0]))
                         .append(", ").append(conditions.get(X).getTextWithCount(selectVerb(THEMES[theme], verbCount++)));
                 chosenVariables.remove(X);
-            } else if (chosenVariables.contains(Y)) {
-                text.append(startSentence ? "Среди " : "среди ").append(Integer.toString(x + y), NumberWord.getStringForNumber(x + y, Gender.MASCULINE, Case.GENITIVE))
-                        .append(" детей, которые ").append(verb.getPlural()).append(" ").append(GOVERN_FORM.get(verb).apply(chosenSubjects[0]))
-                        .append(", ").append(conditions.get(Y_Z).getTextWithCount(y, selectVerb(THEMES[theme], verbCount++)));
-                chosenVariables.remove(Y);
+//            } else if (chosenVariables.contains(Y)) {
+//                text.append(startSentence ? "Среди " : "среди ").append(Integer.toString(x + y), NumberWord.getStringForNumber(x + y, Gender.MASCULINE, Case.GENITIVE))
+//                        .append(" детей, которые ").append(verb.getPlural()).append(" ").append(GOVERN_FORM.get(verb).apply(chosenSubjects[0]))
+//                        .append(", ").append(conditions.get(Y_Z).getTextWithCount(y, selectVerb(THEMES[theme], verbCount++)));
+//                chosenVariables.remove(Y);
             } else {
                 text.append(conditions.get(X_Y).getTextWithCount(selectVerb(THEMES[theme], verbCount++)));
             }
@@ -227,14 +264,14 @@ public class EilerCirclesGenerator implements ProblemGenerator {
             final Verb verb = selectVerb(THEMES[theme], verbCount++);
             if (chosenVariables.contains(Z)) {
                 text.append(startSentence ? "Среди " : "среди ").append(Integer.toString(y + z), NumberWord.getStringForNumber(y + z, Gender.MASCULINE, Case.GENITIVE))
-                        .append(" детей, которые ").append(verb.getPlural()).append(" ").append(GOVERN_FORM.get(verb).apply(chosenSubjects[1]))
+                        .append((z + y) % 10 == 1 ? " ребенка" : " детей").append(", которые ").append(verb.getPlural()).append(" ").append(GOVERN_FORM.get(verb).apply(chosenSubjects[1]))
                         .append(", ").append(conditions.get(Z).getTextWithCount(selectVerb(THEMES[theme], verbCount++)));
                 chosenVariables.remove(Z);
-            } else if (chosenVariables.contains(Y)) {
-                text.append(startSentence ? "Среди " : "среди ").append(Integer.toString(y + z), NumberWord.getStringForNumber(y + z, Gender.MASCULINE, Case.GENITIVE))
-                        .append(" детей, которые ").append(verb.getPlural()).append(" ").append(GOVERN_FORM.get(verb).apply(chosenSubjects[1]))
-                        .append(", ").append(conditions.get(X_Y).getTextWithCount(y, selectVerb(THEMES[theme], verbCount++)));
-                chosenVariables.remove(Y);
+//            } else if (chosenVariables.contains(Y)) {
+//                text.append(startSentence ? "Среди " : "среди ").append(Integer.toString(y + z), NumberWord.getStringForNumber(y + z, Gender.MASCULINE, Case.GENITIVE))
+//                        .append(" детей, которые ").append(verb.getPlural()).append(" ").append(GOVERN_FORM.get(verb).apply(chosenSubjects[1]))
+//                        .append(", ").append(conditions.get(X_Y).getTextWithCount(y, selectVerb(THEMES[theme], verbCount++)));
+//                chosenVariables.remove(Y);
             } else {
                 text.append(conditions.get(Y_Z).getTextWithCount(selectVerb(THEMES[theme], verbCount++)));
             }
@@ -364,7 +401,7 @@ public class EilerCirclesGenerator implements ProblemGenerator {
             return getNumWithString(count, CHILD) + " "
                     + (count % 10 == 1 ? verb.getSingular() : verb.getPlural()) + " "
                     + GOVERN_FORM.get(verb).apply(object2)
-                    + ", но " + text
+                    + ", но " + (text.isEmpty() ? "" : (text + " "))
                     + (count % 10 == 1 ? verb2.getSingular() : verb2.getPlural()) + " "
                     + GOVERN_FORM.get(verb2).apply(object1);
 
@@ -396,7 +433,7 @@ public class EilerCirclesGenerator implements ProblemGenerator {
             }
             return verb.getPlural() + " "
                     + GOVERN_FORM.get(verb).apply(object2)
-                    + ", но " + text
+                    + ", но " + (text.isEmpty() ? "" : (text + " "))
                     + verb2.getPlural() + " "
                     + GOVERN_FORM.get(verb2).apply(object1);
 
@@ -436,7 +473,9 @@ public class EilerCirclesGenerator implements ProblemGenerator {
             case MEDIUM:
                 return findAvailableScenario(difficulty, alreadySolvedProblems, SCENARIOS, Sets.newHashSet(EASY_SCENARIOS));
             case DIFFICULT:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, SCENARIOS, Sets.newHashSet(SCENARIOS));
+                final List<ProblemScenario> scenarios = new ArrayList<>(SCENARIOS);
+                scenarios.add(CANDIES_STORE_SCENARIO);
+                return findAvailableScenario(difficulty, alreadySolvedProblems, scenarios, Sets.newHashSet(SCENARIOS));
             case EXPERT:
                 return null;
 

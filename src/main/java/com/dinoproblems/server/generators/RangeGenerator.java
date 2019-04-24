@@ -18,6 +18,7 @@ import javax.annotation.Nonnull;
 
 import static com.dinoproblems.server.Problem.Difficulty.MEDIUM;
 import static com.dinoproblems.server.ProblemCollection.RANGE;
+import static com.dinoproblems.server.utils.Dictionary.NUMBER;
 import static com.dinoproblems.server.utils.Dictionary.PAGE;
 import static com.dinoproblems.server.utils.GeneratorUtils.Gender.MASCULINE;
 import static com.dinoproblems.server.utils.GeneratorUtils.Gender.NEUTER;
@@ -34,11 +35,12 @@ import static com.dinoproblems.server.Problem.Difficulty.EASY;
 public class RangeGenerator implements ProblemGenerator {
 
     private final static ProblemScenario NUMBERS = new ProblemScenarioImpl(ProblemCollection.RANGE + "_" + "NUMBERS");
+    private final static ProblemScenario NUMBERS_NOT_LESS_NOT_GREATER = new ProblemScenarioImpl(ProblemCollection.RANGE + "_" + "NUMBERS_NOT_LESS_NOT_GREATER");
     private final static ProblemScenario READ_PAGES = new ProblemScenarioImpl(ProblemCollection.RANGE + "_" + "READ_PAGES");
     private final static ProblemScenario TORN_OUT_PAGES = new ProblemScenarioImpl(ProblemCollection.RANGE + "_" + "TORN_OUT_PAGES");
     private final static ProblemScenario DATES = new ProblemScenarioImpl(ProblemCollection.RANGE + "_" + "DATES");
 
-    private static final ProblemScenario[] SCENARIOS = {NUMBERS, READ_PAGES, TORN_OUT_PAGES, DATES};
+    private static final ProblemScenario[] SCENARIOS = {NUMBERS, NUMBERS_NOT_LESS_NOT_GREATER, READ_PAGES, TORN_OUT_PAGES, DATES};
 
     @Nonnull
     @Override
@@ -54,12 +56,22 @@ public class RangeGenerator implements ProblemGenerator {
         int first;
         int second;
         ProblemScenario scenario = problemAvailability.getScenario();
-        if (scenario.equals(NUMBERS)) {
-
+        if (scenario.equals(NUMBERS_NOT_LESS_NOT_GREATER)) {
             first = difficulty == EASY ? randomInt(1, 7) : randomInt(1, 11);
             second = difficulty == EASY ? randomInt(11, 20) : randomInt(28, 40);
             answer = second - first + 1;
-            final String numsWithText = getNumWithString(answer, "число", "числа", "чисел", NEUTER);
+            final String numsWithText = getNumWithString(answer, NUMBER);
+            possibleTextAnswers = Sets.newHashSet(numsWithText);
+            text.append("Сколько существует чисел, которые не меньше ");
+            text.append(Integer.toString(first), NumberWord.getStringForNumber(first, NEUTER, GeneratorUtils.Case.GENITIVE));
+            text.append(", но и не больше ");
+            text.append(String.valueOf(second), NumberWord.getStringForNumber(second, NEUTER, GeneratorUtils.Case.GENITIVE)).append("?");
+            hint = "Какие числа не меньше "+ NumberWord.getStringForNumber(first, NEUTER, GeneratorUtils.Case.GENITIVE) + "? Подумайте, с какого числа надо начинать считать и на каком числе заканчивать.";
+        } else if (scenario.equals(NUMBERS)) {
+            first = difficulty == EASY ? randomInt(1, 7) : randomInt(1, 11);
+            second = difficulty == EASY ? randomInt(11, 20) : randomInt(28, 40);
+            answer = second - first + 1;
+            final String numsWithText = getNumWithString(answer, NUMBER);
             possibleTextAnswers = Sets.newHashSet(numsWithText);
             text.append("Сколько чисел от ");
             text.append(String.valueOf(first), NumberWord.getStringForNumber(first, NEUTER, GeneratorUtils.Case.GENITIVE));
@@ -115,7 +127,7 @@ public class RangeGenerator implements ProblemGenerator {
             text.append(String.valueOf(first), OrdinalNumber.getOrdinalTwoDigitNum(first).getGenitiveForm(MASCULINE));
             text.append(beginMonth + "по ").append(String.valueOf(second), OrdinalNumber.getOrdinalTwoDigitNum(second).getNominative(NEUTER));
             text.append(endMonth + "библиотека не работает». Сколько дней отпуск у библиотекаря? (В" + monthsInstr[monthIndex] + "31 день)");
-            hint = "Попробуйте из количества дней в" + monthsInstr[monthIndex] + "вычесть дату начала отпуска. " +
+            hint = "Вычтите из количества дней в" + monthsInstr[monthIndex] + "дату начала отпуска. " +
                     "Не забывайте, что день начала и день конца отпуска входят в количество дней в отпуске.";
         }
         return new ProblemWithPossibleTextAnswers(text.getText(), text.getTTS(), answer, RANGE, possibleTextAnswers, hint, scenario, difficulty);
@@ -125,9 +137,9 @@ public class RangeGenerator implements ProblemGenerator {
     public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty) {
         switch (difficulty) {
             case EASY:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(NUMBERS, READ_PAGES), new HashSet<>());
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(NUMBERS, READ_PAGES, NUMBERS_NOT_LESS_NOT_GREATER), new HashSet<>());
             case MEDIUM:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(SCENARIOS), Sets.newHashSet(NUMBERS, READ_PAGES));
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(SCENARIOS), Sets.newHashSet(NUMBERS, READ_PAGES, NUMBERS_NOT_LESS_NOT_GREATER));
             case DIFFICULT:
                 return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(TORN_OUT_PAGES, DATES), Sets.newHashSet(SCENARIOS));
             case EXPERT:
