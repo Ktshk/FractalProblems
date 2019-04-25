@@ -208,16 +208,8 @@ public class SequenceGenerator implements ProblemGenerator {
 
     @Override
     public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty) {
-
-
-
-            if (difficulty == Problem.Difficulty.DIFFICULT) {
-                return null;
-
-            }
-
-            return GeneratorUtils.findAvailableScenario(difficulty, alreadySolvedProblems,
-                    Lists.newArrayList(DEFAULT_SCENARIO), new HashSet<>());
-        }
-
+        return GeneratorUtils.findAvailableScenario(difficulty, alreadySolvedProblems,
+                Lists.newArrayList(DEFAULT_SCENARIO), new HashSet<>());
     }
+
+}

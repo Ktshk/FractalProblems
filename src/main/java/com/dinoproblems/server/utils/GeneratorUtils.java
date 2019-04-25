@@ -5,12 +5,17 @@ import com.dinoproblems.server.Problem.Difficulty;
 import com.dinoproblems.server.ProblemGenerator.ProblemAvailability;
 import com.dinoproblems.server.ProblemGenerator.ProblemAvailabilityType;
 import com.dinoproblems.server.ProblemScenario;
+import com.google.common.collect.Lists;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
+import static com.dinoproblems.server.Problem.Difficulty.EASY;
 import static com.dinoproblems.server.utils.GeneratorUtils.Gender.MASCULINE;
 import static com.dinoproblems.server.utils.NumberWord.getStringForNumber;
 
@@ -127,43 +132,74 @@ public class GeneratorUtils {
         return chooseRandomElement(list);
     }
 
+    @Nullable
     public static ProblemAvailability findAvailableScenario(Difficulty difficulty, @Nonnull Collection<Problem> alreadySolvedProblems,
                                                             @Nonnull Collection<ProblemScenario> availableScenarios,
                                                             @Nonnull Collection<ProblemScenario> easierScenarios) {
-        Map<ProblemScenario, ProblemAvailabilityType> scenarioToProblemAvailability = new HashMap<>();
-        for (ProblemScenario problemScenario : availableScenarios) {
-            scenarioToProblemAvailability.put(problemScenario, ProblemAvailabilityType.newScenarioProblem);
-        }
-
         if (alreadySolvedProblems.isEmpty()) {
             return new ProblemAvailability(ProblemAvailabilityType.newProblem, chooseRandomElement(availableScenarios));
         }
-
+        final Map<ProblemScenario, ProblemAvailabilityType> scenarioToProblemAvailability = new HashMap<>();
+        final HashSet<ProblemScenario> easierScenariosSet = easierScenarios
+                .stream()
+                .filter(problemScenario -> !availableScenarios.contains(problemScenario) || !problemScenario.isSingleProblem())
+                .collect(Collectors.toCollection(HashSet::new));
+        final Map<ProblemScenario, Map<Boolean, Set<Difficulty>>> problemsByScenario = new HashMap<>();
         for (Problem problem : alreadySolvedProblems) {
             final ProblemScenario problemScenario = problem.getProblemScenario();
-            if (!scenarioToProblemAvailability.containsKey(problemScenario)) {
+            if (problem.getDifficulty() != difficulty && (difficulty == EASY || problem.getDifficulty() != difficulty.getPrevious())) {
                 continue;
             }
-            if (problem.getState() == Problem.State.SOLVED) {
-                if (problem.getDifficulty().compareTo(difficulty) < 0) {
-                    if (scenarioToProblemAvailability.get(problemScenario) != ProblemAvailabilityType.minorScenarioChanges) {
-                        scenarioToProblemAvailability.put(problemScenario, ProblemAvailabilityType.trainProblem);
+            if (availableScenarios.contains(problemScenario)) {
+                if (!problemsByScenario.containsKey(problemScenario)) {
+                    problemsByScenario.put(problemScenario, new HashMap<>());
+                }
+                final boolean solved = problem.getState() == Problem.State.SOLVED;
+                if (!problemsByScenario.get(problemScenario).containsKey(solved)) {
+                    problemsByScenario.get(problemScenario).put(solved, new HashSet<>());
+                }
+                problemsByScenario.get(problemScenario).get(solved).add(problem.getDifficulty());
+            }
+            if (difficulty != EASY && problem.getDifficulty() == difficulty.getPrevious()) {
+                easierScenariosSet.remove(problem.getProblemScenario());
+            }
+        }
+
+        for (ProblemScenario scenario : availableScenarios) {
+            if (!problemsByScenario.containsKey(scenario)) {
+                scenarioToProblemAvailability.put(scenario, ProblemAvailabilityType.newScenarioProblem);
+            } else {
+                final Map<Boolean, Set<Difficulty>> stateDifficultyMap = problemsByScenario.get(scenario);
+                if (stateDifficultyMap.containsKey(true)) {
+                    if (stateDifficultyMap.get(true).contains(difficulty)) {
+                        if (!scenario.isSingleProblem()) {
+                            scenarioToProblemAvailability.put(scenario, ProblemAvailabilityType.minorScenarioChanges);
+                        }
+                    } else {
+                        if (!scenario.isSingleProblem()) {
+                            scenarioToProblemAvailability.put(scenario, ProblemAvailabilityType.trainProblem);
+                        }
                     }
                 } else {
-                    if (problemScenario.isSingleProblem()) {
-                        scenarioToProblemAvailability.remove(problemScenario);
+                    if (difficulty != EASY && stateDifficultyMap.get(false).contains(difficulty.getPrevious())) {
+                        if (!easierScenariosSet.isEmpty()) {
+                            scenarioToProblemAvailability.put(chooseRandomElement(easierScenariosSet), ProblemAvailabilityType.easierProblem);
+                        } else {
+                            if (!scenario.isSingleProblem()) {
+                                scenarioToProblemAvailability.put(scenario, ProblemAvailabilityType.trainProblem);
+                            }
+                        }
                     } else {
-                        scenarioToProblemAvailability.put(problemScenario, ProblemAvailabilityType.minorScenarioChanges);
-                    }
-                }
-            } else if (problem.getState() == Problem.State.SOLVED_WITH_HINT || problem.getState() == Problem.State.ANSWER_GIVEN) {
-                final ProblemAvailabilityType availabilityType = scenarioToProblemAvailability.get(problemScenario);
-                if (availabilityType == ProblemAvailabilityType.newScenarioProblem) {
-                    if (!easierScenarios.isEmpty()) {
-                        scenarioToProblemAvailability.put(problemScenario, ProblemAvailabilityType.easierProblem);
-                    } else {
-                        if (problemScenario.isSingleProblem()) {
-                            scenarioToProblemAvailability.remove(problemScenario);
+                        if (!easierScenariosSet.isEmpty()) {
+                            if (easierScenarios.contains(scenario)) {
+                                scenarioToProblemAvailability.put(scenario, ProblemAvailabilityType.easierProblem);
+                            } else {
+                                scenarioToProblemAvailability.put(chooseRandomElement(easierScenariosSet), ProblemAvailabilityType.easierProblem);
+                            }
+                        } else {
+                            if (!scenario.isSingleProblem()) {
+                                scenarioToProblemAvailability.put(scenario, ProblemAvailabilityType.trainProblem);
+                            }
                         }
                     }
                 }
@@ -174,29 +210,17 @@ public class GeneratorUtils {
             return null;
         }
 
-        List<ProblemScenario> bestChoice = new ArrayList<>();
-        List<ProblemScenario> otherChoices = new ArrayList<>();
-        for (ProblemScenario problemScenario : scenarioToProblemAvailability.keySet()) {
-            if (scenarioToProblemAvailability.get(problemScenario).equals(ProblemAvailabilityType.minorScenarioChanges)) {
-                otherChoices.add(problemScenario);
-            } else {
-                bestChoice.add(problemScenario);
-            }
+        final ArrayList<ProblemScenario> sortedList = scenarioToProblemAvailability.keySet()
+                .stream()
+                .filter(problemScenario -> availableScenarios.contains(problemScenario) ||
+                        (scenarioToProblemAvailability.get(problemScenario) == ProblemAvailabilityType.easierProblem && easierScenarios.contains(problemScenario)))
+                .collect(Collectors.toCollection(ArrayList::new));
+        if (sortedList.isEmpty()) {
+            return null;
         }
+        Collections.shuffle(sortedList);
+        final Optional<ProblemScenario> max = sortedList.stream().max(Comparator.comparingInt(o -> scenarioToProblemAvailability.get(o).getWeight()));
+        return max.map(problemScenario -> new ProblemAvailability(scenarioToProblemAvailability.get(problemScenario), problemScenario)).orElse(null);
 
-        ProblemScenario scenario;
-        if (!bestChoice.isEmpty()) {
-            scenario = chooseRandomElement(bestChoice);
-        } else {
-            scenario = chooseRandomElement(otherChoices);
-        }
-
-        final ProblemAvailabilityType type = scenarioToProblemAvailability.get(scenario);
-        if (type == ProblemAvailabilityType.easierProblem) {
-            if (!easierScenarios.contains(scenario)) {
-                scenario = chooseRandomElement(easierScenarios);
-            }
-        }
-        return new ProblemAvailability(type, scenario);
     }
 }

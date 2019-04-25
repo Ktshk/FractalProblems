@@ -39,11 +39,10 @@ public class MainServlet extends HttpServlet {
     private Set<String> askToRepeat = Sets.newHashSet("повтори", "повторить", "повтори задачу", "повтори условие");
     private String[] praises = {"Молодец!", "Это правильный ответ.", "Ну конечно! Так и есть.",
             "У вас отлично получается.", "Я не сомневалась, что у вас получится.", "Правильно."};
-    private String[] soundPraises = {"<speaker audio=\"alice-sounds-game-8-bit-coin-1.opus\">",
-            "<speaker audio=\"alice-sounds-game-win-1.opus\">", "<speaker audio=\"alice-sounds-game-win-2.opus\">",
+    private String[] soundPraises = {"<speaker audio=\"alice-sounds-game-win-1.opus\">",
+            "<speaker audio=\"alice-sounds-game-win-2.opus\">",
             "<speaker audio=\"alice-sounds-game-win-3.opus\">"};//Попытка добавления звуков
-    private String[] oneMoreQuestion = {"Хотите ещё задачу?", "Ещё задачу?", "Решаем дальше?",
-            "Ещё одну?", "Давайте решим еще одну!", "Предлагаю решить ещё одну"};
+    private String[] oneMoreQuestion = {"Хотите ещё задачу?", "Решаем дальше?", "Давайте решим еще одну!", "Предлагаю решить ещё одну"};
     private String[] wrongAnswer = {"Нет, это неверно.", "Неверно.", "Это неправильный ответ.", "Нет.", "Нет, это точно неправильно."};
     private String[] notAnAnswer = {"Хотите скажу подсказку или повторю задачу?", "Я могу повторить задачу.", "Могу дать вам подсказку.",
             "Задача не из простых, но я могу помочь", "Я могу подсказать."};

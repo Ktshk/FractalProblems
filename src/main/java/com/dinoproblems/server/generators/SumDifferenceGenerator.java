@@ -11,6 +11,7 @@ import com.dinoproblems.server.utils.*;
 
 import javax.annotation.Nonnull;
 
+import static com.dinoproblems.server.Problem.Difficulty.EXPERT;
 import static com.dinoproblems.server.ProblemCollection.SUM_DIFFERENCE;
 import static com.dinoproblems.server.utils.GeneratorUtils.randomInt;
 import static com.dinoproblems.server.Problem.Difficulty.EASY;
@@ -94,7 +95,7 @@ public class SumDifferenceGenerator implements ProblemGenerator {
 
     @Override
     public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty) {
-        if (difficulty == Problem.Difficulty.DIFFICULT) {
+        if (difficulty == EXPERT) {
             return null;
         }
 

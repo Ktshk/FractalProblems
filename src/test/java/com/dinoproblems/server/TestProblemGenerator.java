@@ -31,14 +31,15 @@ public class TestProblemGenerator {
     public void testProblemCollectionGeneration() {
         final ProblemCollection problemCollection = ProblemCollection.INSTANCE;
         for (Problem.Difficulty difficulty : Problem.Difficulty.values()) {
+//        Problem.Difficulty difficulty = Problem.Difficulty.MEDIUM;
             System.out.println("************* " + difficulty);
             final Session session = new Session("test");
             session.setCurrentDifficulty(difficulty);
 
-            for (int i = 0; i < 15; i++) {
+            for (int i = 0; i < 10; i++) {
 //                solveProblem(problemCollection, session, Problem.State.SOLVED_WITH_HINT);
                 solveProblem(problemCollection, session, Problem.State.SOLVED);
-//                solveProblem(problemCollection, session, Problem.State.ANSWER_GIVEN);
+                solveProblem(problemCollection, session, Problem.State.ANSWER_GIVEN);
             }
         }
     }
@@ -78,11 +79,9 @@ public class TestProblemGenerator {
         session.setCurrentProblem(problem);
 
         System.out.println("Problem: " + problem.getText());
-        final String hint = problem.getHint();
-        if (state == Problem.State.SOLVED_WITH_HINT) {
-            System.out.println("Hint: " + hint);
-        }
+        System.out.println("Difficulty: " + problem.getDifficulty());
         System.out.println("Answer: " + problem.getTextAnswer());
+        System.out.println("State: " + state);
         System.out.println("*** ");
         problem.setState(state);
     }

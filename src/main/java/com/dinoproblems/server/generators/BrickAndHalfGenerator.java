@@ -22,7 +22,7 @@ public class BrickAndHalfGenerator implements ProblemGenerator {
     private final static ProblemScenario BRICK_WEIGHT = new ProblemScenarioImpl(ProblemCollection.BRICK_AND_HALF + "_" + "BRICK_WEIGHT");
     private final static ProblemScenario BRICK_PRICE = new ProblemScenarioImpl(ProblemCollection.BRICK_AND_HALF + "_" + "BRICK_PRICE");
 
-    private static final ProblemScenario[] SCENARIOS = {WAY, BRICK_WEIGHT, BRICK_PRICE};
+    private static final ProblemScenario[] SCENARIOS = {WAY, BRICK_WEIGHT/*, BRICK_PRICE*/};
 
     @Nonnull
     @Override

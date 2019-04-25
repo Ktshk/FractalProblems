@@ -120,7 +120,7 @@ public class WithClosedEyesGenerator implements ProblemGenerator {
                     text.append(getNumWithString(question, things[thing]));
                     text.append(" одного (любого) цвета?");
                     answer = count.length * (question - 1) + 1;
-                    hint = "Допустим, что сначала нам не повезет и мы будем вытаскивать шары разных цветов.";
+                    hint = "Допустим, что сначала нам не повезет и мы будем вытаскивать " + things[thing].getPluralForm() + " разных цветов.";
                 } else if (scenario == DIFFERENT_COLORS) {
                     text.append(getNumWithString(2, things[thing]));
                     text.append(" разных цветов?");

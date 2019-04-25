@@ -121,7 +121,7 @@ public class SpacesGenerator implements ProblemGenerator {
                     if (scenario.isDirectTask()) {
                         text.append("Бобер пилил брёвна. На ").append(getBlocksStringNa(blocks)).append(" он сделал ")
                                 .append(spaceWithText)
-                                .append(". Сколько кусков ").append("бревна", "бревна+").append(" у него получилось?");
+                                .append(". Сколько кусков ").append("бревна", "бревн+а").append(" у него получилось?");
                         possibleTextAnswers = Sets.newHashSet(piecesWithText);
                         answer = pieces;
                     } else {
@@ -209,7 +209,7 @@ public class SpacesGenerator implements ProblemGenerator {
                         answer = spaces;
                         possibleTextAnswers = Sets.newHashSet(GeneratorUtils.getMetersString(spaces));
                     }
-                    hint = "Нарисуйте картинку.";
+                    hint = "Нарисуйте картинку. Посмотрите, на сколько число промежутков между столбами отличается от числа столбов.";
                 } else {
                     int meters = randomInt(2, 5);
                     if (!scenario.isDirectTask()) {
@@ -224,7 +224,7 @@ public class SpacesGenerator implements ProblemGenerator {
                         answer = spaces * meters;
                         possibleTextAnswers = Sets.newHashSet(getMetersString(spaces * meters));
                     }
-                    hint = "Нарисуйте картинку. Сколько промежутков между столбами? Помните, каждый промежуток - это " + getMetersString(meters) + ".";
+                    hint = "Сколько промежутков между столбами? Помните, каждый промежуток - это " + getMetersString(meters) + ".";
                 }
                 break;
             default:
