@@ -6,10 +6,15 @@ import com.dinoproblems.server.ProblemWithPossibleTextAnswers;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
-import java.io.BufferedReader;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -27,43 +32,76 @@ public class VariousProblems {
     }
 
     private void loadProblems() {
-        loadProblemsByDifficulty("easy.txt", Difficulty.EASY);
-        loadProblemsByDifficulty("medium.txt", Difficulty.MEDIUM);
-        loadProblemsByDifficulty("difficult.txt", Difficulty.DIFFICULT);
-        loadProblemsByDifficulty("expert.txt", Difficulty.EXPERT);
+        loadProblemsByDifficulty("easy.xml", Difficulty.EASY);
+        loadProblemsByDifficulty("medium.xml", Difficulty.MEDIUM);
+        loadProblemsByDifficulty("difficult.xml", Difficulty.DIFFICULT);
+        loadProblemsByDifficulty("expert.xml", Difficulty.EXPERT);
     }
 
     private void loadProblemsByDifficulty(String fileName, Difficulty difficulty) {
-        final BufferedReader difficultProblems = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(fileName)));
         try {
-            String line;
+            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            Document doc = documentBuilder.parse(getClass().getResourceAsStream(fileName));
+            doc.getDocumentElement().normalize();
 
-            while ((line = difficultProblems.readLine()) != null) {
-                final String[] tokens = line.split("\t");
-                final String id = tokens[0];
-                final String text = tokens[1];
-                final String tts = tokens[2].isEmpty() ? null : tokens[2];
-                final String hint = tokens[3];
-                final int answer = Integer.valueOf(tokens[4]);
-                final String textAnswer = tokens[5];
-                final HashSet<String> possibleTextAnswers = Sets.newHashSet(textAnswer);
-                for (int i = 6; i < tokens.length; i++) {
-                    if (!tokens[i].isEmpty()) {
-                        possibleTextAnswers.add(tokens[i]);
+            NodeList nodeList = doc.getElementsByTagName("problem");
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                Node problemNode = nodeList.item(i);
+
+                if (problemNode.getNodeType() == Node.ELEMENT_NODE) {
+                    final String id = problemNode.getAttributes().getNamedItem("scenarioId").getNodeValue();
+                    final int answer = Integer.valueOf(problemNode.getAttributes().getNamedItem("answer").getNodeValue());
+                    String text = null;
+                    String tts = null;
+                    String hint = null;
+                    final HashSet<String> possibleTextAnswers = Sets.newHashSet();
+
+                    final NodeList childNodes = problemNode.getChildNodes();
+                    for (int j = 0; j < childNodes.getLength(); j++) {
+                        final Node problemChildNode = childNodes.item(j);
+                        if (problemChildNode.getNodeType() == Node.ELEMENT_NODE) {
+                            if (problemChildNode.getNodeName().equals("text")) {
+                                text = problemChildNode.getTextContent();
+                            } else if (problemChildNode.getNodeName().equals("tts")) {
+                                tts = problemChildNode.getTextContent();
+                            } else if (problemChildNode.getNodeName().equals("hints")) {
+                                final NodeList hintsNodes = problemChildNode.getChildNodes();
+                                hint_iteration:
+                                for (int k = 0; k < hintsNodes.getLength(); k++) {
+                                    final Node hintNode = hintsNodes.item(k);
+                                    if (hintNode.getNodeType() == Node.ELEMENT_NODE) {
+                                        final NodeList hintChildren = hintNode.getChildNodes();
+                                        for (int m = 0; m < hintChildren.getLength(); m++) {
+                                            final Node hintChild = hintChildren.item(m);
+                                            if (hintChild.getNodeType() == Node.ELEMENT_NODE) {
+                                                if (hintChild.getNodeName().equals("text")) {
+                                                    hint = hintChild.getTextContent();
+                                                    break hint_iteration;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            } else if (problemChildNode.getNodeName().equals("text_answers")) {
+                                final NodeList textAnswerNodes = problemChildNode.getChildNodes();
+                                for (int k = 0; k < textAnswerNodes.getLength(); k++) {
+                                    final Node textAnswerNode = textAnswerNodes.item(k);
+                                    if (textAnswerNode.getNodeType() == Node.ELEMENT_NODE) {
+                                        possibleTextAnswers.add(textAnswerNode.getAttributes().getNamedItem("text").getNodeValue());
+                                    }
+                                }
+                            }
+                        }
                     }
+
+                    problems.put(difficulty, new ProblemWithPossibleTextAnswers(text, tts, answer, THEME,
+                            possibleTextAnswers, hint, new ProblemScenarioImpl(THEME + "_" + id, true),
+                            difficulty));
                 }
-                problems.put(difficulty, new ProblemWithPossibleTextAnswers(text, tts, answer, THEME,
-                        possibleTextAnswers, hint, new ProblemScenarioImpl(THEME + "_" + id, true),
-                        difficulty));
             }
-        } catch (IOException e) {
+        } catch (IOException | ParserConfigurationException | SAXException e) {
             e.printStackTrace();
-        } finally {
-            try {
-                difficultProblems.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 

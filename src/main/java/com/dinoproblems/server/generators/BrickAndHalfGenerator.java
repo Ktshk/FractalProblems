@@ -22,14 +22,16 @@ public class BrickAndHalfGenerator implements ProblemGenerator {
     private final static ProblemScenario BRICK_WEIGHT = new ProblemScenarioImpl(ProblemCollection.BRICK_AND_HALF + "_" + "BRICK_WEIGHT");
     private final static ProblemScenario BRICK_PRICE = new ProblemScenarioImpl(ProblemCollection.BRICK_AND_HALF + "_" + "BRICK_PRICE");
 
-    private static final ProblemScenario[] SCENARIOS = {WAY, BRICK_WEIGHT/*, BRICK_PRICE*/};
+    private static final ProblemScenario[] SCENARIOS = {WAY, BRICK_WEIGHT, BRICK_PRICE};
+
+    // TODO: add difficult problem:  Арбуз весит как дыня и четверть арбуза. Дыня весит как 6 яблок и еще треть дыни. Дыня вместе с яблокомвесят 2кг. Сколько весит арбуз?
 
     @Nonnull
     @Override
     public Problem generateProblem(Difficulty difficulty, ProblemAvailability problemAvailability) {
         int k = difficulty == Difficulty.EASY ? 2 : randomInt(3, 5);
         int n = (difficulty == Difficulty.EASY ? randomInt(1, 4) :
-                randomInt(1, 5)) * (k - 1);
+                randomInt(2, 6)) * (k - 1);
         final int answer = n * k / (k - 1);
 
         final ProblemScenario scenario = problemAvailability.getScenario();

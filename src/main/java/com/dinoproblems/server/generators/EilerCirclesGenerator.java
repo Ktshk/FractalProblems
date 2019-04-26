@@ -56,6 +56,7 @@ public class EilerCirclesGenerator implements ProblemGenerator {
 
     private static final ProblemScenario CANDIES_STORE_SCENARIO = new ProblemScenarioImpl(ProblemCollection.EILER_CIRCLES + "_" + "CANDIES_STORE");
     private static final ProblemScenario CUBES_SCENARIO = new ProblemScenarioImpl(ProblemCollection.EILER_CIRCLES + "_" + "CUBES");
+    private static final ProblemScenario EXPERT_CANDIES_SCENARIO = new ProblemScenarioImpl(ProblemCollection.EILER_CIRCLES + "_" + "EXPERT_CANDIES");
 
     static {
         final Set<Set<String>> incorrectCombinations = Sets.newHashSet(Sets.newHashSet(X, Y_Z, TOTAL),
@@ -101,10 +102,6 @@ public class EilerCirclesGenerator implements ProblemGenerator {
     @Nonnull
     @Override
     public Problem generateProblem(Problem.Difficulty difficulty, ProblemAvailability problemAvailability) {
-        if (difficulty == Problem.Difficulty.EXPERT) {
-            throw new IllegalArgumentException();
-        }
-
         if (problemAvailability.getScenario().equals(CANDIES_STORE_SCENARIO)) {
             int cakes = randomInt(40, 61);
             int candies = randomInt(30, 51);
@@ -118,6 +115,16 @@ public class EilerCirclesGenerator implements ProblemGenerator {
                     "кто купил коробки конфет. Не забудьте, что " + getNumWithString(intersection, PEOPLE) + " купили и торт, и коробку конфет.";
             return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.EILER_CIRCLES,
                     Sets.newHashSet(getNumWithString(answer, BUYER), getNumWithString(answer, PEOPLE)), hint, CANDIES_STORE_SCENARIO, difficulty);
+        } else if (problemAvailability.getScenario().equals(EXPERT_CANDIES_SCENARIO)) {
+            String text = "В школе на новогодней елке дети получили сладкие подарки: троечники - леденец, хорошисты - шоколадку, а отличники - леденец и шоколаднку. " +
+                    "Известно, что хорошистов в два раза больше, чем тех, кто получил леденец, а троечников на 12 меньше, чем тех, кто получил шоколадку. " +
+                    "Сколько в классе отличников, если всего в классе 24 ученика.";
+            String hint = "Нарисуйте схему из двух кругов. В один круг поместите тех, кто получил леденец, а во второй - тех, кто получил шоколадку. " +
+                    "В пересечении кругов будут находиться отличники. " +
+                    "Если хорошистов в два раза больше, чем тех, кто получил леденец, то можно общее число школьников разделить на три равные части: " +
+                    "две части - это хорошисты, а одна часть - это те, кто получил леденец.";
+            return new ProblemWithPossibleTextAnswers(text, 2, ProblemCollection.EILER_CIRCLES,
+                    Sets.newHashSet("2 отличника"), hint, EXPERT_CANDIES_SCENARIO, difficulty);
         } else if (problemAvailability.getScenario().equals(CUBES_SCENARIO)) {
             int red = randomInt(4, 10);
             int blue = randomInt(4, 10);
@@ -477,7 +484,7 @@ public class EilerCirclesGenerator implements ProblemGenerator {
                 scenarios.add(CANDIES_STORE_SCENARIO);
                 return findAvailableScenario(difficulty, alreadySolvedProblems, scenarios, Sets.newHashSet(SCENARIOS));
             case EXPERT:
-                return null;
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(EXPERT_CANDIES_SCENARIO), Sets.newHashSet(SCENARIOS));
 
         }
 
