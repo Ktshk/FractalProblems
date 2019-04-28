@@ -26,10 +26,10 @@ public class CombinatoricsGenerator implements ProblemGenerator {
     private static final ProblemScenario CHESS_SCENARIO = new ProblemScenarioImpl(ProblemCollection.COMBINATORICS + "_" + "CHESS", true);
     private static final ProblemScenario NUMBER_SAME_DIGITS = new ProblemScenarioImpl(ProblemCollection.COMBINATORICS + "_" + "NUMBER_SAME_DIGITS", false);
     private static final ProblemScenario CARS = new ProblemScenarioImpl(ProblemCollection.COMBINATORICS + "_" + "CARS", true);
-    private static final ProblemScenario DANCING = new ProblemScenarioImpl(ProblemCollection.COMBINATORICS + "_" + "DANCING", true);
+//    private static final ProblemScenario DANCING = new ProblemScenarioImpl(ProblemCollection.COMBINATORICS + "_" + "DANCING", true);
 
-    private static final Collection<ProblemScenario> EASY_SCENARIOS = Lists.newArrayList(CARS, FLOWERS_SCENARIO, CHESS_SCENARIO, NUMBER_SAME_DIGITS, DANCING);
-    private static final Collection<ProblemScenario> MEDIUM_SCENARIOS = Lists.newArrayList(FLOWERS_SCENARIO, CHESS_SCENARIO, NUMBER_SAME_DIGITS, DANCING);
+    private static final Collection<ProblemScenario> EASY_SCENARIOS = Lists.newArrayList(CARS, FLOWERS_SCENARIO, CHESS_SCENARIO, NUMBER_SAME_DIGITS/*, DANCING*/);
+    private static final Collection<ProblemScenario> MEDIUM_SCENARIOS = Lists.newArrayList(FLOWERS_SCENARIO, CHESS_SCENARIO, NUMBER_SAME_DIGITS/*, DANCING*/);
     private static final Collection<ProblemScenario> DIFFICULT_SCENARIOS = Lists.newArrayList(FLOWERS_SCENARIO, NUMBER_SAME_DIGITS);
     private static final String[] HEROES = {"Миша", "Вася", "Петя", "Витя", "Андрей", "Лёша", "Ваня"};
     private static final String[] HEROES_GENITIVE = {"Миши", "Васи", "Пети", "Вити", "Андрея", "Лёши", "Вани"};
@@ -47,23 +47,23 @@ public class CombinatoricsGenerator implements ProblemGenerator {
             int answer = 12;
             return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.COMBINATORICS,
                     Sets.newHashSet("12 способов"), hint, CARS, difficulty);
-        } else if (scenario.equals(DANCING)) {
-            int n = randomInt(4, 6);
-            String[] heroes = chooseRandomString(HEROES, n);
-            String[] heroesGirls = chooseRandomString(HEROES_GIRLS, n);
-            String text = "В кружок бального танца записались ";
-            for (String hero : heroes) {
-                text += hero + ", ";
-            }
-            for (int i = 0; i < heroesGirls.length; i++) {
-                String heroesGirl = heroesGirls[i];
-                text += heroesGirl + (i < heroesGirls.length - 1 ? ", " : ". ");
-            }
-            text += " Сколько танцевальных пар девочка - мальчик может образоваться?";
-            String hint = "Подумайте, если первым в паре будет " + heroes[0] + ", то сколько для него есть партнерш. А если первым будет " + heroes[1] + "?";
-            int answer = n * n;
-            return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.COMBINATORICS,
-                    Sets.newHashSet(getNumWithString(answer, PAIR)), hint, scenario, difficulty);
+//        } else if (scenario.equals(DANCING)) {
+//            int n = randomInt(4, 6);
+//            String[] heroes = chooseRandomString(HEROES, n);
+//            String[] heroesGirls = chooseRandomString(HEROES_GIRLS, n);
+//            String text = "В кружок бального танца записались ";
+//            for (String hero : heroes) {
+//                text += hero + ", ";
+//            }
+//            for (int i = 0; i < heroesGirls.length; i++) {
+//                String heroesGirl = heroesGirls[i];
+//                text += heroesGirl + (i < heroesGirls.length - 1 ? ", " : ". ");
+//            }
+//            text += " Сколько танцевальных пар девочка - мальчик может образоваться?";
+//            String hint = "Подумайте, если первым в паре будет " + heroes[0] + ", то сколько для него есть партнерш. А если первым будет " + heroes[1] + "?";
+//            int answer = n * n;
+//            return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.COMBINATORICS,
+//                    Sets.newHashSet(getNumWithString(answer, PAIR)), hint, scenario, difficulty);
         } else if (scenario.equals(FLOWERS_SCENARIO)) {
             int k = difficulty == Problem.Difficulty.MEDIUM || difficulty == Problem.Difficulty.EASY
                     ? 3

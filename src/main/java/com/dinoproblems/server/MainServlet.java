@@ -91,13 +91,12 @@ public class MainServlet extends HttpServlet {
             } else if (Objects.equals(command, "end session") ||
                     checkAnswer(command, endSessionAnswers) ||
                     (session.getCurrentProblem() == null && checkAnswer(command, noAnswers))) {
-                responseJson.addProperty("text", "Заходите еще. "+session.getSessionResult());//итоговое сообщение пользователю
+                responseJson.addProperty("text", "Заходите еще. " + session.getSessionResult());//итоговое сообщение пользователю
                 responseJson.addProperty("end_session", true);
                 result.add("response", responseJson);
             } else if (session.getCurrentProblem() == null && session.getCurrentDifficulty() == null) {
                 final Problem.Difficulty currentDifficulty = parseDifficulty(command);
                 if (currentDifficulty == null) {
-
                     dataBaseService.updateMiscAnswersTable(command, "", session.getLastServerResponse());
 
                     session.setLastServerResponse("Не поняла вас. Выберите пожалуйста сложность задач");
@@ -119,34 +118,32 @@ public class MainServlet extends HttpServlet {
                 final Problem problem = session.getCurrentProblem();
 
                 if (problem == null) {
-
                     dataBaseService.updateMiscAnswersTable(command, "", session.getLastServerResponse());
 
                     session.setLastServerResponse("Не поняла вас. Хотите решить задачу?");
                     responseJson.addProperty("text", "Не поняла вас. Хотите решить задачу?");
                     result.add("response", responseJson);
                 } else if (checkAnswer(command, askHint, yesAnswers)) {
-                    if (problem.getState() == Problem.State.HINT_GIVEN) {
-                        responseJson.addProperty("text", "Я уже давала вам подсказку. " + problem.getHint());
-                        session.setLastServerResponse("Я уже давала вам подсказку. " + problem.getHint());
+                    if (!problem.hasHint()) {
+                        giveHint(result, responseJson, session, problem, "Я уже давала вам подсказку. ");
                     } else {
-                        responseJson.addProperty("text", problem.getHint());
-                        session.setLastServerResponse(problem.getHint());
+                        giveHint(result, responseJson, session, problem, "");
                     }
-                    result.add("response", responseJson);
-                    problem.setState(Problem.State.HINT_GIVEN);
-                    addProblemButtons(responseJson);
                 } else if (checkAnswer(command, askToRepeat, yesAnswers)) {
                     responseJson.addProperty("text", problem.getText());
                     session.setLastServerResponse(problem.getText());
                     result.add("response", responseJson);
-                    addProblemButtons(responseJson);
+                    addProblemButtons(responseJson, problem);
                 } else if (checkAnswer(command, askAnswer, yesAnswers)) {
-                    responseJson.addProperty("text", "Правильный ответ " + problem.getTextAnswer() + ". Хотите еще задачу?");
-                    session.setLastServerResponse("Правильный ответ " + problem.getTextAnswer() + ". Хотите еще задачу?");
-                    result.add("response", responseJson);
-                    problem.setState(Problem.State.ANSWER_GIVEN);
-                    session.setCurrentProblem(null);
+                    if (problem.hasHint()) {
+                        giveHint(result, responseJson, session, problem, "Давайте дам вам подсказку. ");
+                    } else {
+                        responseJson.addProperty("text", "Правильный ответ " + problem.getTextAnswer() + ". Хотите еще задачу?");
+                        session.setLastServerResponse("Правильный ответ " + problem.getTextAnswer() + ". Хотите еще задачу?");
+                        result.add("response", responseJson);
+                        problem.setState(Problem.State.ANSWER_GIVEN);
+                        session.setCurrentProblem(null);
+                    }
                 } else {
                     checkCorrectAnswer(command, entitiesArray, responseJson, session);
                     result.add("response", responseJson);
@@ -167,6 +164,14 @@ public class MainServlet extends HttpServlet {
 
     }
 
+    private void giveHint(JsonObject result, JsonObject responseJson, Session session, Problem problem, String prefix) {
+        final String nextHint = problem.getNextHint();
+        responseJson.addProperty("text", prefix + nextHint);
+        session.setLastServerResponse(nextHint);
+        result.add("response", responseJson);
+        addProblemButtons(responseJson, problem);
+    }
+
     private void checkCorrectAnswer(String command, JsonArray entitiesArray, JsonObject responseJson, Session session) {
         final Problem problem = session.getCurrentProblem();
 
@@ -183,7 +188,7 @@ public class MainServlet extends HttpServlet {
                     if (problem.getNumericAnswer() == value) {
                         correctAnswer = true;
                     }
-                    if (Math.abs(value - problem.getNumericAnswer()) <= problem.getNumericAnswer() + 1) {
+                    if (Math.abs(value - problem.getNumericAnswer()) <= Math.ceil(problem.getNumericAnswer() * 0.05)) {
                         almostCorrect = true;
                     }
                     numberFound = true;
@@ -197,7 +202,7 @@ public class MainServlet extends HttpServlet {
         if (correctAnswer) {
             responseJson.addProperty("text", chooseRandomElement(praises) + " " + chooseRandomElement(oneMoreQuestion));
             responseJson.addProperty("tts", chooseRandomElement(soundPraises) + " " + responseJson.get("text")); //Попытка добавления звуков
-            if (problem.getState() == Problem.State.HINT_GIVEN) {
+            if (problem.wasHintGiven()) {
                 problem.setState(Problem.State.SOLVED_WITH_HINT);
             } else {
                 problem.setState(Problem.State.SOLVED);
@@ -205,7 +210,7 @@ public class MainServlet extends HttpServlet {
             session.setCurrentProblem(null);
         } else {
             responseJson.addProperty("text", chooseRandomElement(almostCorrect ? almost : wrongAnswer) + " " + chooseRandomElement(notAnAnswer));
-            addProblemButtons(responseJson);
+            addProblemButtons(responseJson, problem);
         }
     }
 
@@ -217,17 +222,19 @@ public class MainServlet extends HttpServlet {
         final Problem problem = instance.generateProblem(session);
         session.setCurrentProblem(problem);
         responseJson.addProperty("text", problem.getText());
-        addProblemButtons(responseJson);
+        addProblemButtons(responseJson, problem);
         if (problem.getTTS() != null) {
             responseJson.addProperty("tts", problem.getTTS());
         }
     }
 
-    private void addProblemButtons(JsonObject responseJson) {
+    private void addProblemButtons(JsonObject responseJson, Problem problem) {
         final JsonArray buttons = new JsonArray();
         buttons.add(createButton("Повторить"));
         buttons.add(createButton("Подсказка"));
-        buttons.add(createButton("Сказать ответ"));
+        if (!problem.hasHint()) {
+            buttons.add(createButton("Сказать ответ"));
+        }
         responseJson.add("buttons", buttons);
     }
 

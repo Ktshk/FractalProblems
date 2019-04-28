@@ -15,8 +15,10 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 
 /**
  * Created by Katushka on 21.04.2019.
@@ -54,7 +56,7 @@ public class VariousProblems {
                     final int answer = Integer.valueOf(problemNode.getAttributes().getNamedItem("answer").getNodeValue());
                     String text = null;
                     String tts = null;
-                    String hint = null;
+                    List<String> hints = new ArrayList<>();
                     final HashSet<String> possibleTextAnswers = Sets.newHashSet();
 
                     final NodeList childNodes = problemNode.getChildNodes();
@@ -67,7 +69,6 @@ public class VariousProblems {
                                 tts = problemChildNode.getTextContent();
                             } else if (problemChildNode.getNodeName().equals("hints")) {
                                 final NodeList hintsNodes = problemChildNode.getChildNodes();
-                                hint_iteration:
                                 for (int k = 0; k < hintsNodes.getLength(); k++) {
                                     final Node hintNode = hintsNodes.item(k);
                                     if (hintNode.getNodeType() == Node.ELEMENT_NODE) {
@@ -76,8 +77,7 @@ public class VariousProblems {
                                             final Node hintChild = hintChildren.item(m);
                                             if (hintChild.getNodeType() == Node.ELEMENT_NODE) {
                                                 if (hintChild.getNodeName().equals("text")) {
-                                                    hint = hintChild.getTextContent();
-                                                    break hint_iteration;
+                                                    hints.add(hintChild.getTextContent());
                                                 }
                                             }
                                         }
@@ -96,7 +96,7 @@ public class VariousProblems {
                     }
 
                     problems.put(difficulty, new ProblemWithPossibleTextAnswers(text, tts, answer, THEME,
-                            possibleTextAnswers, hint, new ProblemScenarioImpl(THEME + "_" + id, true),
+                            possibleTextAnswers, hints, new ProblemScenarioImpl(THEME + "_" + id, true),
                             difficulty));
                 }
             }

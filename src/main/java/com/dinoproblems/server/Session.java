@@ -12,6 +12,7 @@ import java.util.*;
 public class Session {
     private final String sessionId;
     private Problem currentProblem;
+
     private Multimap<String, Problem> solvedProblemsByTheme = HashMultimap.create();
     private List<Problem> variousProblems;
     private Problem.Difficulty currentDifficulty = null;

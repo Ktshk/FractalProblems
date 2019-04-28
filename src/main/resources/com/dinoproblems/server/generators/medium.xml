@@ -45,7 +45,7 @@
             <answer text="50 рублей"/>
         </text_answers>
     </problem>
-    <problem answer="7" scenarioId="CROWS_FROM_END">
+    <problem answer="6" scenarioId="CROWS_FROM_END">
         <text>На трёх ветках сидели 24 воробья. Когда с первой ветки на вторую перелетели 5 воробьев, а со второй на третью перелетели 3 воробья, то воробьёв на трёх ветках стало поровну. Сколько воробьёв сидело сначала на второй ветке?</text>
         <hints>
             <hint>
@@ -53,7 +53,7 @@
             </hint>
         </hints>
         <text_answers>
-            <answer text="7 воробьёв"/>
+            <answer text="6 воробьёв"/>
         </text_answers>
     </problem>
     <problem answer="12" scenarioId="THREE_GIRLS_AGES">
