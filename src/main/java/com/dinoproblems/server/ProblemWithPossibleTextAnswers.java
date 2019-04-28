@@ -1,5 +1,8 @@
 package com.dinoproblems.server;
 
+import com.google.common.collect.Lists;
+
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -12,8 +15,9 @@ public class ProblemWithPossibleTextAnswers implements Problem {
     private final String tts;
     private int answer;
     private Set<String> possibleTextAnswers;
-    private State state = State.NEW;
-    private String hint;
+    private State state = null;
+    private List<String> hints;
+    private int currentHint = 0;
     private final Difficulty difficulty;
     private final ProblemScenario scenario;
 
@@ -27,7 +31,18 @@ public class ProblemWithPossibleTextAnswers implements Problem {
         this.answer = answer;
         this.theme = theme;
         this.possibleTextAnswers = possibleTextAnswers;
-        this.hint = hint;
+        this.hints = Lists.newArrayList(hint);
+        this.scenario = scenario;
+        this.difficulty = difficulty;
+    }
+
+    public ProblemWithPossibleTextAnswers(String text, String tts, int answer, String theme, Set<String> possibleTextAnswers, List<String> hints, ProblemScenario scenario, Difficulty difficulty) {
+        this.text = text;
+        this.tts = tts;
+        this.answer = answer;
+        this.theme = theme;
+        this.possibleTextAnswers = possibleTextAnswers;
+        this.hints = hints;
         this.scenario = scenario;
         this.difficulty = difficulty;
     }
@@ -37,8 +52,25 @@ public class ProblemWithPossibleTextAnswers implements Problem {
     }
 
     @Override
-    public String getHint() {
-        return hint;
+    public String getNextHint() {
+        final String result = hints.get(currentHint);
+        currentHint++;
+        return result;
+    }
+
+    @Override
+    public String getLastHint() {
+        return hints.get(currentHint - 1);
+    }
+
+    @Override
+    public boolean hasHint() {
+        return currentHint < hints.size();
+    }
+
+    @Override
+    public boolean wasHintGiven() {
+        return currentHint >= 0;
     }
 
     @Override

@@ -16,7 +16,13 @@ public interface Problem {
 
     String getText();
 
-    String getHint();
+    String getNextHint();
+
+    String getLastHint();
+
+    boolean hasHint();
+
+    boolean wasHintGiven();
 
     ProblemScenario getProblemScenario();
 
@@ -30,7 +36,7 @@ public interface Problem {
     }
 
     enum State {
-        NEW, HINT_GIVEN, ANSWER_GIVEN, SOLVED, SOLVED_WITH_HINT
+        ANSWER_GIVEN, SOLVED, SOLVED_WITH_HINT
     }
 
     enum Difficulty {

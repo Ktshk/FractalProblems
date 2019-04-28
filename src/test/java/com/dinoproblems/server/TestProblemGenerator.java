@@ -100,7 +100,7 @@ public class TestProblemGenerator {
                 }
                 final Problem problem = generator.generateProblem(difficulty, problemAvailability);
                 System.out.println("Problem " + (i + 1) + ": " + problem.getText());
-                System.out.println("Hint: " + problem.getHint());
+                System.out.println("Hint: " + problem.getNextHint());
                 System.out.println("Answer: " + problem.getTextAnswer());
                 System.out.println("*** ");
 
