@@ -13,6 +13,7 @@ import javax.annotation.Nonnull;
 
 import static com.dinoproblems.server.Problem.Difficulty.EXPERT;
 import static com.dinoproblems.server.ProblemCollection.SUM_DIFFERENCE;
+import static com.dinoproblems.server.utils.GeneratorUtils.findAvailableScenario;
 import static com.dinoproblems.server.utils.GeneratorUtils.randomInt;
 import static com.dinoproblems.server.Problem.Difficulty.EASY;
 /*
@@ -27,9 +28,23 @@ public class SumDifferenceGenerator implements ProblemGenerator {
     public Problem generateProblem(Problem.Difficulty difficulty, ProblemAvailability problemAvailability) {
         final String[] hero;//владельцы вкусняшек
         //кол-во вкусняшек у первого
-        int first = difficulty == EASY ? randomInt(10, 26) : randomInt(26, 51);
+        int first = 0;
         //кол-во вкусняшек у второго
-        int second = difficulty == EASY ? randomInt(10, 26) : randomInt(26, 51);
+        int second = 0;
+        switch (difficulty) {
+            case EASY:
+                first = randomInt(1, 8);
+                second = randomInt(1, 8);
+                break;
+            case MEDIUM:
+                first = randomInt(1, 33);
+                second = randomInt(1, 33);
+                break;
+            case DIFFICULT:
+                first = randomInt(1, 49);
+                second = randomInt(1, 49);
+                break;
+        }
         int sum;
         int difference;
         hero = new String[]{"Кроша", "Ёжика", "Бараша", "Лосяша", "Копатыча", "Пина", "Кар-Карыча", "Биби"};
@@ -95,11 +110,16 @@ public class SumDifferenceGenerator implements ProblemGenerator {
 
     @Override
     public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty) {
-        if (difficulty == EXPERT) {
-            return null;
+        switch (difficulty) {
+            case EASY:
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(DEFAULT_SCENARIO), new HashSet<>());
+            case MEDIUM:
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(DEFAULT_SCENARIO), Sets.newHashSet(DEFAULT_SCENARIO));
+            case DIFFICULT:
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(DEFAULT_SCENARIO), Sets.newHashSet(DEFAULT_SCENARIO));
+            case EXPERT:
+                return null;
         }
-
-        return GeneratorUtils.findAvailableScenario(difficulty, alreadySolvedProblems,
-                Lists.newArrayList(DEFAULT_SCENARIO), difficulty == EASY ? new HashSet<>() : Sets.newHashSet(DEFAULT_SCENARIO));
+        throw new IllegalArgumentException();
     }
 }

@@ -24,11 +24,13 @@ public class SequenceGenerator implements ProblemGenerator {
     private final static ProblemScenario ARITHMETIC = new ProblemScenarioImpl(ProblemCollection.SEQUENCE + "_" + "ARITHMETIC");
     private final static ProblemScenario DOUBLEARITHMETIC = new ProblemScenarioImpl(ProblemCollection.SEQUENCE + "_" + "DOUBLEARITHMETIC");
     private final static ProblemScenario GEOMETRIC = new ProblemScenarioImpl(ProblemCollection.SEQUENCE + "_" + "GEOMETRIC");
-    private final static ProblemScenario MUL_ON_TWO = new ProblemScenarioImpl(ProblemCollection.SEQUENCE + "_" + "MUL_ON_TWO");
+    private final static ProblemScenario MUL_ON_TWO = new ProblemScenarioImpl(ProblemCollection.SEQUENCE + "_" + "MUL_ON_TWO", true);
     private final static ProblemScenario PARITY_IMPARITY = new ProblemScenarioImpl(ProblemCollection.SEQUENCE + "_" + "PARITY_IMPARITY");
-    private final static ProblemScenario FIBONACCI = new ProblemScenarioImpl(ProblemCollection.SEQUENCE + "_" + "FIBONACCI");
-    private final static ProblemScenario INTERESTING = new ProblemScenarioImpl(ProblemCollection.SEQUENCE + "_" + "INTERESTING");
-    private static final ProblemScenario[] SCENARIOS = {ARITHMETIC, DOUBLEARITHMETIC, GEOMETRIC, MUL_ON_TWO, PARITY_IMPARITY, FIBONACCI, INTERESTING};
+    private final static ProblemScenario FIBONACCI = new ProblemScenarioImpl(ProblemCollection.SEQUENCE + "_" + "FIBONACCI", true);
+    private final static ProblemScenario PRIME_NUMBERS = new ProblemScenarioImpl(ProblemCollection.SEQUENCE + "_" + "PRIME_NUMBERS", true);
+    private final static ProblemScenario FAST_GROWING_SEQ = new ProblemScenarioImpl(ProblemCollection.SEQUENCE + "_" + "FAST_GROWING_SEQ", true);
+    private final static ProblemScenario ELEVEN = new ProblemScenarioImpl(ProblemCollection.SEQUENCE + "_" + "ELEVEN", true);
+
 
     @Nonnull
     @Override
@@ -53,14 +55,21 @@ public class SequenceGenerator implements ProblemGenerator {
                 operand1 = randomInt(3, 5);
                 first = randomInt(1, 26);
                 sequence[0] = first;
-                if (scenario.equals(ARITHMETIC))
+                int[] jokeSequence = {12, 23, 34, 56, 67, 78, 89};
+                if (scenario.equals(ARITHMETIC)) {
+                    hint = "Посмотрите, как второе число отличается от первого и как третье от второго";
                     ArithmeticSequence(sequence, operand1);
-                else if (scenario.equals(DOUBLEARITHMETIC)) {
+                } else if (scenario.equals(DOUBLEARITHMETIC)) {
+                    hint = "Посмотрите, как второе число отличается от первого и как третье от второго";
                     if (sequence[0] % 2 == 0) {
                         for (i = 1; i <= 6; i++) sequence[i] = sequence[i - 1] + 2;
                     } else {
                         for (i = 1; i <= 6; i++) sequence[i] = sequence[i - 1] + 1;
                     }
+                } else if (scenario.equals(ELEVEN)) {
+                    hint = "Посмотрите, на сколько отличаются последующие числа друг от друга";
+                    for (i = 0; i <= 6; i++)
+                        sequence = Arrays.copyOf(jokeSequence, sequence.length);
                 }
                 break;
             case MEDIUM:
@@ -68,70 +77,65 @@ public class SequenceGenerator implements ProblemGenerator {
                 operand2 = randomInt(5, 10);
                 first = randomInt(1, 51);
                 sequence[0] = first;
-                if (scenario.equals(DOUBLEARITHMETIC))
+                if (scenario.equals(DOUBLEARITHMETIC)) {
+                    hint = "Посмотрите, как второе число отличается от первого и как третье от второго";
                     DoubleArithmeticSequence(sequence, operand1, operand2);
-                else if (scenario.equals(ARITHMETIC))
+                } else if (scenario.equals(ARITHMETIC)) {
+                    hint = "Посмотрите, как второе число отличается от первого и как третье от второго";
                     ArithmeticSequence(sequence, operand2);
+                }
                 break;
             case DIFFICULT:
-                type = randomInt(1, 6);
                 operand1 = randomInt(3, 5);
                 operand2 = randomInt(5, 10);
                 operand3 = randomInt(2, 4);
                 first = randomInt(1, 76);
                 sequence[0] = first;
-                if (scenario.equals(DOUBLEARITHMETIC))
+                if (scenario.equals(DOUBLEARITHMETIC)) {
+                    hint = "Посмотрите, как второе число отличается от первого и как третье от второго";
                     DoubleArithmeticSequence(sequence, operand2, operand1);
-                else if (scenario.equals(GEOMETRIC)) {
+                } else if (scenario.equals(GEOMETRIC)) {
+                    hint = "Посмотрите, во сколько отличаются последующие числа друг от друга";
                     if (sequence[0] != 6 * operand3) sequence[0] = 1;
                     GeometricSequence(sequence, operand3);
                 } else if (scenario.equals(FIBONACCI)) {
+                    hint = "Посмотрите, как каждое следующие число связано с двуми предыдущими";
+                    sequence[0] = 1;
                     sequence[1] = sequence[0];
                     for (i = 2; i <= 6; i++) sequence[i] = sequence[i - 1] + sequence[i - 2];
                 } else if (scenario.equals(MUL_ON_TWO)) {
+                    hint = "Посмотрите, во сколько отличаются последующие числа друг от друга";
                     sequence[0] = 2;
                     for (i = 1; i <= 6; i++) sequence[i] = sequence[i - 1] * 2;
                 } else if (scenario.equals(PARITY_IMPARITY)) {
+                    hint = "Посмотрите, разница между числами может изменяться";
                     if (operand2 >= 6) {
                         for (i = 1; i <= 6; i++) sequence[i] = sequence[i - 1] + operand2 - i;
                     } else for (i = 1; i <= 6; i++) sequence[i] = sequence[i - 1] + operand2 + i;
                 }
                 break;
             case EXPERT:
-                if (scenario.equals(INTERESTING)) {//TODO singleProblem???
-
-                    type = randomInt(1, 3);
-                    int[] simpleSequence = {2, 3, 5, 7, 11, 13, 17};
-                    switch (type) {
-                        case 1:
-                            for (i = 0; i <= 6; i++)
-                                sequence[i] = (i + 1) * (i + 2);
-                            break;
-                        case 2:
-                            for (i = 0; i <= 6; i++)
-                                sequence = Arrays.copyOf(simpleSequence, sequence.length);
-                            break;
-
-                    }
+                int[] simpleSequence = {2, 3, 5, 7, 11, 13, 17};
+                if (scenario.equals(FAST_GROWING_SEQ)) {
+                    hint = "Посмотрите, как местоположение элемента последовательности влияет на сам элемент";
+                    for (i = 0; i <= 6; i++)
+                        sequence[i] = (i + 1) * (i + 2);
+                } else if (scenario.equals(PRIME_NUMBERS)) {
+                    hint = "Посмотрите, у всех чисел данной последовательности есть общее свойство";
+                    for (i = 0; i <= 6; i++)
+                        sequence = Arrays.copyOf(simpleSequence, sequence.length);
                 }
-
                 break;
         }
 
         sequenceShow = Arrays.copyOf(sequence, sequenceShow.length);
         answer = sequence[6];
         text = "Дана последовательность из шести натуральных чисел. " + Arrays.toString(sequenceShow) + " Какое число может быть следующим?";
-        hint = "Посмотрите, как второе число отличается от первого и как третье от второго";
-
-
-        String possibleAnswer = Integer.toString(answer);//?
-        final HashSet<String> possibleTextAnswers = Sets.newHashSet(Integer.toString(answer));//?
-        possibleTextAnswers.add(possibleAnswer);//?
+        String possibleAnswer = Integer.toString(answer);
+        final HashSet<String> possibleTextAnswers = Sets.newHashSet(Integer.toString(answer));
+        possibleTextAnswers.add(possibleAnswer);
         return new
-
                 ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.SEQUENCE, possibleTextAnswers, hint, scenario, difficulty);
-
-
     }
 
     private void DoubleArithmeticSequence(int[] sequence, int operand1, int operand2) {
@@ -177,11 +181,11 @@ public class SequenceGenerator implements ProblemGenerator {
             case EASY:
                 return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(ARITHMETIC, DOUBLEARITHMETIC), new HashSet<>());
             case MEDIUM:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(ARITHMETIC, DOUBLEARITHMETIC), new HashSet<>());
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(ARITHMETIC, DOUBLEARITHMETIC), Sets.newHashSet(ARITHMETIC, DOUBLEARITHMETIC));
             case DIFFICULT:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(FIBONACCI, PARITY_IMPARITY,MUL_ON_TWO), Sets.newHashSet(GEOMETRIC,DOUBLEARITHMETIC));
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(FIBONACCI, PARITY_IMPARITY, MUL_ON_TWO, GEOMETRIC, DOUBLEARITHMETIC), Sets.newHashSet(ARITHMETIC, DOUBLEARITHMETIC));
             case EXPERT:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(INTERESTING), new HashSet<>());
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(FAST_GROWING_SEQ, PRIME_NUMBERS), Sets.newHashSet(FIBONACCI, PARITY_IMPARITY, MUL_ON_TWO, GEOMETRIC, DOUBLEARITHMETIC));
         }
         throw new IllegalArgumentException();
     }

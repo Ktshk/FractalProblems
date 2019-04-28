@@ -12,7 +12,7 @@ import java.util.Set;
  */
 public class TestProblemGenerator {
 
-    private static final ProblemGenerator GENERATOR = new LegsAndHeadsGenerator();
+    private static final ProblemGenerator GENERATOR = new SumDifferenceGenerator();
 
     @Test
     public void testAllGenerators() {
