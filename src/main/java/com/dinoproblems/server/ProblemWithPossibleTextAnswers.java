@@ -70,7 +70,7 @@ public class ProblemWithPossibleTextAnswers implements Problem {
 
     @Override
     public boolean wasHintGiven() {
-        return currentHint >= 0;
+        return currentHint > 0;
     }
 
     @Override
