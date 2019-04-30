@@ -90,7 +90,7 @@ public class SnailGenerator implements ProblemGenerator {
                 return null;
             case MEDIUM:
                 return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(MEDIUM_AND_EASY_SCENARIO, TEREMOK_SCENARIO), new HashSet<>());
-            case DIFFICULT:
+            case HARD:
                 return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(MEDIUM_AND_EASY_SCENARIO),
                         Sets.newHashSet(MEDIUM_AND_EASY_SCENARIO));
             case EXPERT:

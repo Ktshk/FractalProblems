@@ -43,10 +43,10 @@ public class SessionResult {
             }
             if (problem.getState() == Problem.State.SOLVED ||
                     problem.getState() == Problem.State.ANSWER_GIVEN) {
-                if (problem.getDifficulty() == Problem.Difficulty.EASY) points -= 2;
-                else if (problem.getDifficulty() == Problem.Difficulty.MEDIUM) points -= 4;
-                else if (problem.getDifficulty() == Problem.Difficulty.DIFFICULT) points -= 6;
-                else points -= 10;
+                if(problem.getDifficulty()==Problem.Difficulty.EASY) points-=2;
+                else if(problem.getDifficulty()==Problem.Difficulty.MEDIUM) points-=4;
+                else if(problem.getDifficulty()==Problem.Difficulty.DIFFICULT) points-=6;
+                else  points-=10;
                 problemsGiven++;
             }*/
 

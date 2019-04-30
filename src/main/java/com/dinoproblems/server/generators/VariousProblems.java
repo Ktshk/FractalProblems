@@ -36,7 +36,7 @@ public class VariousProblems {
     private void loadProblems() {
         loadProblemsByDifficulty("easy.xml", Difficulty.EASY);
         loadProblemsByDifficulty("medium.xml", Difficulty.MEDIUM);
-        loadProblemsByDifficulty("difficult.xml", Difficulty.DIFFICULT);
+        loadProblemsByDifficulty("difficult.xml", Difficulty.HARD);
         loadProblemsByDifficulty("expert.xml", Difficulty.EXPERT);
     }
 

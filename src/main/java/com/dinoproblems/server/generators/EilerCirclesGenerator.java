@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.dinoproblems.server.Problem.Difficulty.DIFFICULT;
+import static com.dinoproblems.server.Problem.Difficulty.HARD;
 import static com.dinoproblems.server.Problem.Difficulty.MEDIUM;
 import static com.dinoproblems.server.ProblemCollection.EILER_CIRCLES;
 import static com.dinoproblems.server.utils.Dictionary.*;
@@ -141,11 +141,11 @@ public class EilerCirclesGenerator implements ProblemGenerator {
         final EilerCirclesScenario scenario = (EilerCirclesScenario) problemAvailability.getScenario();
 
         int x = difficulty == MEDIUM ? randomInt(8, 13) :
-                difficulty == DIFFICULT ? randomInt(12, 20) : randomInt(1, 6);
+                difficulty == HARD ? randomInt(12, 20) : randomInt(1, 6);
         int z = difficulty == MEDIUM ? randomInt(8, 13) :
-                difficulty == DIFFICULT ? randomInt(12, 20) : randomInt(1, 6);
+                difficulty == HARD ? randomInt(12, 20) : randomInt(1, 6);
         int y = difficulty == MEDIUM ? randomInt(5, Math.min(13, 30 - x - z)) :
-                difficulty == DIFFICULT ? randomInt(10, Math.max(16, 45 - x - z)) : randomInt(Math.max(1, 8 - x - z), Math.min(8, 13 - x - z));
+                difficulty == HARD ? randomInt(10, Math.max(16, 45 - x - z)) : randomInt(Math.max(1, 8 - x - z), Math.min(8, 13 - x - z));
 
         int total = x + y + z;
 
@@ -479,7 +479,7 @@ public class EilerCirclesGenerator implements ProblemGenerator {
                 return findAvailableScenario(difficulty, alreadySolvedProblems, EASY_SCENARIOS, new HashSet<>());
             case MEDIUM:
                 return findAvailableScenario(difficulty, alreadySolvedProblems, SCENARIOS, Sets.newHashSet(EASY_SCENARIOS));
-            case DIFFICULT:
+            case HARD:
                 final List<ProblemScenario> scenarios = new ArrayList<>(SCENARIOS);
                 scenarios.add(CANDIES_STORE_SCENARIO);
                 return findAvailableScenario(difficulty, alreadySolvedProblems, scenarios, Sets.newHashSet(SCENARIOS));

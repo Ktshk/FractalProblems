@@ -45,7 +45,7 @@ public class FindNumberGenerator implements ProblemGenerator {
         hint = "Во сколько раз второе число меньше первого? Подумайте, сколько вторых чисел поместится в 385.";
         scenario = new ProblemScenarioImpl(ProblemCollection.FIND_NUMBER + "_NUMBERS_SUM_385", true);
         DIFFICULT_PROBLEMS.put(scenario, new ProblemWithPossibleTextAnswers(text.getText(), text.getTTS(), 350, ProblemCollection.FIND_NUMBER,
-                Sets.newHashSet("350"), hint, scenario, Problem.Difficulty.DIFFICULT));
+                Sets.newHashSet("350"), hint, scenario, Problem.Difficulty.HARD));
 
     }
 
@@ -68,7 +68,7 @@ public class FindNumberGenerator implements ProblemGenerator {
             case EASY:
                 return findAvailableScenario(difficulty, alreadySolvedProblems, EASY_PROBLEMS.keySet(), new HashSet<>());
             case MEDIUM:
-            case DIFFICULT:
+            case HARD:
             case EXPERT:
                 return null;
         }

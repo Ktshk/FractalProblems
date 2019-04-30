@@ -279,7 +279,7 @@ public class SpacesGenerator implements ProblemGenerator {
                 return findAvailableScenario(difficulty, alreadySolvedProblems, EASY_SCENARIOS, new HashSet<>());
             case MEDIUM:
                 return findAvailableScenario(difficulty, alreadySolvedProblems, MEDIUM_SCENARIOS, Sets.newHashSet(EASY_SCENARIOS));
-            case DIFFICULT:
+            case HARD:
                 return findAvailableScenario(difficulty, alreadySolvedProblems,
                         Lists.newArrayList(new SpacesScenario(DRAWING, false), new SpacesScenario(LOG, false)),
                         Sets.newHashSet(MEDIUM_SCENARIOS));

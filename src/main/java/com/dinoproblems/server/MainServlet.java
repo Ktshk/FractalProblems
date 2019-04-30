@@ -47,6 +47,13 @@ public class MainServlet extends HttpServlet {
     private String[] notAnAnswer = {"Хотите скажу подсказку или повторю задачу?", "Я могу повторить задачу.", "Могу дать вам подсказку.",
             "Задача не из простых, но я могу помочь", "Я могу подсказать."};
     private String[] almost = {"Почти.", "Почти верно.", "Близко, но нет."};
+    private String[] didNotUnderstand = {"Не поняла вас. ", "Не понимаю. ", "Мне кажется, это не было ответом на мой вопрос. ",
+            "Не уверена, что поняла вас правильно. "};
+    private String[] wantAProblemQuestion = {"Хотите решить задачу?", "Хотите решить ещё одну задачу?", "Продолжаем решать задачи?"};
+    private String[] allHintAreGiven = {"Я уже давала вам подсказку. ", "У меня закончились подсказки, но могу повторить ещё раз. ",
+            "Больше подсказок нет, но могу повторить. ", "Подсказка была такая. "};
+    private String[] nextHint = {"Следующая подсказка. ", "У меня есть ещё одна подсказка. ",
+            "Одну подсказку я вам уже давала, но могу подсказать ещё. "};
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         final DataBaseService dataBaseService = DataBaseService.INSTANCE;
@@ -100,8 +107,9 @@ public class MainServlet extends HttpServlet {
                 if (currentDifficulty == null) {
                     dataBaseService.updateMiscAnswersTable(command, "", session.getLastServerResponse());
 
-                    session.setLastServerResponse("Не поняла вас. Выберите пожалуйста сложность задач");
-                    responseJson.addProperty("text", "Не поняла вас. Выберите пожалуйста сложность задач");
+                    final String responseText = chooseRandomElement(didNotUnderstand) + "Выберите пожалуйста сложность задач";
+                    session.setLastServerResponse(responseText);
+                    responseJson.addProperty("text", responseText);
                     responseJson.add("buttons", createDifficultyButtons());
                     responseJson.addProperty("end_session", false);
                     result.add("response", responseJson);
@@ -121,14 +129,19 @@ public class MainServlet extends HttpServlet {
                 if (problem == null) {
                     dataBaseService.updateMiscAnswersTable(command, "", session.getLastServerResponse());
 
-                    session.setLastServerResponse("Не поняла вас. Хотите решить задачу?");
-                    responseJson.addProperty("text", "Не поняла вас. Хотите решить задачу?");
+                    final String responseText = chooseRandomElement(didNotUnderstand) + chooseRandomElement(wantAProblemQuestion);
+                    session.setLastServerResponse(responseText);
+                    responseJson.addProperty("text", responseText);
                     result.add("response", responseJson);
                 } else if (checkAnswer(command, askHint, yesAnswers)) {
                     if (!problem.hasHint()) {
-                        giveHint(result, responseJson, session, problem, "Я уже давала вам подсказку. ");
+                        giveHint(result, responseJson, session, problem, chooseRandomElement(allHintAreGiven));
                     } else {
-                        giveHint(result, responseJson, session, problem, "");
+                        if (problem.wasHintGiven()) {
+                            giveHint(result, responseJson, session, problem, chooseRandomElement(nextHint));
+                        } else {
+                            giveHint(result, responseJson, session, problem, "");
+                        }
                     }
                 } else if (checkAnswer(command, askToRepeat, yesAnswers)) {
                     responseJson.addProperty("text", problem.getText());
@@ -139,8 +152,9 @@ public class MainServlet extends HttpServlet {
                     if (problem.hasHint()) {
                         giveHint(result, responseJson, session, problem, "Давайте дам вам подсказку. ");
                     } else {
-                        responseJson.addProperty("text", "Правильный ответ " + problem.getTextAnswer() + ". Хотите еще задачу?");
-                        session.setLastServerResponse("Правильный ответ " + problem.getTextAnswer() + ". Хотите еще задачу?");
+                        final String responseText = "Правильный ответ " + problem.getTextAnswer() + ". " + chooseRandomElement(oneMoreQuestion);
+                        responseJson.addProperty("text", responseText);
+                        session.setLastServerResponse(responseText);
                         result.add("response", responseJson);
                         problem.setState(Problem.State.ANSWER_GIVEN);
                         score.getProblemAnswerGiven(problem.getDifficulty());
@@ -252,7 +266,7 @@ public class MainServlet extends HttpServlet {
         } else if (checkAnswer(command, Sets.newHashSet("средняя", "среднюю"), yesAnswers)) {
             return Problem.Difficulty.MEDIUM;
         } else if (checkAnswer(command, Sets.newHashSet("сложная", "сложную"), yesAnswers)) {
-            return Problem.Difficulty.DIFFICULT;
+            return Problem.Difficulty.HARD;
         } else if (checkAnswer(command, Sets.newHashSet("эксперт", "экспертная"), yesAnswers)) {
             return Problem.Difficulty.EXPERT;
         } else {

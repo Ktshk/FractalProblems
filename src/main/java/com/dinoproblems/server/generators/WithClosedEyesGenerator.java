@@ -166,7 +166,7 @@ public class WithClosedEyesGenerator implements ProblemGenerator {
                 return null;
             case MEDIUM:
                 return findAvailableScenario(difficulty, alreadySolvedProblems, new ArrayList<>(mediumScenarios), new HashSet<>());
-            case DIFFICULT:
+            case HARD:
                 return findAvailableScenario(difficulty, alreadySolvedProblems, new ArrayList<>(mediumScenarios), new HashSet<>(mediumScenarios));
             case EXPERT:
                 return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(COUNT_ITEMS_HARD), mediumScenarios);

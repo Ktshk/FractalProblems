@@ -13,7 +13,6 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import static com.dinoproblems.server.utils.Dictionary.*;
-import static com.dinoproblems.server.utils.Dictionary.PEOPLE;
 import static com.dinoproblems.server.utils.GeneratorUtils.*;
 import static com.dinoproblems.server.utils.GeneratorUtils.Case.GENITIVE;
 import static com.dinoproblems.server.utils.GeneratorUtils.Gender.MASCULINE;
@@ -172,7 +171,7 @@ public class CombinatoricsGenerator implements ProblemGenerator {
                 return findAvailableScenario(difficulty, alreadySolvedProblems, EASY_SCENARIOS, new HashSet<>());
             case MEDIUM:
                 return findAvailableScenario(difficulty, alreadySolvedProblems, MEDIUM_SCENARIOS, new HashSet<>(EASY_SCENARIOS));
-            case DIFFICULT:
+            case HARD:
                 return findAvailableScenario(difficulty, alreadySolvedProblems, DIFFICULT_SCENARIOS, new HashSet<>(MEDIUM_SCENARIOS));
             case EXPERT:
                 return null;

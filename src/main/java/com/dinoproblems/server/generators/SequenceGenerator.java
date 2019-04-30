@@ -1,7 +1,6 @@
 package com.dinoproblems.server.generators;
 
 import com.dinoproblems.server.*;
-import com.dinoproblems.server.utils.GeneratorUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -85,7 +84,7 @@ public class SequenceGenerator implements ProblemGenerator {
                     ArithmeticSequence(sequence, operand2);
                 }
                 break;
-            case DIFFICULT:
+            case HARD:
                 operand1 = randomInt(3, 5);
                 operand2 = randomInt(5, 10);
                 operand3 = randomInt(2, 4);
@@ -182,7 +181,7 @@ public class SequenceGenerator implements ProblemGenerator {
                 return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(ARITHMETIC, DOUBLEARITHMETIC), new HashSet<>());
             case MEDIUM:
                 return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(ARITHMETIC, DOUBLEARITHMETIC), Sets.newHashSet(ARITHMETIC, DOUBLEARITHMETIC));
-            case DIFFICULT:
+            case HARD:
                 return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(FIBONACCI, PARITY_IMPARITY, MUL_ON_TWO, GEOMETRIC, DOUBLEARITHMETIC), Sets.newHashSet(ARITHMETIC, DOUBLEARITHMETIC));
             case EXPERT:
                 return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(FAST_GROWING_SEQ, PRIME_NUMBERS), Sets.newHashSet(FIBONACCI, PARITY_IMPARITY, MUL_ON_TWO, GEOMETRIC, DOUBLEARITHMETIC));
