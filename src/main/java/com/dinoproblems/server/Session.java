@@ -18,6 +18,8 @@ public class Session {
     private Problem.Difficulty currentDifficulty = null;
     private String lastServerResponse;
 
+
+
     public Session(String sessionId) {
         this.sessionId = sessionId;
     }
@@ -77,7 +79,7 @@ public class Session {
     }
 
     public SessionResult getSessionResult(){
-        return new SessionResult(solvedProblemsByTheme.values());//должно быть TaskResult
+        return new SessionResult(solvedProblemsByTheme.values());
     }
 
     @Nullable

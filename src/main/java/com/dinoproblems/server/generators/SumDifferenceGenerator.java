@@ -94,16 +94,22 @@ public class SumDifferenceGenerator implements ProblemGenerator {
             choiceSum = "У " + hero[token1] + " и " + hero[token2] + " вместе " + sum + " " + things[token1].getCountingForm() +
                     ".";
 
-        if (difference % 10 == 1)
+        if (difference % 10 == 1) {
             choiceDifference = " У " + hero[token3] + " на " + difference + " " + things[token1].getNominative() + " больше.";
-        else if (difference % 10 < 5)
+            hint = "Что если отнять у " + hero[token3] + " " + difference + " " + things[token1].getNominative() +
+                    ", теперь поровну " + things[token1].getCountingForm() + " между нашими героями.";
+        } else if (difference % 10 < 5) {
             choiceDifference = " У " + hero[token3] + " на " + difference + " " + things[token1].getGenitive() + " больше.";
-        else
+            hint = "Что если отнять у " + hero[token3] + " " + difference + " " + things[token1].getGenitive() +
+                    ", теперь поровну " + things[token1].getCountingForm() + " между нашими героями.";
+        } else {
             choiceDifference = " У " + hero[token3] + " на " + difference + " " + things[token1].getCountingForm() + " больше.";
+            hint = "Что если отнять у " + hero[token3] + " " + difference + " " + things[token1].getCountingForm() +
+                    ", теперь поровну " + things[token1].getCountingForm() + " между нашими героями.";
+        }
         text = choiceSum + choiceDifference + " Сколько " +
                 things[token1].getCountingForm() + " у " + hero[token3] + "?";
-        hint = "Что если отнять у " + hero[token3] + " его превосходящее количество " + things[token1].getCountingForm() +
-                ", теперь поровну " + things[token1].getCountingForm() + " между нашими героями.";
+
         final HashSet<String> possibleTextAnswers = Sets.newHashSet(Integer.toString(first));
         return new ProblemWithPossibleTextAnswers(text, first, SUM_DIFFERENCE, possibleTextAnswers, hint, DEFAULT_SCENARIO, difficulty);
     }
