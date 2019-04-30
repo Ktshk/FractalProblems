@@ -67,7 +67,7 @@ public class SessionResult {
         switch (difficulty){
             case EASY: problemsSolved[1]=2;
             case MEDIUM: problemsSolved[1]=4;
-            case DIFFICULT: problemsSolved[1]=6;
+            case HARD: problemsSolved[1]=6;
             case EXPERT:problemsSolved[1]=10;
         }
 
@@ -77,7 +77,7 @@ public class SessionResult {
         switch (difficulty){
             case EASY: hintsGiven[1]=-1;
             case MEDIUM: hintsGiven[1]=-2;
-            case DIFFICULT: hintsGiven[1]=-3;
+            case HARD: hintsGiven[1]=-3;
             case EXPERT:hintsGiven[1]=-5;
         }
 
@@ -88,7 +88,7 @@ public class SessionResult {
         switch (difficulty){
             case EASY: problemsGiven[1]=-2;
             case MEDIUM: problemsGiven[1]=-4;
-            case DIFFICULT: problemsGiven[1]=-6;
+            case HARD: problemsGiven[1]=-6;
             case EXPERT:problemsGiven[1]=-10;
         }
 
