@@ -28,7 +28,7 @@ public class SessionResult {
             if (problem.getState() == Problem.State.SOLVED) {
                 if(problem.getDifficulty()==Problem.Difficulty.EASY) points+=2;
                 else if(problem.getDifficulty()==Problem.Difficulty.MEDIUM) points+=4;
-                else if(problem.getDifficulty()==Problem.Difficulty.DIFFICULT) points+=6;
+                else if(problem.getDifficulty()==Problem.Difficulty.HARD) points+=6;
                 else  points+=10;
                 problemsSolved++;
                 if(problemsSolved%3==0) points++;
@@ -36,7 +36,7 @@ public class SessionResult {
             if (problem.getState() == Problem.State.SOLVED_WITH_HINT) {//в будущем поменять на SOLVED_WITH_HINTS
                 if(problem.getDifficulty()==Problem.Difficulty.EASY) points-=1;
                 else if(problem.getDifficulty()==Problem.Difficulty.MEDIUM) points-=2;
-                else if(problem.getDifficulty()==Problem.Difficulty.DIFFICULT) points-=3;
+                else if(problem.getDifficulty()==Problem.Difficulty.HARD) points-=3;
                 else  points-=5;
                 hintsGiven++;
             }
@@ -44,7 +44,7 @@ public class SessionResult {
                     problem.getState() == Problem.State.ANSWER_GIVEN) {
                 if(problem.getDifficulty()==Problem.Difficulty.EASY) points-=2;
                 else if(problem.getDifficulty()==Problem.Difficulty.MEDIUM) points-=4;
-                else if(problem.getDifficulty()==Problem.Difficulty.DIFFICULT) points-=6;
+                else if(problem.getDifficulty()==Problem.Difficulty.HARD) points-=6;
                 else  points-=10;
                 problemsGiven++;
             }

@@ -58,7 +58,7 @@ public class BrothersAndSistersGenerator implements ProblemGenerator {
                 return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(COUNT_CHILDREN, BROTHERS_SISTERS_DIFFERENCE), new HashSet<>());
             case MEDIUM:
                 return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(BROTHERS_SISTERS_DIFFERENCE), Sets.newHashSet(COUNT_CHILDREN));
-            case DIFFICULT:
+            case HARD:
             case EXPERT:
                 return null;
 

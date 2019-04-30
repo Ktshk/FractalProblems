@@ -8,7 +8,6 @@ import com.google.common.collect.Sets;
 import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Set;
 
 import static com.dinoproblems.server.ProblemCollection.AT_LEAST_ONE_FOUND;
 import static com.dinoproblems.server.utils.GeneratorUtils.*;
@@ -104,7 +103,7 @@ public class FoundAtLeastOneGenerator implements ProblemGenerator {
 
     @Override
     public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty) {
-        if (difficulty != Problem.Difficulty.DIFFICULT) {
+        if (difficulty != Problem.Difficulty.HARD) {
             return null;
         }
 

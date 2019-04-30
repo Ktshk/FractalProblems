@@ -140,7 +140,7 @@ public class RangeGenerator implements ProblemGenerator {
                 return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(NUMBERS, READ_PAGES, NUMBERS_NOT_LESS_NOT_GREATER), new HashSet<>());
             case MEDIUM:
                 return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(SCENARIOS), Sets.newHashSet(NUMBERS, READ_PAGES, NUMBERS_NOT_LESS_NOT_GREATER));
-            case DIFFICULT:
+            case HARD:
                 return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(TORN_OUT_PAGES, DATES), Sets.newHashSet(SCENARIOS));
             case EXPERT:
                 return null;

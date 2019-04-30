@@ -99,7 +99,7 @@ public class LegsAndHeadsGenerator implements ProblemGenerator {
                         + "Сколько вылупилось " + animals5more[quest][quest2] + "?";
 
             } else if (scenario.equals(INSECTS)) {
-                heads = difficulty == Problem.Difficulty.DIFFICULT ? randomInt(5, 9) : randomInt(3, 5);
+                heads = difficulty == Problem.Difficulty.HARD ? randomInt(5, 9) : randomInt(3, 5);
                 ducks = randomInt(1, heads);
                 cows = heads - ducks;
                 answer = quest == 0 ? ducks : cows;
@@ -161,7 +161,7 @@ public class LegsAndHeadsGenerator implements ProblemGenerator {
                 return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(ANIMALS, EGGS), new HashSet<>());
             case MEDIUM:
                 return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(MEDIUM_SCENARIOS), Lists.newArrayList(ANIMALS, EGGS));
-            case DIFFICULT:
+            case HARD:
                 return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(ANIMALS, EGGS, INSECTS, COINS), Sets.newHashSet(MEDIUM_SCENARIOS));
             case EXPERT:
                 return null;

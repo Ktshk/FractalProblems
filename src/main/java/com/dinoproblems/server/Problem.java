@@ -40,7 +40,7 @@ public interface Problem {
     }
 
     enum Difficulty {
-        EASY, MEDIUM, DIFFICULT, EXPERT;
+        EASY, MEDIUM, HARD, EXPERT;
 
         public Difficulty getPrevious() {
             switch (this) {
@@ -48,10 +48,10 @@ public interface Problem {
                     throw new IllegalStateException();
                 case MEDIUM:
                     return EASY;
-                case DIFFICULT:
+                case HARD:
                     return MEDIUM;
                 case EXPERT:
-                    return DIFFICULT;
+                    return HARD;
             }
             throw new IllegalStateException();
         }

@@ -77,7 +77,7 @@ public class BrickAndHalfGenerator implements ProblemGenerator {
     }
 
     public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Difficulty difficulty) {
-        if (difficulty == Difficulty.DIFFICULT || difficulty == Difficulty.EXPERT) {
+        if (difficulty == Difficulty.HARD || difficulty == Difficulty.EXPERT) {
             return null;
         }
 

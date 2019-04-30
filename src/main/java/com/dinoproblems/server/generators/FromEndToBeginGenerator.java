@@ -197,7 +197,7 @@ public class FromEndToBeginGenerator implements ProblemGenerator {
 
                 }
                 break;
-            case DIFFICULT:
+            case HARD:
                 secondoperand = randomInt(1, 31);
                 if (scenario.equals(DEFAULT_SCENARIO)) {
                     for (; ; ) {
@@ -312,7 +312,7 @@ public class FromEndToBeginGenerator implements ProblemGenerator {
                 return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(DEFAULT_SCENARIO), new HashSet<>());
             case MEDIUM:
                 return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(DEFAULT_SCENARIO, LILY_SCENARIO), Sets.newHashSet(DEFAULT_SCENARIO));
-            case DIFFICULT:
+            case HARD:
                 return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(DEFAULT_SCENARIO, LILY_SCENARIO), Sets.newHashSet(DEFAULT_SCENARIO, LILY_SCENARIO));
             case EXPERT:
                 return null;
