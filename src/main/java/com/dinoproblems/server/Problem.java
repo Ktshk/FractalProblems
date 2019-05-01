@@ -1,5 +1,7 @@
 package com.dinoproblems.server;
 
+import javax.annotation.Nullable;
+
 /**
  * Created by Katushka on 13.02.2019.
  */
@@ -15,6 +17,9 @@ public interface Problem {
     String getTheme();
 
     String getText();
+
+    @Nullable
+    String getComment();
 
     String getNextHint();
 

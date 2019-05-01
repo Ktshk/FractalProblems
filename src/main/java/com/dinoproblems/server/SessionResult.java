@@ -13,83 +13,30 @@ import static com.dinoproblems.server.utils.GeneratorUtils.Gender.*;
 
 public class SessionResult {
 
-    private final int problemSolved;//кол-во решённых задач
-    private final int totalProblems;//кол-во полей clearAnswer
-    private final int hints;//кол-во полей hintUsed
-    private final int total;//суммарное кол-во баллов
-    public static int [] problemsSolved =new int [2];//счётчик решённых задач
-    public static int [] problemsGiven=new int [2];//счётчик выданных задач
-    public static int  [] hintsGiven=new int [2];//счётчик выданных подсказок
-    public static int [] points=new int [2];//счётчик заработанных баллов
-    public SessionResult(Collection<Problem> values) {
+    private int problemSolved = 0;//кол-во решённых задач
+    private int totalProblems = 0;//кол-во полей clearAnswer
+    private int hints = 0;//кол-во полей hintUsed
+    private int total = 0;//суммарное кол-во баллов
 
-
-       // for (Problem problem : problems) {
-
-           /* if (problem.getState() == Problem.State.SOLVED || problem.getState() == Problem.State.SOLVED_WITH_HINT) {
-                if (problem.getDifficulty() == Problem.Difficulty.EASY) points += 2;
-                else if (problem.getDifficulty() == Problem.Difficulty.MEDIUM) points += 4;
-                else if (problem.getDifficulty() == Problem.Difficulty.DIFFICULT) points += 6;
-                else points += 10;
-                problemsSolved++;
-                if (problemsSolved % 3 == 0) points++;
-            }
-            if (problem.getState() == Problem.State.SOLVED_WITH_HINT) {
-                if (problem.getDifficulty() == Problem.Difficulty.EASY) points -= 1;
-                else if (problem.getDifficulty() == Problem.Difficulty.MEDIUM) points -= 2;
-                else if (problem.getDifficulty() == Problem.Difficulty.DIFFICULT) points -= 3;
-                else points -= 5;
-                hintsGiven++;
-            }
-            if (problem.getState() == Problem.State.SOLVED ||
-                    problem.getState() == Problem.State.ANSWER_GIVEN) {
-                if(problem.getDifficulty()==Problem.Difficulty.EASY) points-=2;
-                else if(problem.getDifficulty()==Problem.Difficulty.MEDIUM) points-=4;
-                else if(problem.getDifficulty()==Problem.Difficulty.DIFFICULT) points-=6;
-                else  points-=10;
-                problemsGiven++;
-            }*/
-
-
-        //}
-
-        problemSolved = problemsSolved[0];
-        hints = hintsGiven[0];
-        totalProblems = problemsGiven[0];
-        total = problemsSolved[1]+problemsGiven[1]+hintsGiven[1];
-
-
+    public SessionResult() {
     }
 
-    public void getProblemSolved(Problem.Difficulty difficulty) {//getter~Alt+Ins
-
-        problemsSolved[0]++;
-        switch (difficulty){
-            case EASY: problemsSolved[1]=2;
-            case MEDIUM: problemsSolved[1]=4;
-            case HARD: problemsSolved[1]=6;
-            case EXPERT:problemsSolved[1]=10;
+    public void updateScore(Problem problem) {
+        totalProblems++;
+        if (problem.getState() == Problem.State.SOLVED) {
+            if (problem.getDifficulty() == Problem.Difficulty.EASY) total += 2;
+            else if (problem.getDifficulty() == Problem.Difficulty.MEDIUM) total += 4;
+            else if (problem.getDifficulty() == Problem.Difficulty.HARD) total += 6;
+            else total += 10;
+            problemSolved++;
+//            if (problemSolved % 3 == 0) total++;
         }
-
-    }
-    public void getProblemSolvedWithHint(Problem.Difficulty difficulty){
-        hintsGiven[0]++;
-        switch (difficulty){
-            case EASY: hintsGiven[1]=-1;
-            case MEDIUM: hintsGiven[1]=-2;
-            case HARD: hintsGiven[1]=-3;
-            case EXPERT:hintsGiven[1]=-5;
-        }
-
-    }
-    public void getProblemAnswerGiven(Problem.Difficulty difficulty){
-
-        problemsGiven[0]++;
-        switch (difficulty){
-            case EASY: problemsGiven[1]=-2;
-            case MEDIUM: problemsGiven[1]=-4;
-            case HARD: problemsGiven[1]=-6;
-            case EXPERT:problemsGiven[1]=-10;
+        if (problem.getState() == Problem.State.SOLVED_WITH_HINT) {
+            if (problem.getDifficulty() == Problem.Difficulty.EASY) total += 1;
+            else if (problem.getDifficulty() == Problem.Difficulty.MEDIUM) total += 2;
+            else if (problem.getDifficulty() == Problem.Difficulty.HARD) total += 3;
+            else total -= 5;
+            hints++;
         }
 
     }

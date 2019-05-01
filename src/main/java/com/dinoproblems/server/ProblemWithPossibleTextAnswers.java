@@ -2,6 +2,7 @@ package com.dinoproblems.server;
 
 import com.google.common.collect.Lists;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Set;
 
@@ -20,6 +21,7 @@ public class ProblemWithPossibleTextAnswers implements Problem {
     private int currentHint = 0;
     private final Difficulty difficulty;
     private final ProblemScenario scenario;
+    private String comment;
 
     public ProblemWithPossibleTextAnswers(String text, int answer, String theme, Set<String> possibleTextAnswers, String hint, ProblemScenario scenario, Difficulty difficulty) {
         this(text, null, answer, theme, possibleTextAnswers, hint, scenario, difficulty);
@@ -36,7 +38,7 @@ public class ProblemWithPossibleTextAnswers implements Problem {
         this.difficulty = difficulty;
     }
 
-    public ProblemWithPossibleTextAnswers(String text, String tts, int answer, String theme, Set<String> possibleTextAnswers, List<String> hints, ProblemScenario scenario, Difficulty difficulty) {
+    public ProblemWithPossibleTextAnswers(String text, String tts, int answer, String theme, Set<String> possibleTextAnswers, List<String> hints, ProblemScenario scenario, Difficulty difficulty, String comment) {
         this.text = text;
         this.tts = tts;
         this.answer = answer;
@@ -45,10 +47,17 @@ public class ProblemWithPossibleTextAnswers implements Problem {
         this.hints = hints;
         this.scenario = scenario;
         this.difficulty = difficulty;
+        this.comment = comment;
     }
 
     public String getText() {
         return text;
+    }
+
+    @Nullable
+    @Override
+    public String getComment() {
+        return comment;
     }
 
     @Override

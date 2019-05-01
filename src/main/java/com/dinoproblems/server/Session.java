@@ -3,6 +3,7 @@ package com.dinoproblems.server;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 
@@ -11,13 +12,13 @@ import java.util.*;
  */
 public class Session {
     private final String sessionId;
+    private final SessionResult sessionResult = new SessionResult();
     private Problem currentProblem;
 
     private Multimap<String, Problem> solvedProblemsByTheme = HashMultimap.create();
     private List<Problem> variousProblems;
     private Problem.Difficulty currentDifficulty = null;
     private String lastServerResponse;
-
 
 
     public Session(String sessionId) {
@@ -78,8 +79,9 @@ public class Session {
                 '}';
     }
 
+    @Nonnull
     public SessionResult getSessionResult(){
-        return new SessionResult(solvedProblemsByTheme.values());
+        return sessionResult;
     }
 
     @Nullable

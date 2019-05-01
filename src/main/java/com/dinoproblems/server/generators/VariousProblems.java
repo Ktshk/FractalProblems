@@ -56,6 +56,7 @@ public class VariousProblems {
                     final int answer = Integer.valueOf(problemNode.getAttributes().getNamedItem("answer").getNodeValue());
                     String text = null;
                     String tts = null;
+                    String comment = null;
                     List<String> hints = new ArrayList<>();
                     final HashSet<String> possibleTextAnswers = Sets.newHashSet();
 
@@ -91,13 +92,23 @@ public class VariousProblems {
                                         possibleTextAnswers.add(textAnswerNode.getAttributes().getNamedItem("text").getNodeValue());
                                     }
                                 }
+                            } else if (problemChildNode.getNodeName().equals("comment")) {
+                                final NodeList commentChildNodes = problemChildNode.getChildNodes();
+                                for (int k = 0; k < commentChildNodes.getLength(); k++) {
+                                    final Node commentChildNode = commentChildNodes.item(k);
+                                    if (commentChildNode.getNodeType() == Node.ELEMENT_NODE) {
+                                        if (commentChildNode.getNodeName().equals("text")) {
+                                            comment = commentChildNode.getTextContent();
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
 
                     problems.put(difficulty, new ProblemWithPossibleTextAnswers(text, tts, answer, THEME,
                             possibleTextAnswers, hints, new ProblemScenarioImpl(THEME + "_" + id, true),
-                            difficulty));
+                            difficulty, comment));
                 }
             }
         } catch (IOException | ParserConfigurationException | SAXException e) {

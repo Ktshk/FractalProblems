@@ -13,6 +13,9 @@
         <text_answers>
             <answer text="одна бацилла"/>
         </text_answers>
+		<comment>
+			<text>Эта задача была на математическом двадцать четвертом математическом празднике кружка Фрактал</text>
+		</comment>
     </problem>
     <problem answer="6" scenarioId="AGE_3_TIMES_IN_5_YEARS">
         <text>Год назад Вася был в 5 раз моложе своего отца, а через 4 года он будет только в 3 раза моложе своего отца. Сколько лет Васе?</text>
@@ -161,4 +164,5 @@
             <answer text="16 флаконов"/>
         </text_answers>
     </problem>
+	
 </problems>
