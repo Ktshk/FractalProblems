@@ -131,11 +131,11 @@ public class FromEndToBeginGenerator implements ProblemGenerator {
                     }
 
                 }
-                text = beginning[token1] + hero1[token1] + " загадал некоторое натуральное число " + hero2[token2] + ". Затем он " + choiceofactions[actions[0]] + operands[0] +
-                        "." + " После " + choiceofactions[actions[1]] + operands[1] + " В итоге " + hero1[token1] + " сказал " + hero2[token2] + " результат, равный " +
+                text = beginning[token1] + hero1[token1] + " загадал некоторое число " + hero2[token2] + ". Затем он " + choiceofactions[actions[0]] + operands[0] +
+                        "." + " После " + choiceofactions[actions[1]] + operands[1] + ". В итоге " + hero1[token1] + " сказал " + hero2[token2] + " результат, равный " +
                         Integer.toString(actionnumber2) + ". Какое число было загадано?";
-                tts=beginning[token1] + hero1[token1] + " загадал некоторое натуральное число " + hero2tts[token2] + ". Затем он " + choiceofactions[actions[0]] + operands[0] +
-                        "." + " После " + choiceofactions[actions[1]] + operands[1] + " В итоге " + hero1[token1] + " сказал " + hero2tts[token2] + " результат, равный " +
+                tts=beginning[token1] + hero1[token1] + " загадал некоторое число " + hero2tts[token2] + ". Затем он " + choiceofactions[actions[0]] + operands[0] +
+                        "." + " После " + choiceofactions[actions[1]] + operands[1] + ". В итоге " + hero1[token1] + " сказал " + hero2tts[token2] + " результат, равный " +
                         Integer.toString(actionnumber2) + ". Какое число было загадано?";
                 hint = "Подумайте, какое число было до того, как " + hero1[token1] + " " + choiceofactions[actions[1]] + operands[1] + ". ";
                 break;
@@ -173,10 +173,10 @@ public class FromEndToBeginGenerator implements ProblemGenerator {
                         actions[2] = 0;
                         operands[2] = Integer.toString(thirdoperand);
                     }
-                    text = beginning[token1] + hero1[token1] + " загадал некоторое натуральное число " + hero2[token2] + ". Затем он " + choiceofactions[actions[0]] + operands[0] +
+                    text = beginning[token1] + hero1[token1] + " загадал некоторое число " + hero2[token2] + ". Затем он " + choiceofactions[actions[0]] + operands[0] +
                             "." + " После " + choiceofactions[actions[1]] + operands[1] + ". Подумав, наш" + hobbies[token1] + choiceofactions[actions[2]] + operands[2] +
                             "." + " В итоге " + hero1[token1] + " сказал " + hero2[token2] + " результат, равный " + Integer.toString(actionnumber3) + ". Какое число было загадано?";
-                    tts=beginning[token1] + hero1[token1] + " загадал некоторое натуральное число " + hero2tts[token2] + ". Затем он " + choiceofactions[actions[0]] + operands[0] +
+                    tts=beginning[token1] + hero1[token1] + " загадал некоторое число " + hero2tts[token2] + ". Затем он " + choiceofactions[actions[0]] + operands[0] +
                             "." + " После " + choiceofactions[actions[1]] + operands[1] + ". Подумав, наш" + hobbies[token1] + choiceofactions[actions[2]] + operands[2] +
                             "." + " В итоге " + hero1[token1] + " сказал " + hero2tts[token2] + " результат, равный " + Integer.toString(actionnumber3) + ". Какое число было загадано?";
 
@@ -268,10 +268,10 @@ public class FromEndToBeginGenerator implements ProblemGenerator {
                         actions[2] = 4;
                         operands[2] = " ";
                     }
-                    text = beginning[token1] + hero1[token1] + " загадал некоторое натуральное число " + hero2[token2] + ". Затем он " + choiceofactions[actions[0]] + operands[0] +
+                    text = beginning[token1] + hero1[token1] + " загадал некоторое число " + hero2[token2] + ". Затем он " + choiceofactions[actions[0]] + operands[0] +
                             "." + " После " + choiceofactions[actions[1]] + operands[1] + ". Подумав, наш" + hobbies[token1] + choiceofactions[actions[2]] + operands[2] +
                             "." + " В итоге " + hero1[token1] + " сказал " + hero2[token2] + " результат, равный " + Integer.toString(actionnumber3) + ". Какое число было загадано?";
-                    tts=beginning[token1] + hero1[token1] + " загадал некоторое натуральное число " + hero2tts[token2] + ". Затем он " + choiceofactions[actions[0]] + operands[0] +
+                    tts=beginning[token1] + hero1[token1] + " загадал некоторое число " + hero2tts[token2] + ". Затем он " + choiceofactions[actions[0]] + operands[0] +
                             "." + " После " + choiceofactions[actions[1]] + operands[1] + ". Подумав, наш" + hobbies[token1] + choiceofactions[actions[2]] + operands[2] +
                             "." + " В итоге " + hero1[token1] + " сказал " + hero2tts[token2] + " результат, равный " + Integer.toString(actionnumber3) + ". Какое число было загадано?";
 

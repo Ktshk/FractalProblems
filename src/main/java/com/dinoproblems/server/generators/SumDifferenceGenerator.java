@@ -63,6 +63,7 @@ public class SumDifferenceGenerator implements ProblemGenerator {
         };
         String text;//итоговый текст задачи
         String hint;//подсказка
+        int answer;
         String choiceSum;
         String choiceDifference;
         for (; ; ) {
@@ -74,9 +75,11 @@ public class SumDifferenceGenerator implements ProblemGenerator {
                 if (first > second) {
                     difference = first - second;
                     token3 = token1;
+                    answer=first;
                 } else {
                     difference = second - first;
                     token3 = token2;
+                    answer=second;
                 }
                 sum = first + second;
                 break;
@@ -110,7 +113,7 @@ public class SumDifferenceGenerator implements ProblemGenerator {
         text = choiceSum + choiceDifference + " Сколько " +
                 things[token1].getCountingForm() + " у " + hero[token3] + "?";
 
-        final HashSet<String> possibleTextAnswers = Sets.newHashSet(Integer.toString(first));
+        final HashSet<String> possibleTextAnswers = Sets.newHashSet(Integer.toString(answer));
         return new ProblemWithPossibleTextAnswers(text, first, SUM_DIFFERENCE, possibleTextAnswers, hint, DEFAULT_SCENARIO, difficulty);
     }
 

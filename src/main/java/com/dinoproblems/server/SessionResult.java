@@ -9,6 +9,9 @@ import java.util.Collection;
 import static com.dinoproblems.server.utils.GeneratorUtils.Gender.*;
 import static com.dinoproblems.server.utils.GeneratorUtils.randomInt;
 
+import com.dinoproblems.server.utils.*;
+
+
 //First stable ver got by Simar 22.04.2019
 //не делаем import так как в одном package
 
@@ -18,8 +21,9 @@ public class SessionResult {
     private int totalProblems = 0;//кол-во выданных задач
     private int hints = 0;//кол-во задач решённых с подсказкой
     private int total = 0;//суммарное кол-во баллов
-    int token1=randomInt(0,5);//выбор фразы начала
-    int token2=randomInt(0,5);//выбор фразы окончания
+    int token1 = randomInt(0, 5);//выбор фразы начала
+    int token2 = randomInt(0, 5);//выбор фразы окончания
+
     public SessionResult() {
     }
 
@@ -39,9 +43,11 @@ public class SessionResult {
             else if (problem.getDifficulty() == Problem.Difficulty.HARD) total += 3;
             else total += 5;
             hints++;
+            problemSolved++;
         }
         if (problem.getState() == Problem.State.ANSWER_GIVEN) {
-            total -= 5;
+            if (total - 5 > 0) total -= 5;
+            else total = 0;
 
         }
 
@@ -69,39 +75,47 @@ public class SessionResult {
                 "У меня ещё есть чему Вас научить. Будет интересно, обязательно приходите!",
                 "Ваши способности нужно развивать. С нетерпением жду Вас снова!",
                 "Новые задачи уже на подходе! Буду рада снова видеть Вас среди своих учеников."};
-        final String [] normalEnding=new String[] {"У Вас есть потенциал. Жду Вас снова!",
-        "Вам есть к чему стремиться. Буду рада снова решать с Вами задачи!",
-        "Вы можете лучше. Обязательно приходите ещё!",
-        "Вы способны на большее. С нетерпением жду Вас снова!",
-        "Я уверена в Вашем будущем успехе. Заходите ещё!"};
+        final String[] normalEnding = new String[]{"У Вас есть потенциал. Жду Вас снова!",
+                "Вам есть к чему стремиться. Буду рада снова решать с Вами задачи!",
+                "Вы можете лучше. Обязательно приходите ещё!",
+                "Вы способны на большее. С нетерпением жду Вас снова!",
+                "Я уверена в Вашем будущем успехе. Заходите ещё!"};
         switch (totalProblems) {
 
             case 1:
                 if (problemSolved != 0)
                     if (hints != 0) {
                         text.append(normalBeginning[token1]);
-                        text.append(String.valueOf(problemSolved), NumberWord.getStringForNumber(problemSolved, FEMININE, GeneratorUtils.Case.NOMINATIVE));
+                        text.append(String.valueOf(problemSolved), NumberWord.getStringForNumber(problemSolved, FEMININE, GeneratorUtils.Case.ACCUSATIVE));
                         text.append(" из ");
                         text.append(String.valueOf(totalProblems), NumberWord.getStringForNumber(totalProblems, FEMININE, GeneratorUtils.Case.GENITIVE));
                         text.append(" предложенной задачи, ");
-                        text.append(String.valueOf(hints), NumberWord.getStringForNumber(hints, NEUTER, GeneratorUtils.Case.NOMINATIVE));
-                        text.append(" из которых с нашей помощью. Всего набрали ");
-                        text.append(String.valueOf(total), NumberWord.getStringForNumber(total, NEUTER, GeneratorUtils.Case.GENITIVE));
-                        text.append(" баллов. ");
-                        text.append(normalEnding[token2]);//добавить генератор рандомных конечный фраз
+                        text.append(String.valueOf(hints), NumberWord.getStringForNumber(hints, FEMININE, GeneratorUtils.Case.ACCUSATIVE));
+                        text.append(" из которых решили с нашей помощью. Всего набрали ");
+                        text.append(String.valueOf(total), NumberWord.getStringForNumber(total, MASCULINE, GeneratorUtils.Case.NOMINATIVE));
+                        text.append(" ");
+                        if (total == 1) text.append(Dictionary.SCORE.getNominative());
+                        else if (total < 5) text.append(Dictionary.SCORE.getGenitive());
+                        else text.append(Dictionary.SCORE.getCountingForm());
+                        text.append(". ");
+                        text.append(normalEnding[token2]);
                         //return "Вы решили " + problemSolved + " из " + totalProblems + " предложенной задачи, " + hints + " из которых с нашей помощью. Ждём Вас снова!";}
                         return text;
                     }//как грамотно вернуть полученный итог?
                     else {
                         text.append(normalBeginning[token1]);
-                        text.append(String.valueOf(problemSolved), NumberWord.getStringForNumber(problemSolved, FEMININE, GeneratorUtils.Case.NOMINATIVE));
+                        text.append(String.valueOf(problemSolved), NumberWord.getStringForNumber(problemSolved, FEMININE, GeneratorUtils.Case.ACCUSATIVE));
                         text.append(" из ");
                         text.append(String.valueOf(totalProblems), NumberWord.getStringForNumber(totalProblems, FEMININE, GeneratorUtils.Case.GENITIVE));
                         text.append(" предложенной задачи");
                         //  text.append(String.valueOf(hints), NumberWord.getStringForNumber(hints, NEUTER, GeneratorUtils.Case.NOMINATIVE));
-                        text.append(" и обошлись без нашей помощи. Всего набрали ");
-                        text.append(String.valueOf(total), NumberWord.getStringForNumber(total, NEUTER, GeneratorUtils.Case.GENITIVE));
-                        text.append(" баллов. ");
+                        text.append(". Вы обошлись без нашей помощи. Всего набрали ");
+                        text.append(String.valueOf(total), NumberWord.getStringForNumber(total, MASCULINE, GeneratorUtils.Case.NOMINATIVE));
+                        text.append(" ");
+                        if (total == 1) text.append(Dictionary.SCORE.getNominative());
+                        else if (total < 5) text.append(Dictionary.SCORE.getGenitive());
+                        else text.append(Dictionary.SCORE.getCountingForm());
+                        text.append(". ");
                         text.append(normalEnding[token2]);
                         return text;
                     }
@@ -115,35 +129,47 @@ public class SessionResult {
             default:
                 if (problemSolved != 0)
                     if (hints != 0) {
-                        if (total>=20) text.append(goodBeginning[token1]);
+                        if (total >= 20) text.append(goodBeginning[token1]);
                         else text.append(normalBeginning[token1]);
-                        text.append("Вы решили ");
-                        text.append(String.valueOf(problemSolved), NumberWord.getStringForNumber(problemSolved, FEMININE, GeneratorUtils.Case.NOMINATIVE));
+                        if (problemSolved == 1)
+                            text.append(String.valueOf(problemSolved), NumberWord.getStringForNumber(problemSolved, FEMININE, GeneratorUtils.Case.ACCUSATIVE));
+                        else
+                            text.append(String.valueOf(problemSolved), NumberWord.getStringForNumber(problemSolved, FEMININE, GeneratorUtils.Case.NOMINATIVE));
                         text.append(" из ");
                         text.append(String.valueOf(totalProblems), NumberWord.getStringForNumber(totalProblems, FEMININE, GeneratorUtils.Case.GENITIVE));
                         text.append(" предложенных задач, ");
-                        text.append(String.valueOf(hints), NumberWord.getStringForNumber(hints, NEUTER, GeneratorUtils.Case.NOMINATIVE));
-                        text.append(", из которых с нашей помощью. Всего набрали ");
-                        text.append(String.valueOf(total), NumberWord.getStringForNumber(total, NEUTER, GeneratorUtils.Case.GENITIVE));
-                        text.append(" баллов. ");
-                        if (total>=20) text.append(goodEnding[token2]);
+                        text.append(String.valueOf(hints), NumberWord.getStringForNumber(hints, FEMININE, GeneratorUtils.Case.ACCUSATIVE));
+                        text.append(" из которых решили с нашей помощью. Всего набрали ");
+                        text.append(String.valueOf(total), NumberWord.getStringForNumber(total, MASCULINE, GeneratorUtils.Case.NOMINATIVE));
+                        text.append(" ");
+                        if (total == 1) text.append(Dictionary.SCORE.getNominative());
+                        else if (total < 5) text.append(Dictionary.SCORE.getGenitive());
+                        else text.append(Dictionary.SCORE.getCountingForm());
+                        text.append(". ");
+                        if (total >= 20) text.append(goodEnding[token2]);
                         else text.append(normalEnding[token2]);
                         return text;
                     }
                     //return "Вы решили " + problemSolved + " из " + totalProblems + " предложенных задач, " + hints + " из которых с нашей помощью. Ждём Вас снова!";
                     else {
-                        if (total>=20) text.append(goodBeginning[token1]);
+                        if (total >= 20) text.append(goodBeginning[token1]);
                         else text.append(normalBeginning[token1]);
-                        text.append("Вы решили ");
-                        text.append(String.valueOf(problemSolved), NumberWord.getStringForNumber(problemSolved, FEMININE, GeneratorUtils.Case.NOMINATIVE));
+                        if (problemSolved == 1)
+                            text.append(String.valueOf(problemSolved), NumberWord.getStringForNumber(problemSolved, FEMININE, GeneratorUtils.Case.ACCUSATIVE));
+                        else
+                            text.append(String.valueOf(problemSolved), NumberWord.getStringForNumber(problemSolved, FEMININE, GeneratorUtils.Case.NOMINATIVE));
                         text.append(" из ");
                         text.append(String.valueOf(totalProblems), NumberWord.getStringForNumber(totalProblems, FEMININE, GeneratorUtils.Case.GENITIVE));
                         text.append(" предложенных задач");
                         // text.append(String.valueOf(hints), NumberWord.getStringForNumber(hints, NEUTER, GeneratorUtils.Case.NOMINATIVE));
-                        text.append(" и обошлись без нашей помощи. Всего набрали ");
-                        text.append(String.valueOf(total), NumberWord.getStringForNumber(total, NEUTER, GeneratorUtils.Case.GENITIVE));
-                        text.append(" баллов. ");
-                        if (total>=20) text.append(goodEnding[token2]);
+                        text.append(". Вы обошлись без нашей помощи. Всего набрали ");
+                        text.append(String.valueOf(total), NumberWord.getStringForNumber(total, MASCULINE, GeneratorUtils.Case.NOMINATIVE));
+                        text.append(" ");
+                        if (total == 1) text.append(Dictionary.SCORE.getNominative());
+                        else if (total < 5) text.append(Dictionary.SCORE.getGenitive());
+                        else text.append(Dictionary.SCORE.getCountingForm());
+                        text.append(". ");
+                        if (total >= 20) text.append(goodEnding[token2]);
                         else text.append(normalEnding[token2]);
                         return text;
                     }//return "Вы решили " + problemSolved + " из " + totalProblems + " предложенных задач и обошлись без нашей помощи. Ждём Вас снова!";
