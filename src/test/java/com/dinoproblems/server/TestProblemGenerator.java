@@ -12,9 +12,7 @@ import java.util.Set;
  */
 public class TestProblemGenerator {
 
-    private static final ProblemGenerator GENERATOR = new SumDifferenceGenerator();
-
-    @Test
+    private static final ProblemGenerator GENERATOR = new EilerCirclesGenerator();
     public void testAllGenerators() {
         for (ProblemGenerator generator : ProblemCollection.INSTANCE.getGenerators()) {
             System.out.println("************* Generator: " + generator);
@@ -31,13 +29,13 @@ public class TestProblemGenerator {
     public void testProblemCollectionGeneration() {
         final ProblemCollection problemCollection = ProblemCollection.INSTANCE;
         for (Problem.Difficulty difficulty : Problem.Difficulty.values()) {
-//        Problem.Difficulty difficulty = Problem.Difficulty.MEDIUM;
+       // Problem.Difficulty difficulty = Problem.Difficulty.MEDIUM;
             System.out.println("************* " + difficulty);
             final Session session = new Session("test");
             session.setCurrentDifficulty(difficulty);
 
             for (int i = 0; i < 10; i++) {
-//                solveProblem(problemCollection, session, Problem.State.SOLVED_WITH_HINT);
+               solveProblem(problemCollection, session, Problem.State.SOLVED_WITH_HINT);
                 solveProblem(problemCollection, session, Problem.State.SOLVED);
                 solveProblem(problemCollection, session, Problem.State.ANSWER_GIVEN);
             }

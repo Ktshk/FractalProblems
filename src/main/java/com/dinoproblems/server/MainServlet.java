@@ -100,6 +100,7 @@ public class MainServlet extends HttpServlet {
                     checkAnswer(command, endSessionAnswers) ||
                     (session.getCurrentProblem() == null && checkAnswer(command, noAnswers))) {
                 responseJson.addProperty("text", score.getResult().getText());//итоговое сообщение пользователю
+                responseJson.addProperty("tts",score.getResult().getTTS());//корректное произношение итогов сессии
                 responseJson.addProperty("end_session", true);
                 result.add("response", responseJson);
             } else if (session.getCurrentProblem() == null && session.getCurrentDifficulty() == null) {
