@@ -87,21 +87,21 @@ public class SumDifferenceGenerator implements ProblemGenerator {
                 second = difficulty == EASY ? randomInt(10, 26) : randomInt(26, 51);
             }
         }
-        if (sum % 10 == 1)
+        if (sum % 10 == 1 && sum>20)
             choiceSum = "У " + hero[token1] + " и " + hero[token2] + " вместе " + sum + " " + things[token1].getNominative() +
                     ".";
-        else if (sum % 10 < 5 && sum % 10 != 0)
+        else if (sum % 10 < 5 && sum /10 != 1 && sum%10!=0)
             choiceSum = "У " + hero[token1] + " и " + hero[token2] + " вместе " + sum + " " + things[token1].getGenitive() +
                     ".";
         else
             choiceSum = "У " + hero[token1] + " и " + hero[token2] + " вместе " + sum + " " + things[token1].getCountingForm() +
                     ".";
 
-        if (difference % 10 == 1) {
+        if (difference % 10 == 1 && sum>20) {
             choiceDifference = " У " + hero[token3] + " на " + difference + " " + things[token1].getNominative() + " больше.";
             hint = "Что если отнять у " + hero[token3] + " " + difference + " " + things[token1].getNominative() +
                     ", теперь поровну " + things[token1].getCountingForm() + " между нашими героями.";
-        } else if (difference % 10 < 5) {
+        } else if (difference % 10 < 5 && sum/10!=1 && sum%10!=0) {
             choiceDifference = " У " + hero[token3] + " на " + difference + " " + things[token1].getGenitive() + " больше.";
             hint = "Что если отнять у " + hero[token3] + " " + difference + " " + things[token1].getGenitive() +
                     ", теперь поровну " + things[token1].getCountingForm() + " между нашими героями.";

@@ -64,7 +64,7 @@ public class SessionResult {
                 "Вы смогли решить ",
                 "Вы дали верные ответы на ",
                 "Вам удалось решить ",
-                "Вам нашли верное решение на "};
+                "Вы нашли верное решение на "};
         final String[] badBeginning = new String[]{"К сожалению Вы не решили ни одной задачи. ",
                 "Мне грустно это сообщать. Вы не смогли решить ни одной задачи. ",
                 "Очень жаль. Вы не дали ни одного верного ответа. ",
@@ -94,8 +94,8 @@ public class SessionResult {
                         text.append(" из которых решили с нашей помощью. Всего набрали ");
                         text.append(String.valueOf(total), NumberWord.getStringForNumber(total, MASCULINE, GeneratorUtils.Case.NOMINATIVE));
                         text.append(" ");
-                        if (total == 1) text.append(Dictionary.SCORE.getNominative());
-                        else if (total < 5) text.append(Dictionary.SCORE.getGenitive());
+                        if (total%10 == 1) text.append(Dictionary.SCORE.getNominative());
+                        else if (total%10>1 && total%10 < 5) text.append(Dictionary.SCORE.getGenitive());
                         else text.append(Dictionary.SCORE.getCountingForm());
                         text.append(". ");
                         text.append(normalEnding[token2]);
@@ -112,8 +112,8 @@ public class SessionResult {
                         text.append(". Вы обошлись без нашей помощи. Всего набрали ");
                         text.append(String.valueOf(total), NumberWord.getStringForNumber(total, MASCULINE, GeneratorUtils.Case.NOMINATIVE));
                         text.append(" ");
-                        if (total == 1) text.append(Dictionary.SCORE.getNominative());
-                        else if (total < 5) text.append(Dictionary.SCORE.getGenitive());
+                        if (total%10 == 1) text.append(Dictionary.SCORE.getNominative());
+                        else if (total%10>1 && total%10<5) text.append(Dictionary.SCORE.getGenitive());
                         else text.append(Dictionary.SCORE.getCountingForm());
                         text.append(". ");
                         text.append(normalEnding[token2]);
@@ -142,8 +142,8 @@ public class SessionResult {
                         text.append(" из которых решили с нашей помощью. Всего набрали ");
                         text.append(String.valueOf(total), NumberWord.getStringForNumber(total, MASCULINE, GeneratorUtils.Case.NOMINATIVE));
                         text.append(" ");
-                        if (total == 1) text.append(Dictionary.SCORE.getNominative());
-                        else if (total < 5) text.append(Dictionary.SCORE.getGenitive());
+                        if (total%10 == 1) text.append(Dictionary.SCORE.getNominative());
+                        else if (total%10>1 && total%10 < 5) text.append(Dictionary.SCORE.getGenitive());
                         else text.append(Dictionary.SCORE.getCountingForm());
                         text.append(". ");
                         if (total >= 20) text.append(goodEnding[token2]);
@@ -165,8 +165,8 @@ public class SessionResult {
                         text.append(". Вы обошлись без нашей помощи. Всего набрали ");
                         text.append(String.valueOf(total), NumberWord.getStringForNumber(total, MASCULINE, GeneratorUtils.Case.NOMINATIVE));
                         text.append(" ");
-                        if (total == 1) text.append(Dictionary.SCORE.getNominative());
-                        else if (total < 5) text.append(Dictionary.SCORE.getGenitive());
+                        if (total%10 == 1) text.append(Dictionary.SCORE.getNominative());
+                        else if (total%10>1 && total%10 < 5) text.append(Dictionary.SCORE.getGenitive());
                         else text.append(Dictionary.SCORE.getCountingForm());
                         text.append(". ");
                         if (total >= 20) text.append(goodEnding[token2]);
