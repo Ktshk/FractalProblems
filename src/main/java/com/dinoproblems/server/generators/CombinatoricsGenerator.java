@@ -139,7 +139,7 @@ public class CombinatoricsGenerator implements ProblemGenerator {
             for (int i = 1; i < num; i++) {
                 answer *= hasZero ? (chosenDigits.length + 1) : chosenDigits.length;
             }
-            String hint = "";
+            String hint = "Подумайте, с каких цифр может начинаться число. А сколько цифр может стоять на втором месте?";
             return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.COMBINATORICS,
                     Sets.newHashSet(Integer.toString(answer)), hint, scenario, difficulty);
         } else {
