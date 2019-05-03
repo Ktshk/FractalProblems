@@ -1,6 +1,7 @@
 package com.dinoproblems.server;
 
 import com.dinoproblems.server.generators.*;
+import com.google.common.collect.HashMultimap;
 import org.junit.Test;
 
 import java.util.HashSet;
@@ -28,10 +29,11 @@ public class TestProblemGenerator {
     @Test
     public void testProblemCollectionGeneration() {
         final ProblemCollection problemCollection = ProblemCollection.INSTANCE;
+        final Session session = new Session(new UserInfo("test", "test", HashMultimap.create()), "test");
+
         for (Problem.Difficulty difficulty : Problem.Difficulty.values()) {
        // Problem.Difficulty difficulty = Problem.Difficulty.MEDIUM;
             System.out.println("************* " + difficulty);
-            final Session session = new Session("test");
             session.setCurrentDifficulty(difficulty);
 
             for (int i = 0; i < 10; i++) {

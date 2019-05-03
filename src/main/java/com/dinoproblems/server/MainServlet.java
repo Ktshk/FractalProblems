@@ -1,5 +1,7 @@
 package com.dinoproblems.server;
 
+import com.dinoproblems.server.utils.GeneratorUtils;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -17,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 
 import static com.dinoproblems.server.utils.GeneratorUtils.randomInt;
 
@@ -86,7 +89,9 @@ public class MainServlet extends HttpServlet {
             result.addProperty("version", version);
             result.add("session", bodyJson.get("session"));
 
-            final Session session = currentProblems.computeIfAbsent(sessionId, Session::new);
+            final Session session = currentProblems.computeIfAbsent(sessionId,
+                    // TODO: replace with device id from json, user name and map from DB
+                    s1 -> new Session(new UserInfo("device_id", "user_name", HashMultimap.create()), s1));
             final SessionResult score = session.getSessionResult();
 
             if (newSession) {
@@ -158,7 +163,7 @@ public class MainServlet extends HttpServlet {
                         session.setLastServerResponse(responseText);
                         result.add("response", responseJson);
                         problem.setState(Problem.State.ANSWER_GIVEN);
-                        score.updateScore(problem);
+                        session.updateScore(problem);
                         session.setCurrentProblem(null);
                     }
                 } else {
@@ -221,10 +226,10 @@ public class MainServlet extends HttpServlet {
             responseJson.addProperty("tts", chooseRandomElement(soundPraises) + " " + responseJson.get("text")); //Попытка добавления звуков
             if (problem.wasHintGiven()) {
                 problem.setState(Problem.State.SOLVED_WITH_HINT);
-                session.getSessionResult().updateScore(problem);
+                session.updateScore(problem);
             } else {
                 problem.setState(Problem.State.SOLVED);
-                session.getSessionResult().updateScore(problem);
+                session.updateScore(problem);
             }
             session.setCurrentProblem(null);
         } else {

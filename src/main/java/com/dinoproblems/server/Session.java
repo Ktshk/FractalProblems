@@ -15,13 +15,14 @@ public class Session {
     private final SessionResult sessionResult = new SessionResult();
     private Problem currentProblem;
 
-    private Multimap<String, Problem> solvedProblemsByTheme = HashMultimap.create();
     private List<Problem> variousProblems;
     private Problem.Difficulty currentDifficulty = null;
     private String lastServerResponse;
 
+    private final UserInfo userInfo;
 
-    public Session(String sessionId) {
+    public Session(UserInfo userInfo, String sessionId) {
+        this.userInfo = userInfo;
         this.sessionId = sessionId;
     }
 
@@ -31,9 +32,6 @@ public class Session {
 
     public void setCurrentProblem(Problem currentProblem) {
         this.currentProblem = currentProblem;
-        if (currentProblem != null) {
-            solvedProblemsByTheme.put(currentProblem.getTheme(), currentProblem);
-        }
     }
 
     public Problem.Difficulty getCurrentDifficulty() {
@@ -53,7 +51,12 @@ public class Session {
     }
 
     public Multimap<String, Problem> getSolvedProblems() {
-        return solvedProblemsByTheme;
+        return userInfo.getSolvedProblemsByTheme();
+    }
+
+    public void updateScore(Problem problem) {
+        userInfo.getSolvedProblemsByTheme().put(problem.getTheme(), problem);
+        sessionResult.updateScore(problem);
     }
 
     @Override
