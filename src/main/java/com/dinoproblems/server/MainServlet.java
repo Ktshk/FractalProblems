@@ -1,6 +1,5 @@
 package com.dinoproblems.server;
 
-import com.dinoproblems.server.utils.GeneratorUtils;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonArray;
@@ -19,7 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
 
 import static com.dinoproblems.server.utils.GeneratorUtils.randomInt;
 
@@ -141,12 +139,12 @@ public class MainServlet extends HttpServlet {
                     result.add("response", responseJson);
                 } else if (checkAnswer(command, askHint, yesAnswers)) {
                     if (!problem.hasHint()) {
-                        giveHint(result, responseJson, session, problem, chooseRandomElement(allHintAreGiven));
+                        giveHint(result, responseJson, session, problem, chooseRandomElement(allHintAreGiven), problem.getLastHint());
                     } else {
                         if (problem.wasHintGiven()) {
-                            giveHint(result, responseJson, session, problem, chooseRandomElement(nextHint));
+                            giveHint(result, responseJson, session, problem, chooseRandomElement(nextHint), problem.getNextHint());
                         } else {
-                            giveHint(result, responseJson, session, problem, "");
+                            giveHint(result, responseJson, session, problem, "", problem.getNextHint());
                         }
                     }
                 } else if (checkAnswer(command, askToRepeat, yesAnswers)) {
@@ -156,7 +154,7 @@ public class MainServlet extends HttpServlet {
                     addProblemButtons(responseJson, problem);
                 } else if (checkAnswer(command, askAnswer, yesAnswers)) {
                     if (problem.hasHint()) {
-                        giveHint(result, responseJson, session, problem, "Давайте дам вам подсказку. ");
+                        giveHint(result, responseJson, session, problem, "Давайте дам вам подсказку. ", problem.getNextHint());
                     } else {
                         final String responseText = "Правильный ответ " + problem.getTextAnswer() + ". " + chooseRandomElement(oneMoreQuestion);
                         responseJson.addProperty("text", responseText);
@@ -186,10 +184,9 @@ public class MainServlet extends HttpServlet {
 
     }
 
-    private void giveHint(JsonObject result, JsonObject responseJson, Session session, Problem problem, String prefix) {
-        final String nextHint = problem.getNextHint();
-        responseJson.addProperty("text", prefix + nextHint);
-        session.setLastServerResponse(nextHint);
+    private void giveHint(JsonObject result, JsonObject responseJson, Session session, Problem problem, String prefix, String hint) {
+        responseJson.addProperty("text", prefix + hint);
+        session.setLastServerResponse(hint);
         result.add("response", responseJson);
         addProblemButtons(responseJson, problem);
     }
