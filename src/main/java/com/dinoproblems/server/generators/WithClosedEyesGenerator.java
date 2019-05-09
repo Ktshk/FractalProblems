@@ -31,7 +31,7 @@ public class WithClosedEyesGenerator implements ProblemGenerator {
     private static final Noun[] PAIRED_THINGS = {SHOE, GLOVE, SKATES};
     private static final String[] WHERE = {"коробке", "ящике", "сумке", "пакете"};
 
-    private final static ProblemScenario COUNT_ITEMS_HARD = new ProblemScenarioImpl(ProblemCollection.WITH_CLOSED_EYES + "_COUNT_ITEMS");
+    private final static ProblemScenario COUNT_ITEMS_HARD = new ProblemScenarioImpl(ProblemCollection.WITH_CLOSED_EYES + "_COUNT_ITEMS", true);
     private final static ProblemScenario ANY_COLOR = new ProblemScenarioImpl(ProblemCollection.WITH_CLOSED_EYES + "_ANY_COLOR");
     private final static ProblemScenario DIFFERENT_COLORS = new ProblemScenarioImpl(ProblemCollection.WITH_CLOSED_EYES + "_DIFFERENT_COLORS");
     private final static ProblemScenario SPECIAL_COLOR = new ProblemScenarioImpl(ProblemCollection.WITH_CLOSED_EYES + "_SPECIAL_COLOR");

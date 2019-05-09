@@ -13,7 +13,7 @@ import java.util.Set;
  */
 public class TestProblemGenerator {
 
-    private static final ProblemGenerator GENERATOR = new SumDifferenceGenerator();
+    private static final ProblemGenerator GENERATOR = new SequenceGenerator();
     public void testAllGenerators() {
         for (ProblemGenerator generator : ProblemCollection.INSTANCE.getGenerators()) {
             System.out.println("************* Generator: " + generator);
@@ -31,17 +31,17 @@ public class TestProblemGenerator {
         final ProblemCollection problemCollection = ProblemCollection.INSTANCE;
         final Session session = new Session(new UserInfo("test", "test", HashMultimap.create()), "test");
 
-        for (Problem.Difficulty difficulty : Problem.Difficulty.values()) {
-       // Problem.Difficulty difficulty = Problem.Difficulty.MEDIUM;
+//        for (Problem.Difficulty difficulty : Problem.Difficulty.values()) {
+        Problem.Difficulty difficulty = Problem.Difficulty.EXPERT;
             System.out.println("************* " + difficulty);
             session.setCurrentDifficulty(difficulty);
 
             for (int i = 0; i < 10; i++) {
-               solveProblem(problemCollection, session, Problem.State.SOLVED_WITH_HINT);
-                solveProblem(problemCollection, session, Problem.State.SOLVED);
-                solveProblem(problemCollection, session, Problem.State.ANSWER_GIVEN);
+//                solveProblem(problemCollection, session, Problem.State.SOLVED_WITH_HINT);
+                solveProblem(session, Problem.State.SOLVED);
+                solveProblem(session, Problem.State.ANSWER_GIVEN);
             }
-        }
+//        }
     }
 
     @Test
@@ -70,8 +70,8 @@ public class TestProblemGenerator {
     }
 
 
-    private void solveProblem(ProblemCollection problemCollection, Session session, Problem.State state) {
-        final Problem problem = problemCollection.generateProblem(session);
+    private void solveProblem(Session session, Problem.State state) {
+        final Problem problem = session.getNextProblem();
         if (problem == null) {
             System.out.println("NO MORE PROBLEMS");
             return;
@@ -84,6 +84,7 @@ public class TestProblemGenerator {
         System.out.println("State: " + state);
         System.out.println("*** ");
         problem.setState(state);
+        session.updateScore(problem);
     }
 
     private void testGenerator(ProblemGenerator generator, int problemCount) {

@@ -14,6 +14,7 @@ public class Session {
     private final String sessionId;
     private final SessionResult sessionResult = new SessionResult();
     private Problem currentProblem;
+    private Problem nextProblem;
 
     private List<Problem> variousProblems;
     private Problem.Difficulty currentDifficulty = null;
@@ -40,6 +41,7 @@ public class Session {
 
     public void setCurrentDifficulty(Problem.Difficulty currentDifficulty) {
         this.currentDifficulty = currentDifficulty;
+        nextProblem = ProblemCollection.INSTANCE.generateProblem(this);
     }
 
     public String getLastServerResponse() {
@@ -55,8 +57,10 @@ public class Session {
     }
 
     public void updateScore(Problem problem) {
+        currentProblem = null;
         userInfo.getSolvedProblemsByTheme().put(problem.getTheme(), problem);
         sessionResult.updateScore(problem);
+        nextProblem = ProblemCollection.INSTANCE.generateProblem(this);
     }
 
     @Override
@@ -106,4 +110,10 @@ public class Session {
         }
         return !variousProblems.isEmpty();
     }
+
+    @Nullable
+    public Problem getNextProblem() {
+        return nextProblem;
+    }
+
 }

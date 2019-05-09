@@ -80,7 +80,7 @@ public class TestRequest {
     @Ignore
     @Test
     public void testLocalHttpRequest() {
-        makeHttpRequest("http://localhost:8080/Alisa_war/demo");
+        makeHttpRequest("http://localhost:8080/demo");
     }
 
     @Ignore

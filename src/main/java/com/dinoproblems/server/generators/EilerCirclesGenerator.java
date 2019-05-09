@@ -56,7 +56,7 @@ public class EilerCirclesGenerator implements ProblemGenerator {
 
     private static final ProblemScenario CANDIES_STORE_SCENARIO = new ProblemScenarioImpl(ProblemCollection.EILER_CIRCLES + "_" + "CANDIES_STORE");
     private static final ProblemScenario CUBES_SCENARIO = new ProblemScenarioImpl(ProblemCollection.EILER_CIRCLES + "_" + "CUBES");
-    private static final ProblemScenario EXPERT_CANDIES_SCENARIO = new ProblemScenarioImpl(ProblemCollection.EILER_CIRCLES + "_" + "EXPERT_CANDIES");
+    private static final ProblemScenario EXPERT_CANDIES_SCENARIO = new ProblemScenarioImpl(ProblemCollection.EILER_CIRCLES + "_" + "EXPERT_CANDIES", true);
 
     static {
         final Set<Set<String>> incorrectCombinations = Sets.newHashSet(Sets.newHashSet(X, Y_Z, TOTAL),

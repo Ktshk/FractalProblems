@@ -14,10 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import static com.dinoproblems.server.utils.GeneratorUtils.randomInt;
 
@@ -34,7 +31,7 @@ public class MainServlet extends HttpServlet {
 
     private Set<String> yesAnswers = Sets.newHashSet("да", "давай", "давайте", "ну давай", "хочу", "валяй", "можно", "ага", "угу");
     private Set<String> noAnswers = Sets.newHashSet("нет", "не хочу", "хватит", "не надо");
-    private Set<String> endSessionAnswers = Sets.newHashSet("хватит", "больше не хочу", "давай закончим", "надоело");
+    private Set<String> endSessionAnswers = Sets.newHashSet("хватит", "больше не хочу", "давай закончим", "надоело", "закончить");
     private Set<String> askAnswer = Sets.newHashSet("ответ", "сдаюсь", "сказать ответ", "скажи ответ");
     private Set<String> askHint = Sets.newHashSet("подсказка", "подсказку", "сказать подсказку", "дать подсказку", "дай", "давай", "дай подсказку", "подскажи");
     private Set<String> askToRepeat = Sets.newHashSet("повтори", "повторить", "повтори задачу", "повтори условие");
@@ -71,8 +68,6 @@ public class MainServlet extends HttpServlet {
                 sb.append(s);
             }
 
-            System.out.println("Request: " + sb.toString());
-
             final JsonParser parser = new JsonParser();
             final JsonObject bodyJson = parser.parse(sb.toString()).getAsJsonObject();
             final String version = bodyJson.get("version").getAsString();
@@ -81,6 +76,10 @@ public class MainServlet extends HttpServlet {
             final boolean newSession = bodyJson.get("session").getAsJsonObject().get("new").getAsBoolean();
             final String sessionId = bodyJson.get("session").getAsJsonObject().get("session_id").getAsString();
             final JsonArray entitiesArray = requestJson.get("nlu").getAsJsonObject().get("entities").getAsJsonArray();
+
+            if (!"ping".equals(command)) {
+                System.out.println(new Date().toString() + " Request: " + sb.toString());
+            }
 
             final JsonObject result = new JsonObject();
             final JsonObject responseJson = new JsonObject();
@@ -93,9 +92,10 @@ public class MainServlet extends HttpServlet {
             final SessionResult score = session.getSessionResult();
 
             if (newSession) {
-                responseJson.addProperty("text", "Это закрытый навык. Я предлагаю вам решить логическую задачу. Какую хотите: простую, среднюю или сложную?");
-                session.setLastServerResponse("Это закрытый навык. Я предлагаю вам решить логическую задачу. Какую хотите: простую, среднюю или сложную?");
-                responseJson.add("buttons", createDifficultyButtons());
+                final String helloText = "Это закрытый навык. Я предлагаю вам решить логическую задачу. Какую хотите: простую, среднюю или сложную?";
+                responseJson.addProperty("text", helloText);
+                session.setLastServerResponse(helloText);
+                responseJson.add("buttons", createDifficultyButtons(session));
 
                 responseJson.addProperty("end_session", false);
                 result.add("response", responseJson);
@@ -103,10 +103,10 @@ public class MainServlet extends HttpServlet {
                     checkAnswer(command, endSessionAnswers) ||
                     (session.getCurrentProblem() == null && checkAnswer(command, noAnswers))) {
                 responseJson.addProperty("text", score.getResult().getText());//итоговое сообщение пользователю
-                responseJson.addProperty("tts",score.getResult().getTTS());//корректное произношение итогов сессии
+                responseJson.addProperty("tts", score.getResult().getTTS());//корректное произношение итогов сессии
                 responseJson.addProperty("end_session", true);
                 result.add("response", responseJson);
-            } else if (session.getCurrentProblem() == null && session.getCurrentDifficulty() == null) {
+            } else if (session.getNextProblem() == null || session.getCurrentDifficulty() == null) {
                 final Problem.Difficulty currentDifficulty = parseDifficulty(command);
                 if (currentDifficulty == null) {
                     dataBaseService.updateMiscAnswersTable(command, "", session.getLastServerResponse());
@@ -114,7 +114,7 @@ public class MainServlet extends HttpServlet {
                     final String responseText = chooseRandomElement(didNotUnderstand) + "Выберите пожалуйста сложность задач";
                     session.setLastServerResponse(responseText);
                     responseJson.addProperty("text", responseText);
-                    responseJson.add("buttons", createDifficultyButtons());
+                    responseJson.add("buttons", createDifficultyButtons(session));
                     responseJson.addProperty("end_session", false);
                     result.add("response", responseJson);
                 } else {
@@ -156,17 +156,10 @@ public class MainServlet extends HttpServlet {
                     if (problem.hasHint()) {
                         giveHint(result, responseJson, session, problem, "Давайте дам вам подсказку. ", problem.getNextHint());
                     } else {
-                        final String responseText = "Правильный ответ " + problem.getTextAnswer() + ". " + chooseRandomElement(oneMoreQuestion);
-                        responseJson.addProperty("text", responseText);
-                        session.setLastServerResponse(responseText);
-                        result.add("response", responseJson);
-                        problem.setState(Problem.State.ANSWER_GIVEN);
-                        session.updateScore(problem);
-                        session.setCurrentProblem(null);
+                        finishWithProblem(result, responseJson, session, problem, Problem.State.ANSWER_GIVEN);
                     }
                 } else {
-                    checkCorrectAnswer(command, entitiesArray, responseJson, session);
-                    result.add("response", responseJson);
+                    checkCorrectAnswer(command, entitiesArray, responseJson, session, result);
                 }
 
                 responseJson.addProperty("end_session", false);
@@ -184,6 +177,26 @@ public class MainServlet extends HttpServlet {
 
     }
 
+    private void finishWithProblem(JsonObject result, JsonObject responseJson, Session session, Problem problem, Problem.State problemState) {
+        problem.setState(problemState);
+        session.updateScore(problem);
+
+        final String prefix = problemState == Problem.State.ANSWER_GIVEN ? "Правильный ответ " + problem.getTextAnswer() + ". "
+                : chooseRandomElement(praises) + " ";
+        if (problemState != Problem.State.ANSWER_GIVEN) {
+            responseJson.addProperty("tts", chooseRandomElement(soundPraises) + " " + responseJson.get("text"));
+        }
+
+        final String responseText = prefix +
+                (session.getNextProblem() != null ? chooseRandomElement(oneMoreQuestion) : "Поздравляю! Вы решили все задачи на этом уровне сложности. Порешаем другие задачи?");
+        if (session.getNextProblem() == null) {
+            responseJson.add("buttons", createDifficultyButtons(session));
+        }
+        responseJson.addProperty("text", responseText);
+        session.setLastServerResponse(responseText);
+        result.add("response", responseJson);
+    }
+
     private void giveHint(JsonObject result, JsonObject responseJson, Session session, Problem problem, String prefix, String hint) {
         responseJson.addProperty("text", prefix + hint);
         session.setLastServerResponse(hint);
@@ -191,7 +204,7 @@ public class MainServlet extends HttpServlet {
         addProblemButtons(responseJson, problem);
     }
 
-    private void checkCorrectAnswer(String command, JsonArray entitiesArray, JsonObject responseJson, Session session) {
+    private void checkCorrectAnswer(String command, JsonArray entitiesArray, JsonObject responseJson, Session session, JsonObject result) {
         final Problem problem = session.getCurrentProblem();
 
         boolean correctAnswer = problem.checkAnswer(command);
@@ -219,20 +232,12 @@ public class MainServlet extends HttpServlet {
         }
 
         if (correctAnswer) {
-            responseJson.addProperty("text", chooseRandomElement(praises) + " " + chooseRandomElement(oneMoreQuestion));
-            responseJson.addProperty("tts", chooseRandomElement(soundPraises) + " " + responseJson.get("text")); //Попытка добавления звуков
-            if (problem.wasHintGiven()) {
-                problem.setState(Problem.State.SOLVED_WITH_HINT);
-                session.updateScore(problem);
-            } else {
-                problem.setState(Problem.State.SOLVED);
-                session.updateScore(problem);
-            }
-            session.setCurrentProblem(null);
+            finishWithProblem(result, responseJson, session, problem, problem.wasHintGiven() ? Problem.State.SOLVED_WITH_HINT : Problem.State.SOLVED);
         } else {
             responseJson.addProperty("text", chooseRandomElement(almostCorrect ? almost : wrongAnswer) + " " + chooseRandomElement(notAnAnswer));
             addProblemButtons(responseJson, problem);
-           // score.getProblemAnswerGiven();
+            result.add("response", responseJson);
+            // score.getProblemAnswerGiven();
         }
     }
 
@@ -241,10 +246,11 @@ public class MainServlet extends HttpServlet {
     }
 
     private void addProblemTextToResponse(JsonObject responseJson, Session session) {
-        final Problem problem = instance.generateProblem(session);
+        final Problem problem = session.getNextProblem();
         session.setCurrentProblem(problem);
         if (problem == null) {
-            responseJson.addProperty("text", "Извините, но у меня закончились задачи. Может быть, порешаем задачи на другой сложности?");
+            responseJson.addProperty("text", "Извините, но вы уже решили все мои задачи на этом уровне сложности. Может быть, порешаем задачи другой сложности?");
+            responseJson.add("buttons", createDifficultyButtons(session));
         } else {
             responseJson.addProperty("text", (problem.getComment() != null ? (problem.getComment() + " ") : "") + problem.getText());
             addProblemButtons(responseJson, problem);
@@ -278,12 +284,24 @@ public class MainServlet extends HttpServlet {
         }
     }
 
-    private JsonArray createDifficultyButtons() {
+    private JsonArray createDifficultyButtons(Session session) {
         final JsonArray buttons = new JsonArray();
-        buttons.add(createButton("простая"));
-        buttons.add(createButton("средняя"));
-        buttons.add(createButton("сложная"));
-        buttons.add(createButton("эксперт"));
+        final Problem.Difficulty currentDifficulty = session.getCurrentDifficulty();
+        if (currentDifficulty != Problem.Difficulty.EASY) {
+            buttons.add(createButton("простая"));
+        }
+        if (currentDifficulty != Problem.Difficulty.MEDIUM) {
+            buttons.add(createButton("средняя"));
+        }
+        if (currentDifficulty != Problem.Difficulty.HARD) {
+            buttons.add(createButton("сложная"));
+        }
+        if (currentDifficulty != Problem.Difficulty.EXPERT) {
+            buttons.add(createButton("эксперт"));
+        }
+        if (currentDifficulty != null) {
+            buttons.add(createButton("закончить"));
+        }
         return buttons;
     }
 
