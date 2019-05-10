@@ -1,8 +1,14 @@
 package com.dinoproblems.server;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+
 import javax.xml.transform.Result;
 import java.sql.*;
+import java.util.HashMap;
+import java.util.Map;
 
+import com.dinoproblems.server.generators.ProblemScenarioImpl;
 /**
  * Created by Katushka on 21.03.2019.
  */
@@ -62,80 +68,92 @@ public class DataBaseService {
 
     public void insertSessionInfo(String device_id,
                                   String device_num,
-                                  String problem_id,
                                   String problem_text,
                                   String difficulty,
-                                  String reference_id,
-                                  String user_id,
                                   String username,
-                                  String scenario_id,
                                   String scenario,
-                                  String solution_id,
+                                  String generator_id,
                                   int points,
                                   boolean hint_used) {
+        int problem_id = 0;
+        int reference_id = 0;
+        int user_id = 0;
+        int scenario_id = 0;
+        int solution_id = 0;
         PreparedStatement preparedStatementInsertUsers = null;
         PreparedStatement preparedStatementInsertDevices = null;
         PreparedStatement preparedStatementInsertReference = null;
         PreparedStatement preparedStatementInsertScenarios = null;
         PreparedStatement preparedStatementInsertProblems = null;
         PreparedStatement preparedStatementInsertSolutions = null;
+        Statement preparedStatementScenarioIdQuery = null;
         Statement refCheckStatement = null;
         ResultSet refExists = null;
         Statement scenarioCheckStatement = null;
         ResultSet scenarioExists = null;
+        ResultSet scenarioIdQuery = null;
+        ResultSet problemLastId = null;
 
-        String insertTableUsers = "INSERT INTO alisa.users (user_id, username) " +
-                "VALUES" + "(?,?)";
+
+        String insertTableUsers = "INSERT INTO alisa.users (username) " +
+                "VALUES" + "(?)";
 
         String insertTableDevices = "INSERT INTO alisa.devices (device_id, device_num) " +
                 "VALUES" + "(?,?)";
 
-        String insertTableReference = "INSERT INTO alisa.reference (reference_id, device_id, user_id) " +
-                "VALUES" + "(?,?,?)";
-
-        String insertTableScenarios = "INSERT INTO alisa.scenarios (scenario_id, scenario) " +
+        String insertTableReference = "INSERT INTO alisa.reference (device_id, user_id) " +
                 "VALUES" + "(?,?)";
 
-        String insertTableProblems = "INSERT INTO alisa.problems (problem_id, problem_text, difficulty, scenario_id) " +
+        String insertTableScenarios = "INSERT INTO alisa.scenarios (scenario, generator_id) " +
+                "VALUES" + "(?,?)";
+
+        String insertTableProblems = "INSERT INTO alisa.problems (problem_text, difficulty, scenario_id) " +
+                "VALUES" + "(?,?,?)";
+
+        String insertTableSolutions = "INSERT INTO alisa.solutions (reference_id, problem_id, points, hint_used) " +
                 "VALUES" + "(?,?,?,?)";
 
-        String insertTableSolutions = "INSERT INTO alisa.solutions (solution_id, reference_id, problem_id, points, hint_used) " +
-                "VALUES" + "(?,?,?,?,?)";
+        String refCheck = "SELECT reference_id FROM alisa.reference WHERE device_id = \'" + device_id + "\'";
 
-        String refCheck = "SELECT * FROM alisa.reference WHERE reference_id = \'" + reference_id + "\'";
-
-        String scenarioCheck = "SELECT * FROM alisa.scenarios WHERE scenario = \'" + scenario + "\'";
-
+        String scenarioCheck = "SELECT scenario_id FROM alisa.scenarios WHERE scenario = \'" + scenario + "\'";
 
 
         try {
             refCheckStatement = connection.createStatement();
             refExists = refCheckStatement.executeQuery(refCheck);
 
+
             scenarioCheckStatement = connection.createStatement();
             scenarioExists =  scenarioCheckStatement.executeQuery(scenarioCheck);
-
             if(refExists.next()) {
+                reference_id = refExists.getInt(1);
+                scenario_id = scenarioExists.getInt(1);
                 if(!scenarioExists.next()) {
-                    preparedStatementInsertScenarios = connection.prepareStatement(insertTableScenarios);
-                    preparedStatementInsertScenarios.setString(1, scenario_id);
-                    preparedStatementInsertScenarios.setString(2, scenario);
+                    preparedStatementInsertScenarios = connection.prepareStatement(insertTableScenarios,Statement.RETURN_GENERATED_KEYS);
+                    preparedStatementInsertScenarios.setString(1, scenario);
+                    preparedStatementInsertScenarios.setString(2, generator_id);
                     preparedStatementInsertScenarios.executeUpdate();
+                    scenarioIdQuery = preparedStatementInsertProblems.getGeneratedKeys();
+                    if(scenarioIdQuery.next()) {
+                        scenario_id = scenarioIdQuery.getInt(1);
+                    }
                 }
-                connection.setAutoCommit(false);
-                preparedStatementInsertProblems = connection.prepareStatement(insertTableProblems);
-                preparedStatementInsertProblems.setString(1, problem_id);
-                preparedStatementInsertProblems.setString(2, problem_text);
-                preparedStatementInsertProblems.setString(3, difficulty);
-                preparedStatementInsertProblems.setString(4, scenario_id);
-                preparedStatementInsertProblems.executeUpdate();
 
-                preparedStatementInsertSolutions = connection.prepareStatement(insertTableSolutions);
-                preparedStatementInsertSolutions.setString(1, solution_id);
-                preparedStatementInsertSolutions.setString(2, reference_id);
-                preparedStatementInsertSolutions.setString(3, problem_id);
-                preparedStatementInsertSolutions.setInt(4, points);
-                preparedStatementInsertSolutions.setBoolean(5, hint_used);
+                connection.setAutoCommit(false);
+                preparedStatementInsertProblems = connection.prepareStatement(insertTableProblems,Statement.RETURN_GENERATED_KEYS);
+                preparedStatementInsertProblems.setString(1, problem_text);
+                preparedStatementInsertProblems.setString(2, difficulty);
+                preparedStatementInsertProblems.setInt(3, scenario_id);
+                preparedStatementInsertProblems.executeUpdate();
+                problemLastId = preparedStatementInsertProblems.getGeneratedKeys();
+                if(problemLastId.next()) {
+                    problem_id = problemLastId.getInt(1);
+                }
+                preparedStatementInsertSolutions = connection.prepareStatement(insertTableSolutions,Statement.RETURN_GENERATED_KEYS);
+                preparedStatementInsertSolutions.setInt(1, reference_id);
+                preparedStatementInsertSolutions.setInt(2, problem_id);
+                preparedStatementInsertSolutions.setInt(3, points);
+                preparedStatementInsertSolutions.setBoolean(4, hint_used);
                 preparedStatementInsertSolutions.executeUpdate();
 
                 connection.commit();
@@ -144,41 +162,57 @@ public class DataBaseService {
 
                 connection.setAutoCommit(false);
 
-                preparedStatementInsertUsers = connection.prepareStatement(insertTableUsers);
-                preparedStatementInsertUsers.setString(1, user_id);
-                preparedStatementInsertUsers.setString(2, username);
+                preparedStatementInsertUsers = connection.prepareStatement(insertTableUsers,Statement.RETURN_GENERATED_KEYS);
+                preparedStatementInsertUsers.setString(1, username);
                 preparedStatementInsertUsers.executeUpdate();
+                ResultSet userLastId = preparedStatementInsertUsers.getGeneratedKeys();
+                if(userLastId.next()) {
+                    user_id = userLastId.getInt("user_id");
+                }
 
-                preparedStatementInsertDevices = connection.prepareStatement(insertTableDevices);
+                preparedStatementInsertDevices = connection.prepareStatement(insertTableDevices,Statement.RETURN_GENERATED_KEYS);
                 preparedStatementInsertDevices.setString(1, device_id);
                 preparedStatementInsertDevices.setString(2, device_num);
                 preparedStatementInsertDevices.executeUpdate();
 
-                preparedStatementInsertReference = connection.prepareStatement(insertTableReference);
-                preparedStatementInsertReference.setString(1, reference_id);
-                preparedStatementInsertReference.setString(2, device_id);
-                preparedStatementInsertReference.setString(3, user_id);
+                preparedStatementInsertReference = connection.prepareStatement(insertTableReference,Statement.RETURN_GENERATED_KEYS);
+                preparedStatementInsertReference.setString(1, device_id);
+                preparedStatementInsertReference.setInt(2, user_id);
                 preparedStatementInsertReference.executeUpdate();
+                ResultSet referenceLastId = preparedStatementInsertReference.getGeneratedKeys();
+                if(referenceLastId.next()) {
+                   reference_id = referenceLastId.getInt("reference_id");
+                }
 
-                preparedStatementInsertScenarios = connection.prepareStatement(insertTableScenarios);
-                preparedStatementInsertScenarios.setString(1, scenario_id);
-                preparedStatementInsertScenarios.setString(2, scenario);
+                preparedStatementInsertScenarios = connection.prepareStatement(insertTableScenarios,Statement.RETURN_GENERATED_KEYS);
+                preparedStatementInsertScenarios.setString(1, scenario);
+                preparedStatementInsertScenarios.setString(2, generator_id);
                 preparedStatementInsertScenarios.executeUpdate();
+                ResultSet scenarioLastId = preparedStatementInsertScenarios.getGeneratedKeys();
+                if(scenarioLastId.next()) {
+                   scenario_id = scenarioLastId.getInt("scenario_id");
+                }
 
-                preparedStatementInsertProblems = connection.prepareStatement(insertTableProblems);
-                preparedStatementInsertProblems.setString(1, problem_id);
-                preparedStatementInsertProblems.setString(2, problem_text);
-                preparedStatementInsertProblems.setString(3, difficulty);
-                preparedStatementInsertProblems.setString(4, scenario_id);
+                preparedStatementInsertProblems = connection.prepareStatement(insertTableProblems,Statement.RETURN_GENERATED_KEYS);
+                preparedStatementInsertProblems.setString(1, problem_text);
+                preparedStatementInsertProblems.setString(2, difficulty);
+                preparedStatementInsertProblems.setInt(3, scenario_id);
                 preparedStatementInsertProblems.executeUpdate();
+                problemLastId = preparedStatementInsertProblems.getGeneratedKeys();
+                if(problemLastId.next()) {
+                    problem_id = problemLastId.getInt("problem_id");
+                }
 
-                preparedStatementInsertSolutions = connection.prepareStatement(insertTableSolutions);
-                preparedStatementInsertSolutions.setString(1, solution_id);
-                preparedStatementInsertSolutions.setString(2, reference_id);
-                preparedStatementInsertSolutions.setString(3, problem_id);
-                preparedStatementInsertSolutions.setInt(4, points);
-                preparedStatementInsertSolutions.setBoolean(5, hint_used);
+                preparedStatementInsertSolutions = connection.prepareStatement(insertTableSolutions,Statement.RETURN_GENERATED_KEYS);
+                preparedStatementInsertSolutions.setInt(1, reference_id);
+                preparedStatementInsertSolutions.setInt(2, problem_id);
+                preparedStatementInsertSolutions.setInt(3, points);
+                preparedStatementInsertSolutions.setBoolean(4, hint_used);
                 preparedStatementInsertSolutions.executeUpdate();
+                problemLastId = preparedStatementInsertSolutions.getGeneratedKeys();
+                if(problemLastId.next()) {
+                    solution_id = problemLastId.getInt("solution_id");
+                }
 
                 connection.commit();
                 System.out.println("Records created successfully");
@@ -200,4 +234,119 @@ public class DataBaseService {
 
     }
 
+    public Map <String, UserInfo> getUserInfoFromDB()
+    {
+        Map <String, UserInfo> DBuserInfo = new HashMap<String, UserInfo>();
+        UserInfo userInfo;
+        Multimap<String, Problem> solvedProblemsByTheme = HashMultimap.create();
+        Problem problem;
+
+        ResultSet users = null;
+        ResultSet devices = null;
+        ResultSet problems = null;
+        ResultSet scenarios = null;
+        ResultSet solutions = null;
+        ResultSet reference = null;
+
+        String selectTableUsers = "SELECT * FROM alisa.users";
+        String selectTableDevices = "SELECT * FROM alisa.devices";
+        String selectTableProblems = "SELECT * FROM alisa.problems";
+        String selectTableScenarios = "SELECT * FROM alisa.scenarios";
+        String selectTableSolutions= "SELECT * FROM alisa.solutions";
+        String selectTableReference = "SELECT * FROM alisa.reference";
+
+        Statement usersQuery = null;
+        Statement devicesQuery = null;
+        Statement problemsQuery = null;
+        Statement scenariosQuery = null;
+        Statement solutionsQuery = null;
+        Statement referenceQuery = null;
+
+        try {
+            connection.setAutoCommit(false);
+
+            usersQuery = connection.createStatement();
+            users = usersQuery.executeQuery(selectTableUsers);
+
+            devicesQuery = connection.createStatement();
+            devices = devicesQuery.executeQuery(selectTableDevices);
+
+            problemsQuery = connection.createStatement();
+            problems = problemsQuery.executeQuery(selectTableProblems);
+
+            scenariosQuery = connection.createStatement();
+            scenarios = scenariosQuery.executeQuery(selectTableScenarios);
+
+            solutionsQuery = connection.createStatement();
+            solutions = solutionsQuery.executeQuery(selectTableSolutions);
+
+            referenceQuery = connection.createStatement();
+            reference = referenceQuery.executeQuery(selectTableReference);
+
+            connection.commit();
+            System.out.println("Records downloaded successfully");
+
+            String currentDeviceId;
+            String theme = null;
+            String hint = null;
+            String problem_text = null;
+            String difficulty_text = null;
+            String username = null;
+            ProblemScenario scenario = null;
+            Problem.Difficulty difficulty = null;
+            while(reference.next() && users.next())
+            {
+                currentDeviceId = reference.getString("device_id");
+                while(solutions.next() && problems.next()) {
+                    if(solutions.getInt("reference_id") == reference.getInt("reference_id")) {
+                        while(scenarios.next())
+                        {
+                            if(scenarios.getInt("scenario_id") == problems.getInt("scenario_id")) {
+                                theme = scenarios.getString("generator_id");
+                                scenario = new ProblemScenarioImpl (scenarios.getString("scenario"));
+                            }
+                        }
+
+                        if(solutions.getBoolean("hint_used")) {
+                            hint = "true";
+                        }
+
+                        problem_text = problems.getString("problem_text");
+                        difficulty_text = problems.getString("difficulty");
+                        problem = new ProblemWithPossibleTextAnswers(
+                                problem_text,
+                                0,
+                                theme,
+                                null,
+                                hint,
+                                scenario,
+                                difficulty.valueOf(difficulty_text));
+                        solvedProblemsByTheme.put(theme, problem);
+                    }
+                }
+                username = users.getString("username");
+                userInfo = new UserInfo(
+                        currentDeviceId,
+                        username,
+                        solvedProblemsByTheme);
+                DBuserInfo.put(currentDeviceId, userInfo);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try { if (devicesQuery != null) devicesQuery.close(); } catch (Exception e) {};
+            try { if (devices != null) devices.close(); } catch (Exception e) {};
+            try { if (usersQuery != null) usersQuery.close(); } catch (Exception e) {}
+            try { if (users != null) users.close(); } catch (Exception e) {}
+            try { if (problemsQuery != null) problemsQuery.close(); } catch (Exception e) {}
+            try { if (problems!= null) problems.close(); } catch (Exception e) {}
+            try { if (scenariosQuery != null) scenariosQuery.close(); } catch (Exception e) {}
+            try { if (scenarios != null) scenarios.close(); } catch (Exception e) {}
+            try { if (solutionsQuery != null) scenariosQuery.close(); } catch (Exception e) {};
+            try { if (solutions != null) solutions.close(); } catch (Exception e) {};
+            try { if (referenceQuery != null) referenceQuery.close(); } catch (Exception e) {};
+            try { if (reference != null) reference.close(); } catch (Exception e) {};
+        }
+        return DBuserInfo;
+    }
 }

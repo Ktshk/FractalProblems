@@ -19,6 +19,7 @@ public class Session {
     private List<Problem> variousProblems;
     private Problem.Difficulty currentDifficulty = null;
     private String lastServerResponse;
+    private Map <String, UserInfo> DBuserInfo = new HashMap <String, UserInfo>();
 
     private final UserInfo userInfo;
 
