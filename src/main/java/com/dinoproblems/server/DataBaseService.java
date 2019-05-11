@@ -137,7 +137,7 @@ public class DataBaseService {
                     preparedStatementInsertScenarios.setString(1, scenario);
                     preparedStatementInsertScenarios.setString(2, generator_id);
                     preparedStatementInsertScenarios.executeUpdate();
-                    scenarioIdQuery = preparedStatementInsertProblems.getGeneratedKeys();
+                    scenarioIdQuery = preparedStatementInsertScenarios.getGeneratedKeys();
                     if (scenarioIdQuery.next()) {
                         scenario_id = scenarioIdQuery.getInt(1);
                     }
