@@ -129,6 +129,7 @@ public class DataBaseService {
             Statement problemCheckStatement = connection.createStatement();
             ResultSet problemExists = problemCheckStatement.executeQuery(problemCheck);
 
+
             if (refExists.next()) {
                 reference_id = refExists.getInt(1);
 
@@ -139,10 +140,10 @@ public class DataBaseService {
                     preparedStatementInsertScenarios.executeUpdate();
                     scenarioIdQuery = preparedStatementInsertScenarios.getGeneratedKeys();
                     if (scenarioIdQuery.next()) {
-                        scenario_id = scenarioIdQuery.getInt(1);
+                        scenario_id = scenarioIdQuery.getInt("scenario_id");
                     }
                 } else {
-                    scenario_id = scenarioExists.getInt(1);
+                    scenario_id = scenarioExists.getInt("scenario_id");
                 }
 
                 connection.setAutoCommit(false);
@@ -155,7 +156,7 @@ public class DataBaseService {
                     preparedStatementInsertProblems.executeUpdate();
                     problemLastId = preparedStatementInsertProblems.getGeneratedKeys();
                     if (problemLastId.next()) {
-                        problem_id = problemLastId.getInt(1);
+                        problem_id = problemLastId.getInt("problem_id");
                     }
                 } else {
                     problem_id = problemExists.getInt("problem_id");
@@ -196,13 +197,17 @@ public class DataBaseService {
                     reference_id = referenceLastId.getInt("reference_id");
                 }
 
-                preparedStatementInsertScenarios = connection.prepareStatement(insertTableScenarios, Statement.RETURN_GENERATED_KEYS);
-                preparedStatementInsertScenarios.setString(1, scenario);
-                preparedStatementInsertScenarios.setString(2, generator_id);
-                preparedStatementInsertScenarios.executeUpdate();
-                ResultSet scenarioLastId = preparedStatementInsertScenarios.getGeneratedKeys();
-                if (scenarioLastId.next()) {
-                    scenario_id = scenarioLastId.getInt("scenario_id");
+                if (!scenarioExists.next()) {
+                    preparedStatementInsertScenarios = connection.prepareStatement(insertTableScenarios, Statement.RETURN_GENERATED_KEYS);
+                    preparedStatementInsertScenarios.setString(1, scenario);
+                    preparedStatementInsertScenarios.setString(2, generator_id);
+                    preparedStatementInsertScenarios.executeUpdate();
+                    ResultSet scenarioLastId = preparedStatementInsertScenarios.getGeneratedKeys();
+                    if (scenarioLastId.next()) {
+                        scenario_id = scenarioLastId.getInt("scenario_id");
+                    }
+                } else {
+                    scenario_id = scenarioExists.getInt("scenario_id");
                 }
 
                 if (!problemExists.next()) {
