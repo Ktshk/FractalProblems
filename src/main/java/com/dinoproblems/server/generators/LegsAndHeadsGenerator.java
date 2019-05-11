@@ -30,7 +30,8 @@ public class LegsAndHeadsGenerator implements ProblemGenerator {
     @Override
     public Problem generateProblem(Problem.Difficulty difficulty, ProblemAvailability problemAvailability) {
         final ProblemScenario scenario = problemAvailability.getScenario();
-        int heads = difficulty == Problem.Difficulty.EASY ? randomInt(3, 5) : randomInt(5, 10);
+        int heads = difficulty == Problem.Difficulty.EASY ? randomInt(3, 5) :
+                difficulty == Problem.Difficulty.MEDIUM ? randomInt(5, 9) : randomInt(9, 16);
         int ducks = randomInt(1, heads);
         int cows = heads - ducks;
         final int quest = randomInt(0, 2);
@@ -99,7 +100,7 @@ public class LegsAndHeadsGenerator implements ProblemGenerator {
                         + "Сколько вылупилось " + animals5more[quest][quest2] + "?";
 
             } else if (scenario.equals(INSECTS)) {
-                heads = difficulty == Problem.Difficulty.HARD ? randomInt(5, 9) : randomInt(3, 5);
+                heads = difficulty == Problem.Difficulty.HARD ? randomInt(6, 11) : randomInt(3, 6);
                 ducks = randomInt(1, heads);
                 cows = heads - ducks;
                 answer = quest == 0 ? ducks : cows;
@@ -134,6 +135,9 @@ public class LegsAndHeadsGenerator implements ProblemGenerator {
                     animals4less[quest][quest2], animals5more[quest][quest2], animalGender[quest][quest2]);
 
             possibleTextAnswers.add(possibleAnswer);
+            if (answer == 2) {
+                possibleTextAnswers.add("двое");
+            }
         } else {
             heads = randomInt(5, 11);
             int firstCoin = randomInt(1, 3);

@@ -38,8 +38,6 @@ public class ProblemCollection {
 
     private BiMap<String, ProblemGenerator> generators = HashBiMap.create();
 
-    private VariousProblems variousProblems = VariousProblems.INSTANCE;
-
     private ProblemCollection() {
         generators.put(SUM_DIFFERENCE, new SumDifferenceGenerator());
         generators.put(LEGS_AND_HEADS, new LegsAndHeadsGenerator());
@@ -60,8 +58,8 @@ public class ProblemCollection {
 
     @Nullable
     public Problem generateProblem(Session session) {
-        if (session.hasVariousProblems(variousProblems.getProblems(session.getCurrentDifficulty())) && randomInt(0, 3) == 0) {
-            return session.getRandomVariousProblem(variousProblems.getProblems(session.getCurrentDifficulty()));
+        if (session.hasVariousProblems() && randomInt(0, 3) == 0) {
+            return session.getRandomVariousProblem();
         }
         final Map<ProblemAvailabilityType, Map<ProblemGenerator, ProblemAvailability>> availabilityTypeToGenerator =
                 new TreeMap<>(Comparator.comparingInt(problemAvailabilityType -> -problemAvailabilityType.getWeight()));
@@ -79,7 +77,7 @@ public class ProblemCollection {
         }
 
         if (availabilityTypeToGenerator.isEmpty()) {
-            return session.getRandomVariousProblem(variousProblems.getProblems(session.getCurrentDifficulty()));
+            return session.getRandomVariousProblem();
         }
         final Map<ProblemGenerator, ProblemAvailability> bestGenerators = availabilityTypeToGenerator.get(availabilityTypeToGenerator.keySet().iterator().next());
 

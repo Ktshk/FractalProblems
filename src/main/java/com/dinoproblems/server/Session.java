@@ -1,5 +1,6 @@
 package com.dinoproblems.server;
 
+import com.dinoproblems.server.generators.VariousProblems;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
@@ -16,16 +17,35 @@ public class Session {
     private Problem currentProblem;
     private Problem nextProblem;
 
-    private List<Problem> variousProblems;
     private Problem.Difficulty currentDifficulty = null;
     private String lastServerResponse;
-    private Map <String, UserInfo> DBuserInfo = new HashMap <String, UserInfo>();
 
-    private final UserInfo userInfo;
+    private UserInfo userInfo = null;
+    private String userName;
+
+    public Session(String sessionId) {
+        this.sessionId = sessionId;
+    }
 
     public Session(UserInfo userInfo, String sessionId) {
         this.userInfo = userInfo;
         this.sessionId = sessionId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public void setUserInfo(UserInfo userInfo) {
+        this.userInfo = userInfo;
+    }
+
+    public UserInfo getUserInfo() {
+        return userInfo;
     }
 
     public Problem getCurrentProblem() {
@@ -34,6 +54,8 @@ public class Session {
 
     public void setCurrentProblem(Problem currentProblem) {
         this.currentProblem = currentProblem;
+        userInfo.setCurrentProblem(currentProblem);
+
     }
 
     public Problem.Difficulty getCurrentDifficulty() {
@@ -57,11 +79,15 @@ public class Session {
         return userInfo.getSolvedProblemsByTheme();
     }
 
-    public void updateScore(Problem problem) {
+    public int updateScore(Problem problem) {
         currentProblem = null;
         userInfo.getSolvedProblemsByTheme().put(problem.getTheme(), problem);
-        sessionResult.updateScore(problem);
+        final int points = sessionResult.updateScore(problem);
+        userInfo.addPoints(points);
+
         nextProblem = ProblemCollection.INSTANCE.generateProblem(this);
+
+        return points;
     }
 
     @Override
@@ -88,28 +114,17 @@ public class Session {
     }
 
     @Nonnull
-    public SessionResult getSessionResult(){
+    public SessionResult getSessionResult() {
         return sessionResult;
     }
 
     @Nullable
-    public Problem getRandomVariousProblem(Collection<Problem> allVariousProblems) {
-        if (variousProblems == null) {
-            variousProblems = new ArrayList<>(allVariousProblems);
-            Collections.shuffle(variousProblems);
-        }
-        if (variousProblems.isEmpty()) {
-            return null;
-        }
-        return variousProblems.remove(variousProblems.size() - 1);
+    public Problem getRandomVariousProblem() {
+        return userInfo.getRandomVariousProblem(getCurrentDifficulty());
     }
 
-    public boolean hasVariousProblems(Collection<Problem> allVariousProblems) {
-        if (variousProblems == null) {
-            variousProblems = new ArrayList<>(allVariousProblems);
-            Collections.shuffle(variousProblems);
-        }
-        return !variousProblems.isEmpty();
+    public boolean hasVariousProblems() {
+        return userInfo.hasVariousProblems(getCurrentDifficulty());
     }
 
     @Nullable

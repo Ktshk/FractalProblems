@@ -34,7 +34,9 @@ public class FindNumberGenerator implements ProblemGenerator {
                 Sets.newHashSet("16 цифр"), hint, scenario, Problem.Difficulty.EASY));
 
         text = new ProblemTextBuilder();
-        text.append("Найди самое маленькое трехзначное число, сумма цифр в которого равна четырём, и при этом все три цифры различные.");
+        text.append("Найди самое маленькое трехзначное число, сумма цифр в которого равна четырём, и при этом ")
+                .append("все", "все")
+                .append(" три цифры различные.");
         hint = "Подумайте, какие три различных числа в сумме дадут 4.";
         scenario = new ProblemScenarioImpl(ProblemCollection.FIND_NUMBER + "_DIGITS_SUM_4", true);
         EASY_PROBLEMS.put(scenario, new ProblemWithPossibleTextAnswers(text.getText(), text.getTTS(), 103, ProblemCollection.FIND_NUMBER,

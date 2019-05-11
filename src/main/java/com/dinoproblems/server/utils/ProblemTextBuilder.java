@@ -20,6 +20,9 @@ public class ProblemTextBuilder {//текст один, речь другая
     }
 
     public ProblemTextBuilder append(String text, String tts) {
+        if (tts == null) {
+            return append(text);
+        }
         if (this.tts == null) {
             this.tts = new StringBuilder(this.text);
         }

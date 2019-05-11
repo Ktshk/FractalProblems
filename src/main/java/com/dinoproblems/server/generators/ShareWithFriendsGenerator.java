@@ -28,7 +28,7 @@ public class ShareWithFriendsGenerator implements ProblemGenerator {
     @Nonnull
     @Override
     public Problem generateProblem(Difficulty difficulty, ProblemAvailability problemAvailability) {
-        String[][] heroes1 = new String[][]{{"Миша", "Миши", "Мише"}, {"Вася", "Васи", "Васе"},
+        String[][] heroes1 = new String[][]{{"Миша", "Миши", "Мише"}, {"Костя", "Кости", "Косте"}, {"Саша", "Саши", "Саше"},
                 {"Петя", "Пети", "Пете"}, {"Витя", "Вити", "Вите"}, {"Андрей", "Андрея", "Андрею"}};
         String[][] heroes2 = new String[][]{{"Маша", "Маши", "Маше"}, {"Вика", "Вики", "Вике"},
                 {"Даша", "Даши", "Даше"}, {"Алёна", "Алёны", "Алёне"}, {"Катя", "Кати", "Кате"}};

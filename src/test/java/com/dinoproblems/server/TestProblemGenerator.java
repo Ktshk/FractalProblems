@@ -13,7 +13,7 @@ import java.util.Set;
  */
 public class TestProblemGenerator {
 
-    private static final ProblemGenerator GENERATOR = new SequenceGenerator();
+    private static final ProblemGenerator GENERATOR = new LegsAndHeadsGenerator();
     public void testAllGenerators() {
         for (ProblemGenerator generator : ProblemCollection.INSTANCE.getGenerators()) {
             System.out.println("************* Generator: " + generator);

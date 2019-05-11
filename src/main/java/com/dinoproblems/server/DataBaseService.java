@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.dinoproblems.server.generators.ProblemScenarioImpl;
+
 /**
  * Created by Katushka on 21.03.2019.
  */
@@ -86,7 +87,6 @@ public class DataBaseService {
         PreparedStatement preparedStatementInsertScenarios = null;
         PreparedStatement preparedStatementInsertProblems = null;
         PreparedStatement preparedStatementInsertSolutions = null;
-        Statement preparedStatementScenarioIdQuery = null;
         Statement refCheckStatement = null;
         ResultSet refExists = null;
         Statement scenarioCheckStatement = null;
@@ -122,34 +122,33 @@ public class DataBaseService {
             refCheckStatement = connection.createStatement();
             refExists = refCheckStatement.executeQuery(refCheck);
 
-
             scenarioCheckStatement = connection.createStatement();
-            scenarioExists =  scenarioCheckStatement.executeQuery(scenarioCheck);
-            if(refExists.next()) {
+            scenarioExists = scenarioCheckStatement.executeQuery(scenarioCheck);
+            if (refExists.next()) {
                 reference_id = refExists.getInt(1);
                 scenario_id = scenarioExists.getInt(1);
-                if(!scenarioExists.next()) {
-                    preparedStatementInsertScenarios = connection.prepareStatement(insertTableScenarios,Statement.RETURN_GENERATED_KEYS);
+                if (!scenarioExists.next()) {
+                    preparedStatementInsertScenarios = connection.prepareStatement(insertTableScenarios, Statement.RETURN_GENERATED_KEYS);
                     preparedStatementInsertScenarios.setString(1, scenario);
                     preparedStatementInsertScenarios.setString(2, generator_id);
                     preparedStatementInsertScenarios.executeUpdate();
                     scenarioIdQuery = preparedStatementInsertProblems.getGeneratedKeys();
-                    if(scenarioIdQuery.next()) {
+                    if (scenarioIdQuery.next()) {
                         scenario_id = scenarioIdQuery.getInt(1);
                     }
                 }
 
                 connection.setAutoCommit(false);
-                preparedStatementInsertProblems = connection.prepareStatement(insertTableProblems,Statement.RETURN_GENERATED_KEYS);
+                preparedStatementInsertProblems = connection.prepareStatement(insertTableProblems, Statement.RETURN_GENERATED_KEYS);
                 preparedStatementInsertProblems.setString(1, problem_text);
                 preparedStatementInsertProblems.setString(2, difficulty);
                 preparedStatementInsertProblems.setInt(3, scenario_id);
                 preparedStatementInsertProblems.executeUpdate();
                 problemLastId = preparedStatementInsertProblems.getGeneratedKeys();
-                if(problemLastId.next()) {
+                if (problemLastId.next()) {
                     problem_id = problemLastId.getInt(1);
                 }
-                preparedStatementInsertSolutions = connection.prepareStatement(insertTableSolutions,Statement.RETURN_GENERATED_KEYS);
+                preparedStatementInsertSolutions = connection.prepareStatement(insertTableSolutions, Statement.RETURN_GENERATED_KEYS);
                 preparedStatementInsertSolutions.setInt(1, reference_id);
                 preparedStatementInsertSolutions.setInt(2, problem_id);
                 preparedStatementInsertSolutions.setInt(3, points);
@@ -162,55 +161,55 @@ public class DataBaseService {
 
                 connection.setAutoCommit(false);
 
-                preparedStatementInsertUsers = connection.prepareStatement(insertTableUsers,Statement.RETURN_GENERATED_KEYS);
+                preparedStatementInsertUsers = connection.prepareStatement(insertTableUsers, Statement.RETURN_GENERATED_KEYS);
                 preparedStatementInsertUsers.setString(1, username);
                 preparedStatementInsertUsers.executeUpdate();
                 ResultSet userLastId = preparedStatementInsertUsers.getGeneratedKeys();
-                if(userLastId.next()) {
+                if (userLastId.next()) {
                     user_id = userLastId.getInt("user_id");
                 }
 
-                preparedStatementInsertDevices = connection.prepareStatement(insertTableDevices,Statement.RETURN_GENERATED_KEYS);
+                preparedStatementInsertDevices = connection.prepareStatement(insertTableDevices, Statement.RETURN_GENERATED_KEYS);
                 preparedStatementInsertDevices.setString(1, device_id);
                 preparedStatementInsertDevices.setString(2, device_num);
                 preparedStatementInsertDevices.executeUpdate();
 
-                preparedStatementInsertReference = connection.prepareStatement(insertTableReference,Statement.RETURN_GENERATED_KEYS);
+                preparedStatementInsertReference = connection.prepareStatement(insertTableReference, Statement.RETURN_GENERATED_KEYS);
                 preparedStatementInsertReference.setString(1, device_id);
                 preparedStatementInsertReference.setInt(2, user_id);
                 preparedStatementInsertReference.executeUpdate();
                 ResultSet referenceLastId = preparedStatementInsertReference.getGeneratedKeys();
-                if(referenceLastId.next()) {
-                   reference_id = referenceLastId.getInt("reference_id");
+                if (referenceLastId.next()) {
+                    reference_id = referenceLastId.getInt("reference_id");
                 }
 
-                preparedStatementInsertScenarios = connection.prepareStatement(insertTableScenarios,Statement.RETURN_GENERATED_KEYS);
+                preparedStatementInsertScenarios = connection.prepareStatement(insertTableScenarios, Statement.RETURN_GENERATED_KEYS);
                 preparedStatementInsertScenarios.setString(1, scenario);
                 preparedStatementInsertScenarios.setString(2, generator_id);
                 preparedStatementInsertScenarios.executeUpdate();
                 ResultSet scenarioLastId = preparedStatementInsertScenarios.getGeneratedKeys();
-                if(scenarioLastId.next()) {
-                   scenario_id = scenarioLastId.getInt("scenario_id");
+                if (scenarioLastId.next()) {
+                    scenario_id = scenarioLastId.getInt("scenario_id");
                 }
 
-                preparedStatementInsertProblems = connection.prepareStatement(insertTableProblems,Statement.RETURN_GENERATED_KEYS);
+                preparedStatementInsertProblems = connection.prepareStatement(insertTableProblems, Statement.RETURN_GENERATED_KEYS);
                 preparedStatementInsertProblems.setString(1, problem_text);
                 preparedStatementInsertProblems.setString(2, difficulty);
                 preparedStatementInsertProblems.setInt(3, scenario_id);
                 preparedStatementInsertProblems.executeUpdate();
                 problemLastId = preparedStatementInsertProblems.getGeneratedKeys();
-                if(problemLastId.next()) {
+                if (problemLastId.next()) {
                     problem_id = problemLastId.getInt("problem_id");
                 }
 
-                preparedStatementInsertSolutions = connection.prepareStatement(insertTableSolutions,Statement.RETURN_GENERATED_KEYS);
+                preparedStatementInsertSolutions = connection.prepareStatement(insertTableSolutions, Statement.RETURN_GENERATED_KEYS);
                 preparedStatementInsertSolutions.setInt(1, reference_id);
                 preparedStatementInsertSolutions.setInt(2, problem_id);
                 preparedStatementInsertSolutions.setInt(3, points);
                 preparedStatementInsertSolutions.setBoolean(4, hint_used);
                 preparedStatementInsertSolutions.executeUpdate();
                 problemLastId = preparedStatementInsertSolutions.getGeneratedKeys();
-                if(problemLastId.next()) {
+                if (problemLastId.next()) {
                     solution_id = problemLastId.getInt("solution_id");
                 }
 
@@ -220,23 +219,54 @@ public class DataBaseService {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            try { if (refCheckStatement != null) refCheckStatement.close(); } catch (Exception e) {};
-            try { if (refExists != null) refExists.close(); } catch (Exception e) {};
-            try { if (preparedStatementInsertUsers != null) preparedStatementInsertUsers.close(); } catch (Exception e) {}
-            try { if (preparedStatementInsertDevices != null) preparedStatementInsertDevices.close(); } catch (Exception e) {}
-            try { if (preparedStatementInsertReference != null) preparedStatementInsertReference.close(); } catch (Exception e) {}
-            try { if (preparedStatementInsertScenarios != null) preparedStatementInsertScenarios.close(); } catch (Exception e) {}
-            try { if (preparedStatementInsertProblems != null) preparedStatementInsertProblems.close(); } catch (Exception e) {}
-            try { if (preparedStatementInsertSolutions != null) preparedStatementInsertSolutions.close(); } catch (Exception e) {}
-            try { if (scenarioCheckStatement != null) scenarioCheckStatement.close(); } catch (Exception e) {};
-            try { if (scenarioExists != null) scenarioExists.close(); } catch (Exception e) {};
+            try {
+                if (refCheckStatement != null) refCheckStatement.close();
+                if (refExists != null) refExists.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+
+            try {
+                if (preparedStatementInsertUsers != null) preparedStatementInsertUsers.close();
+            } catch (Exception e) {
+            }
+            try {
+                if (preparedStatementInsertDevices != null) preparedStatementInsertDevices.close();
+            } catch (Exception e) {
+            }
+            try {
+                if (preparedStatementInsertReference != null) preparedStatementInsertReference.close();
+            } catch (Exception e) {
+            }
+            try {
+                if (preparedStatementInsertScenarios != null) preparedStatementInsertScenarios.close();
+            } catch (Exception e) {
+            }
+            try {
+                if (preparedStatementInsertProblems != null) preparedStatementInsertProblems.close();
+            } catch (Exception e) {
+            }
+            try {
+                if (preparedStatementInsertSolutions != null) preparedStatementInsertSolutions.close();
+            } catch (Exception e) {
+            }
+            try {
+                if (scenarioCheckStatement != null) scenarioCheckStatement.close();
+            } catch (Exception e) {
+            }
+            ;
+            try {
+                if (scenarioExists != null) scenarioExists.close();
+            } catch (Exception e) {
+            }
+            ;
         }
 
     }
 
-    public Map <String, UserInfo> getUserInfoFromDB()
-    {
-        Map <String, UserInfo> DBuserInfo = new HashMap<String, UserInfo>();
+    public Map<String, UserInfo> getUserInfoFromDB() {
+        Map<String, UserInfo> dbUserInfo = new HashMap<>();
         UserInfo userInfo;
         Multimap<String, Problem> solvedProblemsByTheme = HashMultimap.create();
         Problem problem;
@@ -252,23 +282,20 @@ public class DataBaseService {
         String selectTableDevices = "SELECT * FROM alisa.devices";
         String selectTableProblems = "SELECT * FROM alisa.problems";
         String selectTableScenarios = "SELECT * FROM alisa.scenarios";
-        String selectTableSolutions= "SELECT * FROM alisa.solutions";
+        String selectTableSolutions = "SELECT * FROM alisa.solutions";
         String selectTableReference = "SELECT * FROM alisa.reference";
 
-        Statement usersQuery = null;
-        Statement devicesQuery = null;
         Statement problemsQuery = null;
         Statement scenariosQuery = null;
         Statement solutionsQuery = null;
         Statement referenceQuery = null;
 
-        try {
+        try (final Statement usersQuery = connection.createStatement();
+             final Statement devicesQuery = connection.createStatement()){
             connection.setAutoCommit(false);
 
-            usersQuery = connection.createStatement();
             users = usersQuery.executeQuery(selectTableUsers);
 
-            devicesQuery = connection.createStatement();
             devices = devicesQuery.executeQuery(selectTableDevices);
 
             problemsQuery = connection.createStatement();
@@ -293,21 +320,18 @@ public class DataBaseService {
             String difficulty_text = null;
             String username = null;
             ProblemScenario scenario = null;
-            Problem.Difficulty difficulty = null;
-            while(reference.next() && users.next())
-            {
+            while (reference.next() && users.next()) {
                 currentDeviceId = reference.getString("device_id");
-                while(solutions.next() && problems.next()) {
-                    if(solutions.getInt("reference_id") == reference.getInt("reference_id")) {
-                        while(scenarios.next())
-                        {
-                            if(scenarios.getInt("scenario_id") == problems.getInt("scenario_id")) {
+                while (solutions.next() && problems.next()) {
+                    if (solutions.getInt("reference_id") == reference.getInt("reference_id")) {
+                        while (scenarios.next()) {
+                            if (scenarios.getInt("scenario_id") == problems.getInt("scenario_id")) {
                                 theme = scenarios.getString("generator_id");
-                                scenario = new ProblemScenarioImpl (scenarios.getString("scenario"));
+                                scenario = new ProblemScenarioImpl(scenarios.getString("scenario"));
                             }
                         }
 
-                        if(solutions.getBoolean("hint_used")) {
+                        if (solutions.getBoolean("hint_used")) {
                             hint = "true";
                         }
 
@@ -320,7 +344,7 @@ public class DataBaseService {
                                 null,
                                 hint,
                                 scenario,
-                                difficulty.valueOf(difficulty_text));
+                                Problem.Difficulty.valueOf(difficulty_text));
                         solvedProblemsByTheme.put(theme, problem);
                     }
                 }
@@ -329,24 +353,57 @@ public class DataBaseService {
                         currentDeviceId,
                         username,
                         solvedProblemsByTheme);
-                DBuserInfo.put(currentDeviceId, userInfo);
+                dbUserInfo.put(currentDeviceId, userInfo);
             }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            try { if (devicesQuery != null) devicesQuery.close(); } catch (Exception e) {};
-            try { if (devices != null) devices.close(); } catch (Exception e) {};
-            try { if (usersQuery != null) usersQuery.close(); } catch (Exception e) {}
-            try { if (users != null) users.close(); } catch (Exception e) {}
-            try { if (problemsQuery != null) problemsQuery.close(); } catch (Exception e) {}
-            try { if (problems!= null) problems.close(); } catch (Exception e) {}
-            try { if (scenariosQuery != null) scenariosQuery.close(); } catch (Exception e) {}
-            try { if (scenarios != null) scenarios.close(); } catch (Exception e) {}
-            try { if (solutionsQuery != null) scenariosQuery.close(); } catch (Exception e) {};
-            try { if (solutions != null) solutions.close(); } catch (Exception e) {};
-            try { if (referenceQuery != null) referenceQuery.close(); } catch (Exception e) {};
-            try { if (reference != null) reference.close(); } catch (Exception e) {};
+            try {
+                if (devices != null) devices.close();
+            } catch (Exception e) {
+            }
+            ;
+            try {
+                if (users != null) users.close();
+            } catch (Exception e) {
+            }
+            try {
+                if (problemsQuery != null) problemsQuery.close();
+            } catch (Exception e) {
+            }
+            try {
+                if (problems != null) problems.close();
+            } catch (Exception e) {
+            }
+            try {
+                if (scenariosQuery != null) scenariosQuery.close();
+            } catch (Exception e) {
+            }
+            try {
+                if (scenarios != null) scenarios.close();
+            } catch (Exception e) {
+            }
+            try {
+                if (solutionsQuery != null) scenariosQuery.close();
+            } catch (Exception e) {
+            }
+            ;
+            try {
+                if (solutions != null) solutions.close();
+            } catch (Exception e) {
+            }
+            ;
+            try {
+                if (referenceQuery != null) referenceQuery.close();
+            } catch (Exception e) {
+            }
+            ;
+            try {
+                if (reference != null) reference.close();
+            } catch (Exception e) {
+            }
+            ;
         }
-        return DBuserInfo;
+        return dbUserInfo;
     }
 }

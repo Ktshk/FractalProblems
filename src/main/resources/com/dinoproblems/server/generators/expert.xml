@@ -42,7 +42,7 @@
             <answer text="на одну стирку"/>
         </text_answers>
     </problem>
-    <problem answer="24" scenarioId="CANDIES_DIVISION_2_3_4">
+    <problem answer="5" scenarioId="CANDIES_DIVISION_2_3_4">
         <text>У Васи было 30 конфет, он съел несколько, а потом стал раскладывать конфеты на кучки. Когда он пытался разделить их на 2, 3, или 4 равные кучки, одна конфета всегда оказывалась лишней. Зато ему удалось разложить их на 5 кучек. Сколько конфет съел Вася?</text>
         <hints>
             <hint>
@@ -50,7 +50,7 @@
             </hint>
         </hints>
         <text_answers>
-            <answer text="24 конфеты"/>
+            <answer text="5 конфет"/>
         </text_answers>
     </problem>
     <problem answer="9" scenarioId="BERRIES_FROM_END">

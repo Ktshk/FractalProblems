@@ -27,30 +27,32 @@ public class SessionResult {
     public SessionResult() {
     }
 
-    public void updateScore(Problem problem) {
+    public int updateScore(Problem problem) {
         totalProblems++;
+        int points = 0;
         if (problem.getState() == Problem.State.SOLVED) {
-            if (problem.getDifficulty() == Problem.Difficulty.EASY) total += 2;
-            else if (problem.getDifficulty() == Problem.Difficulty.MEDIUM) total += 4;
-            else if (problem.getDifficulty() == Problem.Difficulty.HARD) total += 6;
-            else total += 10;
+            if (problem.getDifficulty() == Problem.Difficulty.EASY) points = 2;
+            else if (problem.getDifficulty() == Problem.Difficulty.MEDIUM) points = 4;
+            else if (problem.getDifficulty() == Problem.Difficulty.HARD) points = 6;
+            else points = 10;
             problemSolved++;
 //          if (problemSolved % 3 == 0) total++;
         }
         if (problem.getState() == Problem.State.SOLVED_WITH_HINT) {
-            if (problem.getDifficulty() == Problem.Difficulty.EASY) total += 1;
-            else if (problem.getDifficulty() == Problem.Difficulty.MEDIUM) total += 2;
-            else if (problem.getDifficulty() == Problem.Difficulty.HARD) total += 3;
-            else total += 5;
+            if (problem.getDifficulty() == Problem.Difficulty.EASY) points += 1;
+            else if (problem.getDifficulty() == Problem.Difficulty.MEDIUM) points += 2;
+            else if (problem.getDifficulty() == Problem.Difficulty.HARD) points += 3;
+            else points += 5;
             hints++;
             problemSolved++;
         }
         if (problem.getState() == Problem.State.ANSWER_GIVEN) {
-            if (total - 5 > 0) total -= 5;
-            else total = 0;
-
+            if (total - 5 > 0) points = -5;
+            else points = 0;
         }
 
+        total += points;
+        return points;
     }
 
     public ProblemTextBuilder getResult() {

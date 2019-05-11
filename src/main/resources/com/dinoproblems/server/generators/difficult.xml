@@ -135,7 +135,7 @@
             <answer text="7 дорог"/>
         </text_answers>
     </problem>
-    <problem answer="32" scenarioId="WINNIE_HONEY_DIFFICULT">
+    <problem answer="28" scenarioId="WINNIE_HONEY_DIFFICULT">
         <text>Горшок с медом весит 5 кг. У Винни-Пуха есть 9 горшков с медом. Он взвесил их и понял, что они вместе весят 37 кг. Потом он обнаружил, что вчера ночью мыши опустошили четыре горшка ровно на половину. Сколько всего килограмм меда теперь может съесть Винни-Пух из своих горшков?</text>
         <hints>
             <hint>
@@ -143,7 +143,7 @@
             </hint>
         </hints>
         <text_answers>
-            <answer text="32 кг"/>
+            <answer text="28 кг"/>
         </text_answers>
     </problem>
     <problem answer="22" scenarioId="AGE_DIFFERENCE_TWO_TIMES">

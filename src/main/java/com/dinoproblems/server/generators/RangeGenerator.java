@@ -71,8 +71,7 @@ public class RangeGenerator implements ProblemGenerator {
             first = difficulty == EASY ? randomInt(1, 7) : randomInt(1, 11);
             second = difficulty == EASY ? randomInt(11, 20) : randomInt(28, 40);
             answer = second - first + 1;
-            final String numsWithText = getNumWithString(answer, NUMBER);
-            possibleTextAnswers = Sets.newHashSet(numsWithText);
+            possibleTextAnswers = Sets.newHashSet(String.valueOf(answer));
             text.append("Сколько чисел от ");
             text.append(String.valueOf(first), NumberWord.getStringForNumber(first, NEUTER, GeneratorUtils.Case.GENITIVE));
             text.append(" до ");
