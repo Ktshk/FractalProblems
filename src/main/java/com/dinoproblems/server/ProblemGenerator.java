@@ -19,7 +19,7 @@ public interface ProblemGenerator {
     ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Difficulty difficulty);
 
     enum ProblemAvailabilityType {
-        newProblem(3), newScenarioProblem(1), minorScenarioChanges(0), trainProblem(1), easierProblem(2);
+        newProblem(4), newForThisDifficulty(3), newScenarioProblem(1), minorScenarioChanges(0), trainProblem(1), easierProblem(2);
 
         private final int weight;
 

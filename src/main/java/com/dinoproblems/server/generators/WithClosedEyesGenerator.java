@@ -96,7 +96,7 @@ public class WithClosedEyesGenerator implements ProblemGenerator {
             text.append(" в ").append(where).append("?");
             possibleTextAnswers.add(getNumWithString(answer, things[thing]));
             hint = "Чтобы вытащить 1 " + chosenColors[0].getNominative(MASCULINE) + " " + things[thing].getNominative() +
-                    ", нужно сначала вытащить все " + chosenColors[1].getPluralForm() + chosenColors[2].getPluralForm();
+                    ", нужно сначала вытащить все " + chosenColors[1].getPluralForm() + " и " + chosenColors[2].getPluralForm();
         } else {
             for (int i = 0; i < count.length; i++) {
                 if (i == count.length - 1) {
@@ -104,10 +104,10 @@ public class WithClosedEyesGenerator implements ProblemGenerator {
                 } else if (i > 0) {
                     text.append(", ");
                 }
-                text.append(count[i]).append(scenario != COUNT_ITEMS_HARD ? " " : " пар ").append(chosenColors[i].getCountingForm());
+                text.append(count[i]).append(scenario != PAIRS ? " " : " пар ").append(chosenColors[i].getCountingForm());
             }
 
-            if (scenario != COUNT_ITEMS_HARD) {
+            if (scenario != PAIRS) {
 
                 int question = randomInt(scenario == SPECIAL_COLOR ? 1 : 2, min - 1);
 
@@ -125,7 +125,7 @@ public class WithClosedEyesGenerator implements ProblemGenerator {
                     text.append(getNumWithString(2, things[thing]));
                     text.append(" разных цветов?");
                     answer = max + 1;
-                    hint = "Что если сначала мы будем вытаскивать шары одного цвета? Подумайте, как долго это может продолжаться.";
+                    hint = "Что если сначала мы будем вытаскивать " + things[thing].getPluralForm() + " одного цвета? Подумайте, как долго это может продолжаться.";
                 } else {
                     text.append(getNumWithString(question, things[thing]));
                     int questionColor = randomInt(0, count.length);
@@ -139,7 +139,7 @@ public class WithClosedEyesGenerator implements ProblemGenerator {
                         }
                     }
                     answer += question;
-                    hint = "Если сначала нам не повезет, мы будем вытаскивать шары других цветов. " +
+                    hint = "Если сначала нам не повезет, мы будем вытаскивать " + things[thing].getPluralForm() + " других цветов. " +
                             "Но в когда-то нам точно должен попасться " + chosenColors[questionColor].getNominativeNeuter() + ". ";
                 }
                 possibleTextAnswers.add(getNumWithString(answer, things[thing]));

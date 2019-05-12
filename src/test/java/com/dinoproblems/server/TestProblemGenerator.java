@@ -13,7 +13,8 @@ import java.util.Set;
  */
 public class TestProblemGenerator {
 
-    private static final ProblemGenerator GENERATOR = new LegsAndHeadsGenerator();
+    private static final ProblemGenerator GENERATOR = new CombinatoricsGenerator();
+
     public void testAllGenerators() {
         for (ProblemGenerator generator : ProblemCollection.INSTANCE.getGenerators()) {
             System.out.println("************* Generator: " + generator);
@@ -31,8 +32,8 @@ public class TestProblemGenerator {
         final ProblemCollection problemCollection = ProblemCollection.INSTANCE;
         final Session session = new Session(new UserInfo("test", "test", HashMultimap.create()), "test");
 
-//        for (Problem.Difficulty difficulty : Problem.Difficulty.values()) {
-        Problem.Difficulty difficulty = Problem.Difficulty.EXPERT;
+        for (Problem.Difficulty difficulty : Problem.Difficulty.values()) {
+//        Problem.Difficulty difficulty = Problem.Difficulty.EXPERT;
             System.out.println("************* " + difficulty);
             session.setCurrentDifficulty(difficulty);
 
@@ -41,7 +42,7 @@ public class TestProblemGenerator {
                 solveProblem(session, Problem.State.SOLVED);
                 solveProblem(session, Problem.State.ANSWER_GIVEN);
             }
-//        }
+        }
     }
 
     @Test

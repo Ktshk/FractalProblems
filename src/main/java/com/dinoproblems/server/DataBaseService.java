@@ -3,7 +3,6 @@ package com.dinoproblems.server;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
-import javax.xml.transform.Result;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -80,7 +79,6 @@ public class DataBaseService {
         int reference_id = 0;
         int user_id = 0;
         int scenario_id = 0;
-        int solution_id = 0;
         PreparedStatement preparedStatementInsertUsers = null;
         PreparedStatement preparedStatementInsertDevices = null;
         PreparedStatement preparedStatementInsertReference = null;
@@ -253,19 +251,16 @@ public class DataBaseService {
             }
         }
     }
-    public Map <String, UserInfo> getUserInfoFromDB()
-    {
-        Map <String, UserInfo> dbUserInfo = new HashMap<String, UserInfo>();
-        UserInfo userInfo;
-        Multimap<String, Problem> solvedProblemsByTheme;
+
+    public Map<String, UserInfo> getUserInfoFromDB() {
+        Map<String, UserInfo> dbUserInfo = new HashMap<>();
+
         Problem problem;
 
         String currentDeviceId;
         String theme;
-        String hint;
-        String problem_text;
-        String difficulty_text;
-        String username;
+        String problemЕext;
+        String difficultyText;
         ProblemScenario scenario;
 
         String selectAllTables = "select alisa.reference.device_id, username, problem_text, difficulty, scenario, points, hint_used, generator_id\n" +
@@ -274,45 +269,49 @@ public class DataBaseService {
                 "and alisa.solutions.reference_id = alisa.reference.reference_id and alisa.solutions.problem_id = alisa.problems.problem_id\n" +
                 "and alisa.problems.scenario_id = alisa.scenarios.scenario_id";
 
-        try (Statement selectAllTablesQuery = connection.createStatement()){
+        try (Statement selectAllTablesQuery = connection.createStatement()) {
             ResultSet allTables = selectAllTablesQuery.executeQuery(selectAllTables);
-            while(allTables.next())
-            {
+            while (allTables.next()) {
                 currentDeviceId = allTables.getString("device_id");
                 theme = allTables.getString("generator_id");
-                scenario = new ProblemScenarioImpl (allTables.getString("scenario"));
-                if(allTables.getBoolean("hint_used")) {
-                    hint = "true";
-                } else {
-                    hint = "false";
-                }
-                problem_text = allTables.getString("problem_text");
-                difficulty_text = allTables.getString("difficulty");
+                scenario = new ProblemScenarioImpl(allTables.getString("scenario"));
+
+                final boolean hintUsed = allTables.getBoolean("hint_used");
+                final int points = allTables.getInt("points");
+
+                problemЕext = allTables.getString("problem_text");
+                difficultyText = allTables.getString("difficulty");
+
                 problem = new ProblemWithPossibleTextAnswers(
-                        problem_text,
+                        problemЕext,
                         0,
                         theme,
                         null,
-                        hint,
+                        "",
                         scenario,
-                        Problem.Difficulty.valueOf(difficulty_text));
-                solvedProblemsByTheme = HashMultimap.create();
-                solvedProblemsByTheme.put(theme, problem);
-                username = allTables.getString("username");
-                userInfo = new UserInfo(
-                        currentDeviceId,
-                        username,
-                        solvedProblemsByTheme);
-                if(dbUserInfo.containsKey(currentDeviceId)) {
-                    UserInfo addedUserInfo = dbUserInfo.get(currentDeviceId);
-                    addedUserInfo.getSolvedProblemsByTheme().put(theme, problem);
-                    dbUserInfo.put(currentDeviceId, addedUserInfo);
+                        Problem.Difficulty.valueOf(difficultyText));
+                problem.setState(points <= 0 ? Problem.State.ANSWER_GIVEN : (hintUsed ? Problem.State.SOLVED_WITH_HINT : Problem.State.SOLVED));
+
+                final UserInfo userInfo;
+                if (dbUserInfo.containsKey(currentDeviceId)) {
+                    userInfo = dbUserInfo.get(currentDeviceId);
+                    userInfo.addSolvedProblem(theme, problem);
+                    dbUserInfo.put(currentDeviceId, userInfo);
                 } else {
+                    final Multimap<String, Problem> solvedProblemsByTheme = HashMultimap.create();
+                    solvedProblemsByTheme.put(theme, problem);
+                    final String username = allTables.getString("username");
+
+                    userInfo = new UserInfo(
+                            currentDeviceId,
+                            username,
+                            solvedProblemsByTheme);
                     dbUserInfo.put(currentDeviceId, userInfo);
                 }
+                userInfo.addPoints(points);
             }
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
 
         return dbUserInfo;

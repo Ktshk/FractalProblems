@@ -170,7 +170,9 @@ public class GeneratorUtils {
                 scenarioToProblemAvailability.put(scenario, ProblemAvailabilityType.newScenarioProblem);
             } else {
                 final Map<Boolean, Set<Difficulty>> stateDifficultyMap = problemsByScenario.get(scenario);
-                if (stateDifficultyMap.containsKey(true)) {
+                if (stateDifficultyMap.values().stream().noneMatch(difficulties -> difficulties.contains(difficulty))) {
+                    scenarioToProblemAvailability.put(scenario, ProblemAvailabilityType.newForThisDifficulty);
+                } else if (stateDifficultyMap.containsKey(true)) {
                     if (stateDifficultyMap.get(true).contains(difficulty)) {
                         if (!scenario.isSingleProblem()) {
                             scenarioToProblemAvailability.put(scenario, ProblemAvailabilityType.minorScenarioChanges);

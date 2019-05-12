@@ -75,13 +75,13 @@ public class Session {
         this.lastServerResponse = lastServerResponse;
     }
 
-    public Multimap<String, Problem> getSolvedProblems() {
-        return userInfo.getSolvedProblemsByTheme();
+    public Collection<Problem> getSolvedProblems(String theme) {
+        return userInfo.getSolvedProblemsByTheme(theme);
     }
 
     public int updateScore(Problem problem) {
         currentProblem = null;
-        userInfo.getSolvedProblemsByTheme().put(problem.getTheme(), problem);
+        userInfo.addSolvedProblem(problem.getTheme(), problem);
         final int points = sessionResult.updateScore(problem);
         userInfo.addPoints(points);
 

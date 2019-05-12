@@ -156,4 +156,14 @@ public class ProblemWithPossibleTextAnswers implements Problem {
         result = 31 * result + answer;
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "Problem{" +
+                "text='" + text + '\'' +
+                ", answer=" + answer +
+                ", difficulty=" + difficulty +
+                ", scenario=" + scenario +
+                '}';
+    }
 }

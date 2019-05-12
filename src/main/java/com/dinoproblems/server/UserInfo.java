@@ -1,72 +1,89 @@
 package com.dinoproblems.server;
 
+import com.dinoproblems.server.Problem.Difficulty;
 import com.dinoproblems.server.generators.VariousProblems;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
- * Created by Katushka on 02.05.2019.
+ * Created by Katushka
+ * on 02.05.2019.
  */
 public class UserInfo {
     private String deviceId;
     private String name;
     private Multimap<String, Problem> solvedProblemsByTheme = HashMultimap.create();
-    private List<Problem> variousProblems;
+
+    private Map<Difficulty, List<Problem>> variousProblems = new HashMap<>();
+    private Map<Difficulty, Set<String>> solvedVariousProblems = new HashMap<>(); // for the initialization only
+
     private Problem currentProblem;
     private int points;
 
-    public UserInfo(String deviceId, String name, Multimap<String, Problem> solvedProblemsByTheme) {
+    UserInfo(String deviceId, String name, Multimap<String, Problem> solvedProblemsByTheme) {
         this.deviceId = deviceId;
         this.name = name;
         this.solvedProblemsByTheme = solvedProblemsByTheme;
     }
 
-    public String getDeviceId() {
+    String getDeviceId() {
         return deviceId;
     }
 
-    public String getName() {
+    String getName() {
         return name;
     }
 
-    public Multimap<String, Problem> getSolvedProblemsByTheme() {
-        return solvedProblemsByTheme;
+    Collection<Problem> getSolvedProblemsByTheme(String theme) {
+        return solvedProblemsByTheme.get(theme);
     }
 
-    public Problem getCurrentProblem() {
+    Problem getCurrentProblem() {
         return currentProblem;
     }
 
-    public void setCurrentProblem(Problem currentProblem) {
+    void setCurrentProblem(Problem currentProblem) {
         this.currentProblem = currentProblem;
     }
 
-    public void addPoints(int pointsToAdd) {
+    void addPoints(int pointsToAdd) {
         this.points += pointsToAdd;
     }
 
-    public Problem getRandomVariousProblem(Problem.Difficulty difficulty) {
-        if (variousProblems == null) {
-            variousProblems = new ArrayList<>(VariousProblems.INSTANCE.getProblems(difficulty));
-            Collections.shuffle(variousProblems);
-        }
-        if (variousProblems.isEmpty()) {
-            return null;
-        }
-        return variousProblems.remove(variousProblems.size() - 1);
+    public int getTotalScore() {
+        return points;
     }
 
-    public boolean hasVariousProblems(Problem.Difficulty difficulty) {
-        if (variousProblems == null) {
-            variousProblems = new ArrayList<>(VariousProblems.INSTANCE.getProblems(difficulty));
-            Collections.shuffle(variousProblems);
+    Problem getRandomVariousProblem(Difficulty difficulty) {
+        if (!variousProblems.containsKey(difficulty)) {
+            initVariousProblems(difficulty);
         }
-        return !variousProblems.isEmpty();
+        if (variousProblems.get(difficulty).isEmpty()) {
+            return null;
+        }
+        return variousProblems.get(difficulty).remove(variousProblems.get(difficulty).size() - 1);
+    }
+
+    private void initVariousProblems(Difficulty difficulty) {
+        System.out.println("initVariousProblems");
+        System.out.println("solvedVariousProblems = " + solvedVariousProblems);
+        final ArrayList<Problem> problems = VariousProblems.INSTANCE.getProblems(difficulty)
+                .stream()
+                .filter(problem -> !solvedVariousProblems.containsKey(difficulty) ||
+                        !solvedVariousProblems.get(difficulty).contains(problem.getProblemScenario().getScenarioId()))
+                .collect(Collectors.toCollection(ArrayList::new));
+        variousProblems.put(difficulty, problems);
+        Collections.shuffle(problems);
+    }
+
+    boolean hasVariousProblems(Difficulty difficulty) {
+        if (!variousProblems.containsKey(difficulty)) {
+            initVariousProblems(difficulty);
+        }
+        return !variousProblems.get(difficulty).isEmpty();
     }
 
     @Override
@@ -76,8 +93,8 @@ public class UserInfo {
 
         UserInfo userInfo = (UserInfo) o;
 
-        if (deviceId != null ? !deviceId.equals(userInfo.deviceId) : userInfo.deviceId != null) return false;
-        return name != null ? name.equals(userInfo.name) : userInfo.name == null;
+        return (deviceId != null ? deviceId.equals(userInfo.deviceId) : userInfo.deviceId == null)
+                && (name != null ? name.equals(userInfo.name) : userInfo.name == null);
     }
 
     @Override
@@ -85,5 +102,27 @@ public class UserInfo {
         int result = deviceId != null ? deviceId.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
         return result;
+    }
+
+    void addSolvedProblem(String theme, Problem problem) {
+        solvedProblemsByTheme.put(theme, problem);
+        if (VariousProblems.THEME.equals(theme)) {
+            if (!variousProblems.containsKey(problem.getDifficulty())) {
+                if (!solvedVariousProblems.containsKey(problem.getDifficulty())) {
+                    solvedVariousProblems.put(problem.getDifficulty(), new HashSet<>());
+                }
+                solvedVariousProblems.get(problem.getDifficulty()).add(problem.getProblemScenario().getScenarioId());
+            } else {
+                // very slow but in reality we should never get here
+                final List<Problem> problems = variousProblems.get(problem.getDifficulty());
+                for (int i = 0; i < problems.size(); i++) {
+                    Problem problem1 =  problems.get(i);
+                    if (problem1.getProblemScenario().getScenarioId().equals(problem.getProblemScenario().getScenarioId())) {
+                        problems.remove(i);
+                        break;
+                    }
+                }
+            }
+        }
     }
 }

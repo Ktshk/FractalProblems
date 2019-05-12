@@ -1,5 +1,6 @@
 package com.dinoproblems.server;
 
+import com.dinoproblems.server.utils.GeneratorUtils;
 import com.dinoproblems.server.utils.ProblemTextBuilder;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Sets;
@@ -60,6 +61,10 @@ public class MainServlet extends HttpServlet {
             "Одну подсказку я вам уже давала, но могу подсказать ещё. "};
     private String meetOnceMore[] = {"Рада снова слышать вас, ", "Здравствуйте ", "Очень приятно снова слышать вас, "};
     private String niceToMeet[] = {"Приятно познакомиться, ", "Очень приятно, ", "Рада знакомству, "};
+
+    public MainServlet() {
+        userInfos = DataBaseService.INSTANCE.getUserInfoFromDB();
+    }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         final DataBaseService dataBaseService = DataBaseService.INSTANCE;
@@ -169,9 +174,10 @@ public class MainServlet extends HttpServlet {
                         responseJson.addProperty("text", text);
                         session.setLastServerResponse(text);
                     } else {
-                        final String text = chooseRandomElement(didNotUnderstand) + " Вас зовут " + session.getUserName();
+                        final String text = chooseRandomElement(didNotUnderstand) + " Вас зовут " + session.getUserName() + "?";
                         responseJson.addProperty("text", text);
                         session.setLastServerResponse(text);
+                        dataBaseService.updateMiscAnswersTable(command, "", session.getLastServerResponse());
                     }
                     responseJson.addProperty("end_session", false);
                     result.add("response", responseJson);
@@ -286,7 +292,7 @@ public class MainServlet extends HttpServlet {
 
     private void giveHint(JsonObject result, JsonObject responseJson, Session session, Problem problem, String prefix, String hint) {
         responseJson.addProperty("text", prefix + hint);
-        session.setLastServerResponse(hint);
+        session.setLastServerResponse(prefix + hint);
         result.add("response", responseJson);
         addProblemButtons(responseJson, problem);
     }
@@ -321,9 +327,11 @@ public class MainServlet extends HttpServlet {
         if (correctAnswer) {
             finishWithProblem(result, responseJson, session, problem, problem.wasHintGiven() ? Problem.State.SOLVED_WITH_HINT : Problem.State.SOLVED, clientId);
         } else {
-            responseJson.addProperty("text", chooseRandomElement(almostCorrect ? almost : wrongAnswer) + " " + chooseRandomElement(notAnAnswer));
+            final String text = chooseRandomElement(almostCorrect ? almost : wrongAnswer) + " " + chooseRandomElement(notAnAnswer);
+            responseJson.addProperty("text", text);
             addProblemButtons(responseJson, problem);
             result.add("response", responseJson);
+            session.setLastServerResponse(text);
             // score.getProblemAnswerGiven();
         }
     }
@@ -336,14 +344,18 @@ public class MainServlet extends HttpServlet {
         final Problem problem = session.getNextProblem();
         session.setCurrentProblem(problem);
         if (problem == null) {
-            responseJson.addProperty("text", "Извините, но вы уже решили все мои задачи на этом уровне сложности. Может быть, порешаем задачи другой сложности?");
+            final String text = "Извините, но вы уже решили все мои задачи на этом уровне сложности. Может быть, порешаем задачи другой сложности?";
+            responseJson.addProperty("text", text);
             responseJson.add("buttons", createDifficultyButtons(session));
+            session.setLastServerResponse(text);
         } else {
-            responseJson.addProperty("text", (problem.getComment() != null ? (problem.getComment() + " ") : "") + problem.getText());
+            final String text = (problem.getComment() != null ? (problem.getComment() + " ") : "") + problem.getText();
+            responseJson.addProperty("text", text);
             addProblemButtons(responseJson, problem);
             if (problem.getTTS() != null) {
                 responseJson.addProperty("tts", (problem.getComment() != null ? (problem.getComment() + " ") : "") + problem.getTTS());
             }
+            session.setLastServerResponse(text);
         }
     }
 
