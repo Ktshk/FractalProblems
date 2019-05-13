@@ -78,7 +78,7 @@ public class SpacesGenerator implements ProblemGenerator {
                         .append("Пришла мама и положила между каждыми двумя соседними пирожными по одной корзиночке с фруктами. ")
                         .append("Сколько всего сладостей стало на столе?");
                 answer = pieces * 2;
-                hint = "Нарисуйте картинку и посчитатйе, сколько корзиночек положила мама.";
+                hint = "Нарисуйте картинку и посчитайте, сколько корзиночек положила мама.";
                 possibleTextAnswers = Sets.newHashSet(getNumWithString(answer, SWEETS));
                 break;
             case PILLS:
@@ -156,7 +156,7 @@ public class SpacesGenerator implements ProblemGenerator {
                                 + (thing < 2 ? " нарисовал " : " выложил ") + " ещё по одной. "
                                 + "Всего получилось " + getNumWithString(total, things[thing])
                                 + ".  Сколько " + things[thing].getCountingForm() + (thing < 2 ? " нарисовал " : " выложил ") + chosenHeroes[0] + "?");
-                        possibleTextAnswers = Sets.newHashSet(getNumWithString(spaces, things[thing], ACCUSATIVE));
+                        possibleTextAnswers = Sets.newHashSet(getNumWithString(pieces, things[thing], ACCUSATIVE));
                         answer = pieces;
                     }
                     hint = "Подумайте, насколько меньше " + things[thing].getCountingForm() + (thing < 2 ? " нарисовал " : " выложил ") + chosenHeroes[1] + ". ";
@@ -187,7 +187,7 @@ public class SpacesGenerator implements ProblemGenerator {
                         answer = pieces;
                     } else {
                         text.append("Сколько " + things[thing].getCountingForm() + (thing < 2 ? " нарисовал " : " выложил ") + chosenHeroes[2] + "?");
-                        possibleTextAnswers = Sets.newHashSet(getNumWithString(spaces, things[thing], ACCUSATIVE));
+                        possibleTextAnswers = Sets.newHashSet(getNumWithString(spaces2, things[thing], ACCUSATIVE));
                         answer = spaces2;
                     }
                     hint = "Подумайте, насколько меньше " + things[thing].getCountingForm() + (thing < 2 ? " нарисовал " : " выложил ") + chosenHeroes[2] + ", чем до этого было.";
