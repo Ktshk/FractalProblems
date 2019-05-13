@@ -75,7 +75,7 @@ import java.util.UUID;
 public class TestRequest {
 
 
-    public static final String ELASTICBEANSTALK_URL = "helloworld-env-1.ha4x2kktxp.us-east-2.elasticbeanstalk.com/demo";
+    public static final String ELASTICBEANSTALK_URL = "alisa-release.us-east-2.elasticbeanstalk.com/demo";
 
     @Ignore
     @Test

@@ -16,6 +16,7 @@ import com.dinoproblems.server.utils.*;
 
 import javax.annotation.Nonnull;
 
+import static com.dinoproblems.server.Problem.Difficulty.EXPERT;
 import static com.dinoproblems.server.Problem.Difficulty.MEDIUM;
 import static com.dinoproblems.server.ProblemCollection.RANGE;
 import static com.dinoproblems.server.utils.Dictionary.NUMBER;
@@ -37,6 +38,7 @@ public class RangeGenerator implements ProblemGenerator {
     private final static ProblemScenario NUMBERS = new ProblemScenarioImpl(ProblemCollection.RANGE + "_" + "NUMBERS");
     private final static ProblemScenario NUMBERS_NOT_LESS_NOT_GREATER = new ProblemScenarioImpl(ProblemCollection.RANGE + "_" + "NUMBERS_NOT_LESS_NOT_GREATER");
     private final static ProblemScenario READ_PAGES = new ProblemScenarioImpl(ProblemCollection.RANGE + "_" + "READ_PAGES");
+    private final static ProblemScenario TORN_OUT_PAGES_EXPERT = new ProblemScenarioImpl(ProblemCollection.RANGE + "_" + "TORN_OUT_PAGES_EXPERT", true);
     private final static ProblemScenario TORN_OUT_PAGES = new ProblemScenarioImpl(ProblemCollection.RANGE + "_" + "TORN_OUT_PAGES");
     private final static ProblemScenario DATES = new ProblemScenarioImpl(ProblemCollection.RANGE + "_" + "DATES");
 
@@ -78,7 +80,6 @@ public class RangeGenerator implements ProblemGenerator {
             text.append(String.valueOf(second), NumberWord.getStringForNumber(second, NEUTER, GeneratorUtils.Case.GENITIVE)).append("?");
             hint = "Попробуйте отнять от второго числа первое, но не забывайте, что первое число тоже входит в диапазон чисел.";
         } else if (scenario.equals(READ_PAGES)) {
-
             hero = heroes[randomInt(0, heroes.length)];
             first = difficulty == EASY ? randomInt(1, 8) : randomInt(1, 11);
             second = difficulty == EASY ? randomInt(2, 13) : randomInt(8, 28);
@@ -90,25 +91,53 @@ public class RangeGenerator implements ProblemGenerator {
                     ". На какой странице " + hero + " закончила?");
             hint = "Попробуйте сложить страницы, но не забывайте, что страница, с которой " + hero +
                     " начала читать тоже входит в количество прочитанных страниц.";
-        } else if (scenario.equals(TORN_OUT_PAGES)) {
+        } else if (scenario.equals(TORN_OUT_PAGES) || scenario.equals(TORN_OUT_PAGES_EXPERT)) {
             String[] booksource = new String[]{" в библиотеке ", " у подруги ", " у друга ", " у учителя "};
             String book = booksource[randomInt(0, booksource.length)];
             hero = heroes[randomInt(0, heroes.length)];
-            first = difficulty == MEDIUM ? randomInt(1, 7) : randomInt(1, 12);
-            if (first % 2 != 0) {
-                first++;
-            }
-            second = difficulty == MEDIUM ? randomInt(11, 20) : randomInt(28, 41);
-            if (second % 2 == 0) {
-                second++;
+            text.append(hero + " взяла" + book + "книгу. В середине книги она обнаружила, что после страницы ");
+            if (difficulty == EXPERT) {
+                int firstDigit = randomInt(1, 5);
+                int secondDigit = randomInt(firstDigit + 1, 10);
+                int thirdDigit = randomInt(firstDigit + 2, 10);
+
+                if (firstDigit % 2 == 0 && secondDigit % 2 == 0) {
+                    secondDigit++;
+
+                } else if (firstDigit % 2 == 1 && secondDigit % 2 == 1) {
+                    if (secondDigit == 9) {
+                        secondDigit--;
+                    } else {
+                        secondDigit++;
+                    }
+                }
+                if (firstDigit % 2 == 0 && thirdDigit % 2 == 1) {
+                    thirdDigit--;
+                }
+                if (firstDigit % 2 == 1 && thirdDigit % 2 == 0) {
+                    thirdDigit++;
+                }
+                first = firstDigit * 100 + secondDigit * 10 + thirdDigit;
+                second = thirdDigit * 100 + firstDigit * 10 + secondDigit;
+                text.append(first + " сразу идет страница, состоящая из тех же цифр. Сколько страниц было вырвано из книги?");
+                hint = "Если первая страница на развороте " + first + ", то вторая должна быть другой чётности. Подумайте, на какую цифру она должна кончаться.";
+            } else {
+                first = difficulty == MEDIUM ? randomInt(1, 7) : randomInt(1, 12);
+                if (first % 2 != 0) {
+                    first++;
+                }
+                second = difficulty == MEDIUM ? randomInt(11, 20) : randomInt(28, 41);
+                if (second % 2 == 0) {
+                    second++;
+                }
+
+                text.append(first + " сразу идет страница " + second + ". Сколько страниц было вырвано из книги?");
+                hint = "Попробуйте вычесть страницы, но не забывайте, что страницы " + first + " и " + second +
+                        " не входят в количество вырванных страниц.";
             }
             answer = second - first - 1;
             final String pagesWithText = getNumWithString(answer, PAGE);
             possibleTextAnswers = Sets.newHashSet(pagesWithText);
-            text.append(hero + " взяла" + book + "книгу. В середине книги она обнаружила, что после страницы " + first +
-                    " сразу идет страница " + second + ". Сколько страниц было вырвано из книги?");
-            hint = "Попробуйте вычесть страницы, но не забывайте, что страницы " + first + " и " + second +
-                    " не входят в количество вырванных страниц.";
         } else {
             String[] months = new String[]{" января ", " марта ", " мая ", " июля ", " августа ", " октября "};
             String[] monthsInstr = new String[]{" январе ", " марте ", " мае ", " июле ", " августе ", " октябре "};
@@ -143,6 +172,8 @@ public class RangeGenerator implements ProblemGenerator {
                 return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(TORN_OUT_PAGES, DATES), Sets.newHashSet(SCENARIOS));
             case EXPERT:
                 return null;
+                // TODO: uncomment
+//                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(TORN_OUT_PAGES_EXPERT), Sets.newHashSet(TORN_OUT_PAGES));
 
         }
 

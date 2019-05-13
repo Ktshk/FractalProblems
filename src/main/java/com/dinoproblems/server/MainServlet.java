@@ -129,7 +129,7 @@ public class MainServlet extends HttpServlet {
                         }
                     } else {
                         final ProblemTextBuilder text = new ProblemTextBuilder().append(helloText)
-                                .append("Я предлагаю вам решить олимпиадную задачу по математике от ").append("кружка", "кружка+")
+                                .append("Я предлагаю вам решить олимпиадную задачу по математике от ").append("кружка", "кружк+а")
                                 .append(" Фрактал. Какую хотите: простую, среднюю или сложную?");
                         responseJson.addProperty("text", text.getText());
                         responseJson.addProperty("tts", text.getTTS());

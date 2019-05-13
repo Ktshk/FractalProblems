@@ -35,7 +35,15 @@ public enum NumberWord {
     SEVENTY(70, "семьдесят", "семидесяти"),
     EIGHTY(80, "восемьдесят", "восьмидесяти"),
     NINETY(90, "девносто", "девяноста"),
-    HUNDRED(100, "сто", "ста");
+    HUNDRED(100, "сто", "ста"),
+    TWO_HUNDRED(200, "двести", "двести"),
+    THREE_HUNDRED(300, "триста", "триста"),
+    FOUR_HUNDRED(400, "четыреста", "четыреста"),
+    FIVE_HUNDRED(500, "пятьсот", "пятиста"),
+    SIX_HUNDRED(600, "шестьсот", "шестиста"),
+    SEVEN_HUNDRED(700, "семьсот", "семиста"),
+    EIGHT_HUNDRED(800, "восемьсот", "восьмиста"),
+    NINE_HUNDRED(900, "девятьсот", "девятиста");
 
     private final int number;
 
@@ -65,7 +73,7 @@ public enum NumberWord {
     }
 
     public static String getStringForNumber(int number, GeneratorUtils.Gender gender, GeneratorUtils.Case wordCase) {
-        if (number >= 200) {
+        if (number >= 1000) {
             throw new IllegalArgumentException();
         }
         String result = "";

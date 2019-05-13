@@ -13,7 +13,7 @@ import java.util.Set;
  */
 public class TestProblemGenerator {
 
-    private static final ProblemGenerator GENERATOR = new CombinatoricsGenerator();
+    private static final ProblemGenerator GENERATOR = new RangeGenerator();
 
     public void testAllGenerators() {
         for (ProblemGenerator generator : ProblemCollection.INSTANCE.getGenerators()) {
