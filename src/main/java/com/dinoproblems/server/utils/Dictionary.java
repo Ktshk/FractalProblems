@@ -17,12 +17,12 @@ public class Dictionary {
     public final static Noun BROTHER = new NounBuilder().nom("брат").gen("брата").counting("братьев").plural("братья").gender(MASCULINE).createNoun();
     public final static Noun BOUQUET = new NounBuilder().nom("букет").gen("букета").counting("букетов").plural("букеты").gender(MASCULINE).createNoun();
     public final static Noun PINK_FLOWER = new NounBuilder().nom("гвоздика").gen("гвоздики").counting("гвоздик").plural("гвоздики").gender(FEMININE).createNoun();
-    public final static Noun PEAR = new NounBuilder().nom("груша").gen("груши").counting("груш").plural("груши").gender(FEMININE).createNoun();
+    public final static Noun PEAR = new NounBuilder().nom("груша").gen("груши").acc("грушу").counting("груш").plural("груши").gender(FEMININE).createNoun();
     public final static Noun GIRL = new NounBuilder().nom("девочка").gen("девочки").counting("девочек").plural("девочки").gender(FEMININE).createNoun();
     public final static Noun STAR = new NounBuilder().nom("звёздочка").gen("звёздочки").counting("звёздочек").plural("звёздочки").acc("звёздочку").gender(FEMININE).createNoun();
     public final static Noun HISTORY = new NounBuilder().nom("история").gen("истории").instr("историей").acc("историю").gender(FEMININE).createNoun();
     public final static Noun PENCIL = new NounBuilder().nom("карандаш").gen("карандаша").counting("карандашей").plural("карандаши").gender(MASCULINE).createNoun();
-    public final static Noun CANDY = new NounBuilder().nom("конфета").gen("конфеты").counting("конфет").plural("конфеты").gender(FEMININE).createNoun();
+    public final static Noun CANDY = new NounBuilder().nom("конфета").gen("конфеты").counting("конфет").acc("конфету").plural("конфеты").gender(FEMININE).createNoun();
     public final static Noun SKATES = new NounBuilder().nom("конёк").gen("конька").counting("коньков").plural("коньки").gender(MASCULINE).createNoun();
     public final static Noun CANDY_BOX = new NounBuilder().nom("коробка конфет").gen("коробки конфет").counting("коробок конфет").plural("коробки конфет").gender(FEMININE).createNoun();
     public final static Noun BRICK = new NounBuilder().nom("кубик").gen("кубика").counting("кубиков").plural("кубики").gender(MASCULINE).createNoun();

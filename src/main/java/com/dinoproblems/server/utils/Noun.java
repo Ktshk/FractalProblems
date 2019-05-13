@@ -43,7 +43,7 @@ public class Noun implements AbstractNoun {
     }
 
     public String getAccusativeForm() {
-        return accusativeForm;
+        return accusativeForm == null ? nominative : accusativeForm;
     }
 
     @Override

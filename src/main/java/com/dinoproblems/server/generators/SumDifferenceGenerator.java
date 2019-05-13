@@ -12,8 +12,10 @@ import com.dinoproblems.server.utils.*;
 import javax.annotation.Nonnull;
 
 import static com.dinoproblems.server.Problem.Difficulty.EXPERT;
+import static com.dinoproblems.server.Problem.Difficulty.MEDIUM;
 import static com.dinoproblems.server.ProblemCollection.SUM_DIFFERENCE;
 import static com.dinoproblems.server.utils.GeneratorUtils.findAvailableScenario;
+import static com.dinoproblems.server.utils.GeneratorUtils.getNumWithString;
 import static com.dinoproblems.server.utils.GeneratorUtils.randomInt;
 import static com.dinoproblems.server.Problem.Difficulty.EASY;
 /*
@@ -64,8 +66,6 @@ public class SumDifferenceGenerator implements ProblemGenerator {
         String text;//итоговый текст задачи
         String hint;//подсказка
         int answer;
-        String choiceSum;
-        String choiceDifference;
         for (; ; ) {
             if (token1 != token2) break;
             else token2 = randomInt(0, 8);
@@ -75,41 +75,27 @@ public class SumDifferenceGenerator implements ProblemGenerator {
                 if (first > second) {
                     difference = first - second;
                     token3 = token1;
-                    answer=first;
+                    answer = first;
                 } else {
                     difference = second - first;
                     token3 = token2;
-                    answer=second;
+                    answer = second;
                 }
                 sum = first + second;
                 break;
             } else {
-                second = difficulty == EASY ? randomInt(10, 26) : randomInt(26, 51);
+                second = difficulty == EASY ? randomInt(5, 16) :
+                        (difficulty == MEDIUM ? randomInt(10, 26) :
+                                randomInt(26, 51));
             }
         }
-        if (sum % 10 == 1 && sum>20)
-            choiceSum = "У " + hero[token1] + " и " + hero[token2] + " вместе " + sum + " " + things[token1].getNominative() +
-                    ".";
-        else if (sum % 10 < 5 && sum /10 != 1 && sum%10!=0)
-            choiceSum = "У " + hero[token1] + " и " + hero[token2] + " вместе " + sum + " " + things[token1].getGenitive() +
-                    ".";
-        else
-            choiceSum = "У " + hero[token1] + " и " + hero[token2] + " вместе " + sum + " " + things[token1].getCountingForm() +
-                    ".";
+        final String choiceSum = "У " + hero[token1] + " и " + hero[token2] + " вместе " +
+                getNumWithString(sum, things[token1]) + ".";
+        final String choiceDifference = " У " + hero[token3] + " на " +
+                getNumWithString(difference, things[token1], GeneratorUtils.Case.ACCUSATIVE) + " больше.";
 
-        if (difference % 10 == 1 && sum>20) {
-            choiceDifference = " У " + hero[token3] + " на " + difference + " " + things[token1].getNominative() + " больше.";
-            hint = "Что если отнять у " + hero[token3] + " " + difference + " " + things[token1].getNominative() +
-                    ", теперь поровну " + things[token1].getCountingForm() + " между нашими героями.";
-        } else if (difference % 10 < 5 && sum/10!=1 && sum%10!=0) {
-            choiceDifference = " У " + hero[token3] + " на " + difference + " " + things[token1].getGenitive() + " больше.";
-            hint = "Что если отнять у " + hero[token3] + " " + difference + " " + things[token1].getGenitive() +
-                    ", теперь поровну " + things[token1].getCountingForm() + " между нашими героями.";
-        } else {
-            choiceDifference = " У " + hero[token3] + " на " + difference + " " + things[token1].getCountingForm() + " больше.";
-            hint = "Что если отнять у " + hero[token3] + " " + difference + " " + things[token1].getCountingForm() +
-                    ", теперь поровну " + things[token1].getCountingForm() + " между нашими героями.";
-        }
+        hint = "Что если отнять у " + hero[token3] + " " + getNumWithString(difference, things[token1], GeneratorUtils.Case.ACCUSATIVE) +
+                ", теперь поровну " + things[token1].getCountingForm() + " между нашими героями.";
         text = choiceSum + choiceDifference + " Сколько " +
                 things[token1].getCountingForm() + " у " + hero[token3] + "?";
 
