@@ -82,7 +82,7 @@ public class FoundAtLeastOneGenerator implements ProblemGenerator {
         final HashSet<String> possibleTextAnswers = Sets.newHashSet(getNumWithString(answer, chosenParticularThings[question]));
         final String hint = "Подумайте, может ли " + chosenParticularThings[0].getCountingForm() + " быть больше или равно " +
                 NumberWord.getStringForNumber(count1 + 1, chosenParticularThings[0].getGender(), Case.GENITIVE);
-        return new ProblemWithPossibleTextAnswers(text, tts, answer, AT_LEAST_ONE_FOUND, possibleTextAnswers, hint, problemAvailability.getScenario(), difficulty);
+        return new ProblemWithPossibleTextAnswers.Builder().text(text).tts(tts).answer(answer).theme(AT_LEAST_ONE_FOUND).possibleTextAnswers(possibleTextAnswers).hint(hint).scenario(problemAvailability.getScenario()).difficulty(difficulty).create();
     }
 
     private String getWhere(int scenario) {

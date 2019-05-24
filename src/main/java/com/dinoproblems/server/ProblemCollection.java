@@ -58,7 +58,10 @@ public class ProblemCollection {
 
     @Nullable
     public Problem generateProblem(Session session) {
-        if (session.hasVariousProblems() && randomInt(0, 3) == 0) {
+        final Problem.Difficulty currentDifficulty = session.getCurrentDifficulty();
+        if (session.hasVariousProblems() &&
+                ((currentDifficulty == Problem.Difficulty.EXPERT && randomInt(0, 2) == 0)
+                        || ((currentDifficulty != Problem.Difficulty.EXPERT && randomInt(0, 3) == 0))) ) {
             final Problem randomVariousProblem = session.getRandomVariousProblem();
             if (randomVariousProblem != null)
                 System.out.println("randomVariousProblem.getDifficulty() = " + randomVariousProblem.getDifficulty());
@@ -69,7 +72,7 @@ public class ProblemCollection {
         for (Map.Entry<String, ProblemGenerator> problemGeneratorEntry : generators.entrySet()) {
             final ProblemGenerator problemGenerator = problemGeneratorEntry.getValue();
             final Collection<Problem> themedProblems = session.getSolvedProblems(problemGeneratorEntry.getKey());
-            final ProblemAvailability problemAvailability = problemGenerator.hasProblem(themedProblems, session.getCurrentDifficulty());
+            final ProblemAvailability problemAvailability = problemGenerator.hasProblem(themedProblems, currentDifficulty);
             if (problemAvailability != null) {
                 if (!availabilityTypeToGenerator.containsKey(problemAvailability.getType())) {
                     availabilityTypeToGenerator.put(problemAvailability.getType(), new HashMap<>());
@@ -97,7 +100,7 @@ public class ProblemCollection {
                 .collect(Collectors.toList());
 
         final Map.Entry<ProblemGenerator, Set<Problem>> entry = GeneratorUtils.chooseRandomElement(minValues);
-        Problem.Difficulty difficulty = session.getCurrentDifficulty();
+        Problem.Difficulty difficulty = currentDifficulty;
         final ProblemAvailability problemAvailability = bestGenerators.get(entry.getKey());
         if (problemAvailability.getType() == ProblemAvailabilityType.easierProblem) {
             difficulty = difficulty.getPrevious();

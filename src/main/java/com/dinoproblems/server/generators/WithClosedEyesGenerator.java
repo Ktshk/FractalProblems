@@ -154,7 +154,7 @@ public class WithClosedEyesGenerator implements ProblemGenerator {
                 hint = "Что если мы будем сначала доставать только левые " + things[thing].getPluralForm() + "? Но для пары нам нужен и левый, и правый. ";
             }
         }
-        return new ProblemWithPossibleTextAnswers(text.toString(), answer, WITH_CLOSED_EYES, possibleTextAnswers, hint, scenario, difficulty);
+        return new ProblemWithPossibleTextAnswers.Builder().text(text.toString()).answer(answer).theme(WITH_CLOSED_EYES).possibleTextAnswers(possibleTextAnswers).hint(hint).scenario(scenario).difficulty(difficulty).create();
     }
 
     @Nullable

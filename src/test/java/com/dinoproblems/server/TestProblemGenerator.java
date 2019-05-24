@@ -13,7 +13,7 @@ import java.util.Set;
  */
 public class TestProblemGenerator {
 
-    private static final ProblemGenerator GENERATOR = new RangeGenerator();
+    private static final ProblemGenerator GENERATOR = new FromEndToBeginGenerator();
 
     public void testAllGenerators() {
         for (ProblemGenerator generator : ProblemCollection.INSTANCE.getGenerators()) {
@@ -29,8 +29,7 @@ public class TestProblemGenerator {
 
     @Test
     public void testProblemCollectionGeneration() {
-        final ProblemCollection problemCollection = ProblemCollection.INSTANCE;
-        final Session session = new Session(new UserInfo("test", "test", HashMultimap.create()), "test");
+        final Session session = new Session(new UserInfo("test", "test"), "test");
 
         for (Problem.Difficulty difficulty : Problem.Difficulty.values()) {
 //        Problem.Difficulty difficulty = Problem.Difficulty.EXPERT;

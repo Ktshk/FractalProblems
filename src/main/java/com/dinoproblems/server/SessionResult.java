@@ -4,12 +4,10 @@ import com.dinoproblems.server.utils.GeneratorUtils;
 import com.dinoproblems.server.utils.NumberWord;
 import com.dinoproblems.server.utils.ProblemTextBuilder;
 
-import java.util.Collection;
-
+import static com.dinoproblems.server.utils.Dictionary.SCORE;
 import static com.dinoproblems.server.utils.GeneratorUtils.Gender.*;
+import static com.dinoproblems.server.utils.GeneratorUtils.getNumWithString;
 import static com.dinoproblems.server.utils.GeneratorUtils.randomInt;
-
-import com.dinoproblems.server.utils.*;
 
 
 //First stable ver got by Simar 22.04.2019
@@ -20,9 +18,11 @@ public class SessionResult {
     private int problemSolved = 0;//кол-во решённых задач
     private int totalProblems = 0;//кол-во выданных задач
     private int hints = 0;//кол-во задач решённых с подсказкой
-    private int total = 0;//суммарное кол-во баллов
-    int token1 = randomInt(0, 5);//выбор фразы начала
-    int token2 = randomInt(0, 5);//выбор фразы окончания
+    private int sessionScore = 0;//суммарное кол-во баллов
+    private int token1 = randomInt(0, 5);//выбор фразы начала
+    private int token2 = randomInt(0, 5);//выбор фразы окончания
+    private int solvedInARow = 0;
+    private int solvedInARowWithHint = 0;
 
     public SessionResult() {
     }
@@ -36,26 +36,46 @@ public class SessionResult {
             else if (problem.getDifficulty() == Problem.Difficulty.HARD) points = 6;
             else points = 10;
             problemSolved++;
-//          if (problemSolved % 3 == 0) total++;
+            solvedInARow++;
+            solvedInARowWithHint++;
+
+            if (solvedInARow % 3 == 0) {
+                points = points * 2;
+            }
         }
         if (problem.getState() == Problem.State.SOLVED_WITH_HINT) {
-            if (problem.getDifficulty() == Problem.Difficulty.EASY) points += 1;
-            else if (problem.getDifficulty() == Problem.Difficulty.MEDIUM) points += 2;
-            else if (problem.getDifficulty() == Problem.Difficulty.HARD) points += 3;
-            else points += 5;
+            if (problem.getDifficulty() == Problem.Difficulty.EASY) points = 1;
+            else if (problem.getDifficulty() == Problem.Difficulty.MEDIUM) points = 2;
+            else if (problem.getDifficulty() == Problem.Difficulty.HARD) points = 3;
+            else points = 5;
             hints++;
             problemSolved++;
+            solvedInARow = 0;
+            solvedInARowWithHint++;
+
+            if (solvedInARowWithHint % 3 == 0) {
+                points = points * 2;
+            }
         }
         if (problem.getState() == Problem.State.ANSWER_GIVEN) {
-            if (total - 5 > 0) points = -5;
-            else points = 0;
+            if (sessionScore - 5 > 0) {
+                points = -5;
+            } else {
+                points = 0;
+            }
+            solvedInARow = 0;
+            solvedInARowWithHint = 0;
         }
 
-        total += points;
+        sessionScore += points;
         return points;
     }
 
-    public ProblemTextBuilder getResult() {
+    public int getSolvedInARow() {
+        return Math.max(solvedInARow, solvedInARowWithHint);
+    }
+
+    public ProblemTextBuilder getResult(int totalScore) {
         ProblemTextBuilder text = new ProblemTextBuilder();//Ctrl+o//окончания+остальные поля
         final String[] goodBeginning = new String[]{"Молодец! Вам удалось решить ",
                 "Невероятно! Вы дали верные ответы на ",
@@ -70,7 +90,7 @@ public class SessionResult {
         final String[] badBeginning = new String[]{"К сожалению Вы не решили ни одной задачи. ",
                 "Мне грустно это сообщать. Вы не смогли решить ни одной задачи. ",
                 "Очень жаль. Вы не дали ни одного верного ответа. ",
-                "Печально. Вам не удалось решишь ни одной задачи. ",
+                "Печально. Вам не удалось решить ни одной задачи. ",
                 "Я расстроена. Вы не нашли ни одного верного решения. "};
         final String[] goodEnding = new String[]{"Так держать! Жду Вас снова!",
                 "Уже готовлю для Вас интересные задачи! Заходите ещё!",
@@ -92,14 +112,8 @@ public class SessionResult {
                         text.append(" из ");
                         text.append(String.valueOf(totalProblems), NumberWord.getStringForNumber(totalProblems, FEMININE, GeneratorUtils.Case.GENITIVE));
                         text.append(" предложенной задачи, ");
-                        text.append(String.valueOf(hints), NumberWord.getStringForNumber(hints, FEMININE, GeneratorUtils.Case.ACCUSATIVE));
-                        text.append(" из которых решили с нашей помощью. Всего набрали ");
-                        text.append(String.valueOf(total), NumberWord.getStringForNumber(total, MASCULINE, GeneratorUtils.Case.NOMINATIVE));
-                        text.append(" ");
-                        if (total%10 == 1) text.append(Dictionary.SCORE.getNominative());
-                        else if (total%10>1 && total%10 < 5) text.append(Dictionary.SCORE.getGenitive());
-                        else text.append(Dictionary.SCORE.getCountingForm());
-                        text.append(". ");
+                        addHintsInfo(text);
+                        addScore(totalScore, text);
                         text.append(normalEnding[token2]);
                         //return "Вы решили " + problemSolved + " из " + totalProblems + " предложенной задачи, " + hints + " из которых с нашей помощью. Ждём Вас снова!";}
                         return text;
@@ -111,13 +125,8 @@ public class SessionResult {
                         text.append(String.valueOf(totalProblems), NumberWord.getStringForNumber(totalProblems, FEMININE, GeneratorUtils.Case.GENITIVE));
                         text.append(" предложенной задачи");
                         //  text.append(String.valueOf(hints), NumberWord.getStringForNumber(hints, NEUTER, GeneratorUtils.Case.NOMINATIVE));
-                        text.append(". Вы обошлись без нашей помощи. Всего набрали ");
-                        text.append(String.valueOf(total), NumberWord.getStringForNumber(total, MASCULINE, GeneratorUtils.Case.NOMINATIVE));
-                        text.append(" ");
-                        if (total%10 == 1) text.append(Dictionary.SCORE.getNominative());
-                        else if (total%10>1 && total%10<5) text.append(Dictionary.SCORE.getGenitive());
-                        else text.append(Dictionary.SCORE.getCountingForm());
-                        text.append(". ");
+                        text.append(". Вы обошлись без моей помощи.");
+                        addScore(totalScore, text);
                         text.append(normalEnding[token2]);
                         return text;
                     }
@@ -131,7 +140,7 @@ public class SessionResult {
             default:
                 if (problemSolved != 0)
                     if (hints != 0) {
-                        if (total >= 20) text.append(goodBeginning[token1]);
+                        if (sessionScore >= 20) text.append(goodBeginning[token1]);
                         else text.append(normalBeginning[token1]);
                         if (problemSolved == 1)
                             text.append(String.valueOf(problemSolved), NumberWord.getStringForNumber(problemSolved, FEMININE, GeneratorUtils.Case.ACCUSATIVE));
@@ -140,21 +149,13 @@ public class SessionResult {
                         text.append(" из ");
                         text.append(String.valueOf(totalProblems), NumberWord.getStringForNumber(totalProblems, FEMININE, GeneratorUtils.Case.GENITIVE));
                         text.append(" предложенных задач, ");
-                        text.append(String.valueOf(hints), NumberWord.getStringForNumber(hints, FEMININE, GeneratorUtils.Case.ACCUSATIVE));
-                        text.append(" из которых решили с нашей помощью. Всего набрали ");
-                        text.append(String.valueOf(total), NumberWord.getStringForNumber(total, MASCULINE, GeneratorUtils.Case.NOMINATIVE));
-                        text.append(" ");
-                        if (total%10 == 1) text.append(Dictionary.SCORE.getNominative());
-                        else if (total%10>1 && total%10 < 5) text.append(Dictionary.SCORE.getGenitive());
-                        else text.append(Dictionary.SCORE.getCountingForm());
-                        text.append(". ");
-                        if (total >= 20) text.append(goodEnding[token2]);
+                        addHintsInfo(text);
+                        addScore(totalScore, text);
+                        if (sessionScore >= 20) text.append(goodEnding[token2]);
                         else text.append(normalEnding[token2]);
                         return text;
-                    }
-                    //return "Вы решили " + problemSolved + " из " + totalProblems + " предложенных задач, " + hints + " из которых с нашей помощью. Ждём Вас снова!";
-                    else {
-                        if (total >= 20) text.append(goodBeginning[token1]);
+                    } else {
+                        if (sessionScore >= 20) text.append(goodBeginning[token1]);
                         else text.append(normalBeginning[token1]);
                         if (problemSolved == 1)
                             text.append(String.valueOf(problemSolved), NumberWord.getStringForNumber(problemSolved, FEMININE, GeneratorUtils.Case.ACCUSATIVE));
@@ -164,14 +165,9 @@ public class SessionResult {
                         text.append(String.valueOf(totalProblems), NumberWord.getStringForNumber(totalProblems, FEMININE, GeneratorUtils.Case.GENITIVE));
                         text.append(" предложенных задач");
                         // text.append(String.valueOf(hints), NumberWord.getStringForNumber(hints, NEUTER, GeneratorUtils.Case.NOMINATIVE));
-                        text.append(". Вы обошлись без нашей помощи. Всего набрали ");
-                        text.append(String.valueOf(total), NumberWord.getStringForNumber(total, MASCULINE, GeneratorUtils.Case.NOMINATIVE));
-                        text.append(" ");
-                        if (total%10 == 1) text.append(Dictionary.SCORE.getNominative());
-                        else if (total%10>1 && total%10 < 5) text.append(Dictionary.SCORE.getGenitive());
-                        else text.append(Dictionary.SCORE.getCountingForm());
-                        text.append(". ");
-                        if (total >= 20) text.append(goodEnding[token2]);
+                        text.append(". Вы обошлись без нашей помощи.");
+                        addScore(totalScore, text);
+                        if (sessionScore >= 20) text.append(goodEnding[token2]);
                         else text.append(normalEnding[token2]);
                         return text;
                     }//return "Вы решили " + problemSolved + " из " + totalProblems + " предложенных задач и обошлись без нашей помощи. Ждём Вас снова!";
@@ -184,5 +180,27 @@ public class SessionResult {
                 }
 
         }
+    }
+
+    private void addHintsInfo(ProblemTextBuilder text) {
+        if (hints < problemSolved) {
+            text.append(String.valueOf(hints), NumberWord.getStringForNumber(hints, FEMININE, GeneratorUtils.Case.ACCUSATIVE));
+            text.append(" из которых решили с моей помощью.");
+        } else {
+            if (problemSolved == 1) {
+                text.append("правда, решили её только с моей мпомощью.");
+            } else {
+                text.append("правда, решили их только с моей мпомощью.");
+            }
+        }
+
+    }
+
+    private void addScore(int totalScore, ProblemTextBuilder text) {
+        text.append(" Вы набрали ").append(getNumWithString(sessionScore, SCORE));
+        if (totalScore != sessionScore) {
+            text.append(", а всего у вас ").append(getNumWithString(totalScore, SCORE));
+        }
+        text.append(". ");
     }
 }

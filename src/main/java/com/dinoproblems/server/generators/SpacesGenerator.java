@@ -34,6 +34,9 @@ public class SpacesGenerator implements ProblemGenerator {
     private static  final ArrayList<ProblemScenario> EASY_SCENARIOS;
     private static final ArrayList<ProblemScenario> MEDIUM_SCENARIOS;
 
+    private static final ProblemScenario EXPERT_SCENARIO = new ProblemScenarioImpl(ProblemCollection.SPACES + "_" + "EXPERT", true);
+    private static final Problem EXPERT_PROBLEM;
+
     private static final String[] HEROES = {"Миша", "Дима", "Коля", "Вася", "Рома", "Сережа"};
 
     static {
@@ -52,11 +55,23 @@ public class SpacesGenerator implements ProblemGenerator {
         MEDIUM_SCENARIOS = new ArrayList<>(SCENARIOS);
         MEDIUM_SCENARIOS.remove(new SpacesScenario(LOG, false));
         MEDIUM_SCENARIOS.add(new SpacesScenario(ELEVATOR, true));
+
+        String text = "Имеется 28 брёвен – длинных и коротких. Длинные распиливают на 6 частей, а короткие – на 3 части. Чтобы распилить все короткие брёвна, потребовалось сделать столько же распилов, сколько чтобы распилить все длинные. Сколько получилось кусков бревна?";
+        String tts = "Имеется 28 брёвен – длинных и коротких. Длинные распиливают на шесть частей, а короткие – на три части. Чтобы распилить все короткие брёвна, потребовалось сделать столько же распилов, сколько чтобы распилить все длинные. Сколько получилось кусков бревн+а?";
+        String hint1 = "На двух брёвнах с пятью распилами столько же распилов сколько на пяти брёвнах с двумя распилами.";
+        int answer = 108;
+        EXPERT_PROBLEM = new ProblemWithPossibleTextAnswers.Builder().text(text).tts(tts).answer(answer).theme(ProblemCollection.SPACES)
+                .possibleTextAnswers(Sets.newHashSet("108 кусков")).hint(hint1).scenario(EXPERT_SCENARIO)
+                .difficulty(Problem.Difficulty.EXPERT).create();
     }
 
     @Override
     @Nonnull
     public Problem generateProblem(Problem.Difficulty difficulty, ProblemAvailability problemAvailability) {
+        if (problemAvailability.getScenario().equals(EXPERT_SCENARIO)) {
+            return EXPERT_PROBLEM;
+        }
+
         int spaces = difficulty == Problem.Difficulty.EASY ? GeneratorUtils.randomInt(7, 15) : GeneratorUtils.randomInt(10, 25);
         int blocks = difficulty == Problem.Difficulty.EASY ? 1 :
                 difficulty == Problem.Difficulty.MEDIUM ? GeneratorUtils.randomInt(1, 5)
@@ -231,7 +246,7 @@ public class SpacesGenerator implements ProblemGenerator {
                 throw new IllegalArgumentException();
         }
 
-        return new ProblemWithPossibleTextAnswers(text.getText(), text.getTTS(), answer, ProblemCollection.SPACES, possibleTextAnswers, hint, scenario, difficulty);
+        return new ProblemWithPossibleTextAnswers.Builder().text(text.getText()).tts(text.getTTS()).answer(answer).theme(ProblemCollection.SPACES).possibleTextAnswers(possibleTextAnswers).hint(hint).scenario(scenario).difficulty(difficulty).create();
     }
 
     private String getBlocksStringNa(int count) {
@@ -284,7 +299,7 @@ public class SpacesGenerator implements ProblemGenerator {
                         Lists.newArrayList(new SpacesScenario(DRAWING, false), new SpacesScenario(LOG, false)),
                         Sets.newHashSet(MEDIUM_SCENARIOS));
             case EXPERT:
-                return null;
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(EXPERT_SCENARIO), new HashSet<>());
 
         }
 

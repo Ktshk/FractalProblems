@@ -133,8 +133,7 @@ public class SequenceGenerator implements ProblemGenerator {
         String possibleAnswer = Integer.toString(answer);
         final HashSet<String> possibleTextAnswers = Sets.newHashSet(Integer.toString(answer));
         possibleTextAnswers.add(possibleAnswer);
-        return new
-                ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.SEQUENCE, possibleTextAnswers, hint, scenario, difficulty);
+        return new ProblemWithPossibleTextAnswers.Builder().text(text).answer(answer).theme(ProblemCollection.SEQUENCE).possibleTextAnswers(possibleTextAnswers).hint(hint).scenario(scenario).difficulty(difficulty).create();
     }
 
     private void DoubleArithmeticSequence(int[] sequence, int operand1, int operand2) {

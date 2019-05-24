@@ -57,6 +57,7 @@ public class VariousProblems {
                     String text = null;
                     String tts = null;
                     String comment = null;
+                    String commentTTS = null;
                     List<String> hints = new ArrayList<>();
                     final HashSet<String> possibleTextAnswers = Sets.newHashSet();
 
@@ -99,6 +100,8 @@ public class VariousProblems {
                                     if (commentChildNode.getNodeType() == Node.ELEMENT_NODE) {
                                         if (commentChildNode.getNodeName().equals("text")) {
                                             comment = commentChildNode.getTextContent();
+                                        } else if (commentChildNode.getNodeName().equals("tts")) {
+                                            commentTTS = commentChildNode.getTextContent();
                                         }
                                     }
                                 }
@@ -106,9 +109,9 @@ public class VariousProblems {
                         }
                     }
 
-                    problems.put(difficulty, new ProblemWithPossibleTextAnswers(text, tts, answer, THEME,
-                            possibleTextAnswers, hints, new ProblemScenarioImpl(THEME + "_" + id, true),
-                            difficulty, comment));
+                    problems.put(difficulty, new ProblemWithPossibleTextAnswers.Builder().text(text).tts(tts).answer(answer).theme(THEME)
+                            .possibleTextAnswers(possibleTextAnswers).hints(hints).scenario(new ProblemScenarioImpl(THEME + "_" + id, true))
+                            .difficulty(difficulty).comment(comment).commentTTS(commentTTS).create());
                 }
             }
         } catch (IOException | ParserConfigurationException | SAXException e) {

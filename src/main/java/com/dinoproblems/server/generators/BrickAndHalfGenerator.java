@@ -38,9 +38,8 @@ public class BrickAndHalfGenerator implements ProblemGenerator {
 
         if (scenario.equals(WAY)) {
             final String text = "Миша прошёл " + n * 100 + " метров и ещё " + getPartString(k) + " пути. Какова длина пути?";
-            return new ProblemWithPossibleTextAnswers(text, answer * 100, ProblemCollection.BRICK_AND_HALF,
-                    Sets.newHashSet(answer * 100 + " м", answer * 100 + " метров"),
-                    "Подумайте, какую часть пути составляют " + n * 100 + " метров.", scenario, difficulty);
+            return new ProblemWithPossibleTextAnswers.Builder().text(text).answer(answer * 100).theme(ProblemCollection.BRICK_AND_HALF)
+                    .possibleTextAnswers(Sets.newHashSet(answer * 100 + " м", answer * 100 + " метров")).hint("Подумайте, какую часть пути составляют " + n * 100 + " метров.").scenario(scenario).difficulty(difficulty).create();
         } else {
             String[] things1 = new String[]{"Кирпич", "Арбуз", "Мешок картошки"};
             String[] things = new String[]{"кирпич", "арбуз", "мешок картошки"};
@@ -51,14 +50,14 @@ public class BrickAndHalfGenerator implements ProblemGenerator {
                 final String text = things1[i] + " весит " + n + " кг и ещё " + getPartString(k) + " " + thingsMod[i] + ". Сколько весит " + things[i] + "?";
                 final HashSet<String> possibleTextAnswers = Sets.newHashSet(answer + " кг", GeneratorUtils.getNumWithString(answer, "килограмм", "килограмма", "килограммов", MASCULINE));
                 final String hint = "Подумайте, какую часть " + thingsMod[i] + (n % 10 == 1 && (n / 10 == 0 || n / 10 >= 2) ? " составляет " : " составляют ") + n + " кг.";
-                return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.BRICK_AND_HALF,
-                        possibleTextAnswers, hint, scenario, difficulty);
+                return new ProblemWithPossibleTextAnswers.Builder().text(text).answer(answer).theme(ProblemCollection.BRICK_AND_HALF)
+                        .possibleTextAnswers(possibleTextAnswers).hint(hint).scenario(scenario).difficulty(difficulty).create();
             } else {
                 final String text = things1[i] + " стоит " + n * 10 + " рублей и ещё " + getPartString(k) + " " + thingsMod[i] + ". Сколько стоит " + things[i] + "?";
                 final String hint = "Подумайте, какую часть " + thingsMod[i] + " можно купить за  " + n * 10 + " рублей.";
 
-                return new ProblemWithPossibleTextAnswers(text, answer * 10, ProblemCollection.BRICK_AND_HALF,
-                        Sets.newHashSet(answer * 10 + " рублей"), hint, scenario, difficulty);
+                return new ProblemWithPossibleTextAnswers.Builder().text(text).answer(answer * 10).theme(ProblemCollection.BRICK_AND_HALF)
+                        .possibleTextAnswers(Sets.newHashSet(answer * 10 + " рублей")).hint(hint).scenario(scenario).difficulty(difficulty).create();
 
             }
         }

@@ -8,10 +8,10 @@ import java.util.Map;
  */
 public enum NumberWord {
 
-    ONE(1, "один", "одного"),
-    TWO(2, "два", "двух"),
-    THREE(3, "три", "трех"),
-    FOUR(4, "четыре", "четырех"),
+    ONE(1, "один", "одного", "одному"),
+    TWO(2, "два", "двух", "двум"),
+    THREE(3, "три", "трех", "трём"),
+    FOUR(4, "четыре", "четырех", "четырём"),
     FIVE(5, "пять", "пяти"),
     SIX(6, "шесть", "шести"),
     SEVEN(7, "семь", "семи"),
@@ -36,14 +36,14 @@ public enum NumberWord {
     EIGHTY(80, "восемьдесят", "восьмидесяти"),
     NINETY(90, "девносто", "девяноста"),
     HUNDRED(100, "сто", "ста"),
-    TWO_HUNDRED(200, "двести", "двести"),
-    THREE_HUNDRED(300, "триста", "триста"),
-    FOUR_HUNDRED(400, "четыреста", "четыреста"),
-    FIVE_HUNDRED(500, "пятьсот", "пятиста"),
-    SIX_HUNDRED(600, "шестьсот", "шестиста"),
-    SEVEN_HUNDRED(700, "семьсот", "семиста"),
-    EIGHT_HUNDRED(800, "восемьсот", "восьмиста"),
-    NINE_HUNDRED(900, "девятьсот", "девятиста");
+    TWO_HUNDRED(200, "двести", "двести", "двумстам"),
+    THREE_HUNDRED(300, "триста", "триста", "трёмстам"),
+    FOUR_HUNDRED(400, "четыреста", "четыреста", "четырёмстам"),
+    FIVE_HUNDRED(500, "пятьсот", "пятиста", "пятистам"),
+    SIX_HUNDRED(600, "шестьсот", "шестиста", "шестистам"),
+    SEVEN_HUNDRED(700, "семьсот", "семиста", "семистам"),
+    EIGHT_HUNDRED(800, "восемьсот", "восьмиста", "восьмистам"),
+    NINE_HUNDRED(900, "девятьсот", "девятиста", "девятистам");
 
     private final int number;
 
@@ -57,11 +57,16 @@ public enum NumberWord {
         }
     }
 
-    NumberWord(int number, String nominative, String genitive) {
+    NumberWord(int number, String nominative, String genitive, String dative) {
         this.number = number;
         cases.put(GeneratorUtils.Case.GENITIVE, genitive);
         cases.put(GeneratorUtils.Case.NOMINATIVE, nominative);
         cases.put(GeneratorUtils.Case.ACCUSATIVE, nominative);
+        cases.put(GeneratorUtils.Case.DATIVE, dative);
+    }
+
+    NumberWord(int number, String nominative, String genitive) {
+        this(number, nominative, genitive, genitive);
     }
 
     public int getNumber() {
@@ -107,6 +112,8 @@ public enum NumberWord {
     private static String getTwoInGender(GeneratorUtils.Gender gender, GeneratorUtils.Case wordCase) {
         if (wordCase == GeneratorUtils.Case.GENITIVE) {
             return "двух";
+        } else if (wordCase == GeneratorUtils.Case.DATIVE) {
+            return "двум";
         } else {
             if (gender == GeneratorUtils.Gender.FEMININE) {
                 return "две";
@@ -124,6 +131,8 @@ public enum NumberWord {
                     return "один";
                 case GENITIVE:
                     return "одного";
+                case DATIVE:
+                    return "одному";
 
             }
         } else if (gender == GeneratorUtils.Gender.FEMININE) {
@@ -133,6 +142,7 @@ public enum NumberWord {
                 case ACCUSATIVE:
                     return "одну";
                 case GENITIVE:
+                case DATIVE:
                     return "одной";
             }
         } else {
@@ -142,6 +152,8 @@ public enum NumberWord {
                     return "одно";
                 case GENITIVE:
                     return "одного";
+                case DATIVE:
+                    return "одному";
             }
         }
         return "один";

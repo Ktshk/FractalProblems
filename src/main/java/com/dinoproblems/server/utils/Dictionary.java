@@ -19,6 +19,7 @@ public class Dictionary {
     public final static Noun PINK_FLOWER = new NounBuilder().nom("гвоздика").gen("гвоздики").counting("гвоздик").plural("гвоздики").gender(FEMININE).createNoun();
     public final static Noun PEAR = new NounBuilder().nom("груша").gen("груши").acc("грушу").counting("груш").plural("груши").gender(FEMININE).createNoun();
     public final static Noun GIRL = new NounBuilder().nom("девочка").gen("девочки").counting("девочек").plural("девочки").gender(FEMININE).createNoun();
+    public final static Noun PROBLEM = new NounBuilder().nom("задача").gen("задачи").counting("задач").plural("задачи").acc("задачу").gender(FEMININE).createNoun();
     public final static Noun STAR = new NounBuilder().nom("звёздочка").gen("звёздочки").counting("звёздочек").plural("звёздочки").acc("звёздочку").gender(FEMININE).createNoun();
     public final static Noun HISTORY = new NounBuilder().nom("история").gen("истории").instr("историей").acc("историю").gender(FEMININE).createNoun();
     public final static Noun PENCIL = new NounBuilder().nom("карандаш").gen("карандаша").counting("карандашей").plural("карандаши").gender(MASCULINE).createNoun();

@@ -3,6 +3,7 @@ package com.dinoproblems.server.generators;
 import com.dinoproblems.server.*;
 import com.dinoproblems.server.Problem.Difficulty;
 import com.dinoproblems.server.utils.GeneratorUtils;
+import com.dinoproblems.server.utils.NumberWord;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -96,7 +97,7 @@ public class FromEndToBeginGenerator implements ProblemGenerator {
         times = new String[]{" раз", " раза"};
         String choice;
         String text = null;//итоговый текст задачи
-        String tts=null;
+        String tts = null;
         int i = 10;
         String hint = null;
         for (; ; ) {
@@ -134,9 +135,9 @@ public class FromEndToBeginGenerator implements ProblemGenerator {
                 text = beginning[token1] + hero1[token1] + " загадал некоторое число " + hero2[token2] + ". Затем он " + choiceofactions[actions[0]] + operands[0] +
                         "." + " После " + choiceofactions[actions[1]] + operands[1] + ". В итоге " + hero1[token1] + " сказал " + hero2[token2] + " результат, равный " +
                         Integer.toString(actionnumber2) + ". Какое число было загадано?";
-                tts=beginning[token1] + hero1[token1] + " загадал некоторое число " + hero2tts[token2] + ". Затем он " + choiceofactions[actions[0]] + operands[0] +
+                tts = beginning[token1] + hero1[token1] + " загадал некоторое число " + hero2tts[token2] + ". Затем он " + choiceofactions[actions[0]] + operands[0] +
                         "." + " После " + choiceofactions[actions[1]] + operands[1] + ". В итоге " + hero1[token1] + " сказал " + hero2tts[token2] + " результат, равный " +
-                        Integer.toString(actionnumber2) + ". Какое число было загадано?";
+                        NumberWord.getStringForNumber(actionnumber2, GeneratorUtils.Gender.MASCULINE, GeneratorUtils.Case.DATIVE) + ". Какое число было загадано?";
                 hint = "Подумайте, какое число было до того, как " + hero1[token1] + " " + choiceofactions[actions[1]] + operands[1] + ". ";
                 break;
             case MEDIUM:
@@ -176,9 +177,9 @@ public class FromEndToBeginGenerator implements ProblemGenerator {
                     text = beginning[token1] + hero1[token1] + " загадал некоторое число " + hero2[token2] + ". Затем он " + choiceofactions[actions[0]] + operands[0] +
                             "." + " После " + choiceofactions[actions[1]] + operands[1] + ". Подумав, наш" + hobbies[token1] + choiceofactions[actions[2]] + operands[2] +
                             "." + " В итоге " + hero1[token1] + " сказал " + hero2[token2] + " результат, равный " + Integer.toString(actionnumber3) + ". Какое число было загадано?";
-                    tts=beginning[token1] + hero1[token1] + " загадал некоторое число " + hero2tts[token2] + ". Затем он " + choiceofactions[actions[0]] + operands[0] +
+                    tts = beginning[token1] + hero1[token1] + " загадал некоторое число " + hero2tts[token2] + ". Затем он " + choiceofactions[actions[0]] + operands[0] +
                             "." + " После " + choiceofactions[actions[1]] + operands[1] + ". Подумав, наш" + hobbies[token1] + choiceofactions[actions[2]] + operands[2] +
-                            "." + " В итоге " + hero1[token1] + " сказал " + hero2tts[token2] + " результат, равный " + Integer.toString(actionnumber3) + ". Какое число было загадано?";
+                            "." + " В итоге " + hero1[token1] + " сказал " + hero2tts[token2] + " результат, равный " + NumberWord.getStringForNumber(actionnumber3, GeneratorUtils.Gender.MASCULINE, GeneratorUtils.Case.DATIVE) + ". Какое число было загадано?";
 
 
                     hint = "Подумайте, какое число было до того, как " + hero1[token1] + " " + choiceofactions[actions[2]] + operands[2] + ". ";
@@ -271,9 +272,9 @@ public class FromEndToBeginGenerator implements ProblemGenerator {
                     text = beginning[token1] + hero1[token1] + " загадал некоторое число " + hero2[token2] + ". Затем он " + choiceofactions[actions[0]] + operands[0] +
                             "." + " После " + choiceofactions[actions[1]] + operands[1] + ". Подумав, наш" + hobbies[token1] + choiceofactions[actions[2]] + operands[2] +
                             "." + " В итоге " + hero1[token1] + " сказал " + hero2[token2] + " результат, равный " + Integer.toString(actionnumber3) + ". Какое число было загадано?";
-                    tts=beginning[token1] + hero1[token1] + " загадал некоторое число " + hero2tts[token2] + ". Затем он " + choiceofactions[actions[0]] + operands[0] +
+                    tts = beginning[token1] + hero1[token1] + " загадал некоторое число " + hero2tts[token2] + ". Затем он " + choiceofactions[actions[0]] + operands[0] +
                             "." + " После " + choiceofactions[actions[1]] + operands[1] + ". Подумав, наш" + hobbies[token1] + choiceofactions[actions[2]] + operands[2] +
-                            "." + " В итоге " + hero1[token1] + " сказал " + hero2tts[token2] + " результат, равный " + Integer.toString(actionnumber3) + ". Какое число было загадано?";
+                            "." + " В итоге " + hero1[token1] + " сказал " + hero2tts[token2] + " результат, равный " + NumberWord.getStringForNumber(actionnumber3, GeneratorUtils.Gender.MASCULINE, GeneratorUtils.Case.DATIVE) + ". Какое число было загадано?";
 
                     hint = "Подумайте, какое число было до того, как " + hero1[token1] + " " + choiceofactions[actions[2]] + operands[2] + ". ";
                 } else if (scenario.equals(LILY_SCENARIO)) {
@@ -298,9 +299,7 @@ public class FromEndToBeginGenerator implements ProblemGenerator {
         String possibleAnswer = Integer.toString(answer);
         final HashSet<String> possibleTextAnswers = Sets.newHashSet(Integer.toString(answer));
         possibleTextAnswers.add(possibleAnswer);
-        return new
-
-                ProblemWithPossibleTextAnswers(text,tts, answer, ProblemCollection.FROM_END_TO_BEGIN, possibleTextAnswers, hint, scenario, difficulty);
+        return new ProblemWithPossibleTextAnswers.Builder().text(text).tts(tts).answer(answer).theme(ProblemCollection.FROM_END_TO_BEGIN).possibleTextAnswers(possibleTextAnswers).hint(hint).scenario(scenario).difficulty(difficulty).create();
 
     }
 

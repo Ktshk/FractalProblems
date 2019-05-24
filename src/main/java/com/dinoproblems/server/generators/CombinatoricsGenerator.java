@@ -18,21 +18,25 @@ import static com.dinoproblems.server.utils.GeneratorUtils.Case.GENITIVE;
 import static com.dinoproblems.server.utils.GeneratorUtils.Gender.MASCULINE;
 
 /**
- * Created by Katushka on 18.04.2019.
+ * Created by Katushka
+ * on 18.04.2019.
  */
 public class CombinatoricsGenerator implements ProblemGenerator {
+    private static final ProblemScenario CRAZY_TRAFFIC_LIGHTS_SCENARIO = new ProblemScenarioImpl(ProblemCollection.COMBINATORICS + "_" + "CRAZY_TRAFFIC_LIGHTS", true);
     private static final ProblemScenario FLOWERS_SCENARIO = new ProblemScenarioImpl(ProblemCollection.COMBINATORICS + "_" + "FLOWERS", true);
     private static final ProblemScenario CHESS_SCENARIO = new ProblemScenarioImpl(ProblemCollection.COMBINATORICS + "_" + "CHESS", true);
     private static final ProblemScenario NUMBER_SAME_DIGITS = new ProblemScenarioImpl(ProblemCollection.COMBINATORICS + "_" + "NUMBER_SAME_DIGITS", false);
     private static final ProblemScenario CARS = new ProblemScenarioImpl(ProblemCollection.COMBINATORICS + "_" + "CARS", true);
 //    private static final ProblemScenario DANCING = new ProblemScenarioImpl(ProblemCollection.COMBINATORICS + "_" + "DANCING", true);
 
-    private static final Collection<ProblemScenario> EASY_SCENARIOS = Lists.newArrayList(CARS, FLOWERS_SCENARIO, CHESS_SCENARIO, NUMBER_SAME_DIGITS/*, DANCING*/);
-    private static final Collection<ProblemScenario> MEDIUM_SCENARIOS = Lists.newArrayList(FLOWERS_SCENARIO, CHESS_SCENARIO, NUMBER_SAME_DIGITS/*, DANCING*/);
+    private static final Collection<ProblemScenario> EASY_SCENARIOS = Lists.newArrayList(CARS, FLOWERS_SCENARIO, CHESS_SCENARIO,
+            NUMBER_SAME_DIGITS, CRAZY_TRAFFIC_LIGHTS_SCENARIO/*, DANCING*/);
+    private static final Collection<ProblemScenario> MEDIUM_SCENARIOS = Lists.newArrayList(FLOWERS_SCENARIO, CHESS_SCENARIO,
+            NUMBER_SAME_DIGITS/*, DANCING*/);
     private static final Collection<ProblemScenario> DIFFICULT_SCENARIOS = Lists.newArrayList(FLOWERS_SCENARIO, NUMBER_SAME_DIGITS);
     private static final String[] HEROES = {"Миша", "Вася", "Петя", "Витя", "Андрей", "Лёша", "Ваня"};
     private static final String[] HEROES_GENITIVE = {"Миши", "Васи", "Пети", "Вити", "Андрея", "Лёши", "Вани"};
-    private static final String[] HEROES_GIRLS = {"Маша", "Вика", "Лена", "Наташа", "Алина", "Света", "Лиза"};
+//    private static final String[] HEROES_GIRLS = {"Маша", "Вика", "Лена", "Наташа", "Алина", "Света", "Лиза"};
 
     @Nonnull
     @Override
@@ -44,8 +48,12 @@ public class CombinatoricsGenerator implements ProblemGenerator {
                     "Сколькими способами " + HEROES[heroIndex] + " может составить их в ряд? ";
             String hint = "Если первая машинка будет красной, то какой может быть вторая третья и четвертая? А если первая машинка жёлтая или чёрная?";
             int answer = 12;
-            return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.COMBINATORICS,
-                    Sets.newHashSet("12 способов"), hint, CARS, difficulty);
+            return new ProblemWithPossibleTextAnswers.Builder().text(text).answer(answer).theme(ProblemCollection.COMBINATORICS).possibleTextAnswers(Sets.newHashSet("12 способов")).hint(hint).scenario(scenario).difficulty(difficulty).create();
+        } else if (scenario.equals(CRAZY_TRAFFIC_LIGHTS_SCENARIO)) {
+            String text = "Светофор сошел с ума и стал менять местами свои цвета. Сколько разных вариантов у него может получиться?";
+            String hint = "Давайте подумаем, какие могут быть варианты. Например, если первый верхний цвет красный? А если зелёный?";
+            int answer = 6;
+            return new ProblemWithPossibleTextAnswers.Builder().text(text).answer(answer).theme(ProblemCollection.COMBINATORICS).possibleTextAnswers(Sets.newHashSet("6 вариантов")).hint(hint).scenario(scenario).difficulty(difficulty).create();
 //        } else if (scenario.equals(DANCING)) {
 //            int n = randomInt(4, 6);
 //            String[] heroes = chooseRandomString(HEROES, n);
@@ -89,9 +97,8 @@ public class CombinatoricsGenerator implements ProblemGenerator {
             text += "?";
             int answer = c(n + k - 1, k);
             final String hint = "Попробуйте выписать все возможные букеты, которые может собрать " + hero + ". " +
-                    "Например, три " + flowers[0].getGenitive() + " или " + flowers[0].getNominative() + " и две " + flowers[1].getGenitive() + ".";
-            return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.COMBINATORICS,
-                    Sets.newHashSet(getNumWithString(answer, BOUQUET)), hint, scenario, difficulty);
+                    "Например, " + getNumWithString(3, flowers[0]) + " или " + flowers[0].getNominative() + " и " + getNumWithString(2, flowers[1]) + ".";
+            return new ProblemWithPossibleTextAnswers.Builder().text(text).answer(answer).theme(ProblemCollection.COMBINATORICS).possibleTextAnswers(Sets.newHashSet(getNumWithString(answer, BOUQUET))).hint(hint).scenario(scenario).difficulty(difficulty).create();
         } else if (scenario.equals(CHESS_SCENARIO)) {
             int children = difficulty == Problem.Difficulty.EASY ? 4 : randomInt(5, 7);
             final String[] heroes = chooseRandom(HEROES, children, String[]::new);
@@ -111,8 +118,7 @@ public class CombinatoricsGenerator implements ProblemGenerator {
             String hint = heroes[0] + " сыграл с каждым, то есть он сыграл " + getNumWithString(children - 1, PARTY) + "" +
                     ". " + heroes[1] + " тоже сыграл с каждым " + getNumWithString(children - 1, PARTY) +
                     ". Но не забывайте, что одну партию они сыграли друг с другом, то есть её надо посчитать всего один раз.";
-            return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.COMBINATORICS,
-                    Sets.newHashSet(getNumWithString(answer, PARTY)), hint, scenario, difficulty);
+            return new ProblemWithPossibleTextAnswers.Builder().text(text).answer(answer).theme(ProblemCollection.COMBINATORICS).possibleTextAnswers(Sets.newHashSet(getNumWithString(answer, PARTY))).hint(hint).scenario(scenario).difficulty(difficulty).create();
         } else if (scenario.equals(NUMBER_SAME_DIGITS)) {
             String[] digits = {"1", "2", "3", "4", "5", "6", "7", "8", "9"};
             int num = difficulty == Problem.Difficulty.EASY
@@ -140,8 +146,7 @@ public class CombinatoricsGenerator implements ProblemGenerator {
                 answer *= hasZero ? (chosenDigits.length + 1) : chosenDigits.length;
             }
             String hint = "Подумайте, с каких цифр может начинаться число. А сколько цифр может стоять на втором месте?";
-            return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.COMBINATORICS,
-                    Sets.newHashSet(Integer.toString(answer)), hint, scenario, difficulty);
+            return new ProblemWithPossibleTextAnswers.Builder().text(text).answer(answer).theme(ProblemCollection.COMBINATORICS).possibleTextAnswers(Sets.newHashSet(Integer.toString(answer))).hint(hint).scenario(scenario).difficulty(difficulty).create();
         } else {
             throw new IllegalArgumentException("Scenario: " + scenario.getScenarioId());
         }

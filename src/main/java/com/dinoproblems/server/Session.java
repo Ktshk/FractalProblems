@@ -81,12 +81,10 @@ public class Session {
 
     public int updateScore(Problem problem) {
         currentProblem = null;
-        userInfo.addSolvedProblem(problem.getTheme(), problem);
         final int points = sessionResult.updateScore(problem);
-        userInfo.addPoints(points);
+        userInfo.addSolvedProblem(problem.getTheme(), problem, points);
 
         nextProblem = ProblemCollection.INSTANCE.generateProblem(this);
-
         return points;
     }
 

@@ -3,6 +3,7 @@ package com.dinoproblems.server;
 import com.google.common.collect.Lists;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -22,23 +23,9 @@ public class ProblemWithPossibleTextAnswers implements Problem {
     private final Difficulty difficulty;
     private final ProblemScenario scenario;
     private String comment;
+    private String commentTTS;
 
-    public ProblemWithPossibleTextAnswers(String text, int answer, String theme, Set<String> possibleTextAnswers, String hint, ProblemScenario scenario, Difficulty difficulty) {
-        this(text, null, answer, theme, possibleTextAnswers, hint, scenario, difficulty);
-    }
-
-    public ProblemWithPossibleTextAnswers(String text, String tts, int answer, String theme, Set<String> possibleTextAnswers, String hint, ProblemScenario scenario, Difficulty difficulty) {
-        this.text = text;
-        this.tts = tts;
-        this.answer = answer;
-        this.theme = theme;
-        this.possibleTextAnswers = possibleTextAnswers;
-        this.hints = Lists.newArrayList(hint);
-        this.scenario = scenario;
-        this.difficulty = difficulty;
-    }
-
-    public ProblemWithPossibleTextAnswers(String text, String tts, int answer, String theme, Set<String> possibleTextAnswers, List<String> hints, ProblemScenario scenario, Difficulty difficulty, String comment) {
+    public ProblemWithPossibleTextAnswers(String text, String tts, int answer, String theme, Set<String> possibleTextAnswers, List<String> hints, ProblemScenario scenario, Difficulty difficulty, String comment, String commentTTS) {
         this.text = text;
         this.tts = tts;
         this.answer = answer;
@@ -48,6 +35,7 @@ public class ProblemWithPossibleTextAnswers implements Problem {
         this.scenario = scenario;
         this.difficulty = difficulty;
         this.comment = comment;
+        this.commentTTS = commentTTS;
     }
 
     public String getText() {
@@ -58,6 +46,12 @@ public class ProblemWithPossibleTextAnswers implements Problem {
     @Override
     public String getComment() {
         return comment;
+    }
+
+    @Nullable
+    @Override
+    public String getCommentTTS() {
+        return commentTTS;
     }
 
     @Override
@@ -165,5 +159,80 @@ public class ProblemWithPossibleTextAnswers implements Problem {
                 ", difficulty=" + difficulty +
                 ", scenario=" + scenario +
                 '}';
+    }
+
+    public static class Builder {
+        private String text;
+        private int answer;
+        private String theme;
+        private Set<String> possibleTextAnswers;
+        private ProblemScenario scenario;
+        private Difficulty difficulty;
+        private String tts = null;
+        private List<String> hints;
+        private String comment;
+        private String commentTTS;
+
+        public Builder text(String text) {
+            this.text = text;
+            return this;
+        }
+
+        public Builder answer(int answer) {
+            this.answer = answer;
+            return this;
+        }
+
+        public Builder theme(String theme) {
+            this.theme = theme;
+            return this;
+        }
+
+        public Builder possibleTextAnswers(Set<String> possibleTextAnswers) {
+            this.possibleTextAnswers = possibleTextAnswers;
+            return this;
+        }
+
+        public Builder hint(String hint) {
+            if (hints == null) {
+                hints = new ArrayList<>();
+            }
+            hints.add(hint);
+            return this;
+        }
+
+        public Builder scenario(ProblemScenario scenario) {
+            this.scenario = scenario;
+            return this;
+        }
+
+        public Builder difficulty(Difficulty difficulty) {
+            this.difficulty = difficulty;
+            return this;
+        }
+
+        public Builder tts(String tts) {
+            this.tts = tts;
+            return this;
+        }
+
+        public Builder hints(List<String> hints) {
+            this.hints = hints;
+            return this;
+        }
+
+        public Builder comment(String comment) {
+            this.comment = comment;
+            return this;
+        }
+
+        public Builder commentTTS(String commentTTS) {
+            this.commentTTS = commentTTS;
+            return this;
+        }
+
+        public ProblemWithPossibleTextAnswers create() {
+            return new ProblemWithPossibleTextAnswers(text, tts, answer, theme, possibleTextAnswers, hints, scenario, difficulty, comment, commentTTS);
+        }
     }
 }

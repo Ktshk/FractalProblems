@@ -11,7 +11,6 @@ import com.dinoproblems.server.utils.*;
 
 import javax.annotation.Nonnull;
 
-import static com.dinoproblems.server.Problem.Difficulty.EXPERT;
 import static com.dinoproblems.server.Problem.Difficulty.MEDIUM;
 import static com.dinoproblems.server.ProblemCollection.SUM_DIFFERENCE;
 import static com.dinoproblems.server.utils.GeneratorUtils.findAvailableScenario;
@@ -100,7 +99,7 @@ public class SumDifferenceGenerator implements ProblemGenerator {
                 things[token1].getCountingForm() + " у " + hero[token3] + "?";
 
         final HashSet<String> possibleTextAnswers = Sets.newHashSet(Integer.toString(answer));
-        return new ProblemWithPossibleTextAnswers(text, first, SUM_DIFFERENCE, possibleTextAnswers, hint, DEFAULT_SCENARIO, difficulty);
+        return new ProblemWithPossibleTextAnswers.Builder().text(text).answer(answer).theme(SUM_DIFFERENCE).possibleTextAnswers(possibleTextAnswers).hint(hint).scenario(DEFAULT_SCENARIO).difficulty(difficulty).create();
     }
 
     @Override

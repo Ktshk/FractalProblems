@@ -33,8 +33,8 @@ public class GeneratorUtils {
     public enum Case {
         NOMINATIVE,
         GENITIVE,
-        ACCUSATIVE
-
+        ACCUSATIVE,
+        DATIVE
         // TODO: add other cases
     }
 
@@ -61,6 +61,7 @@ public class GeneratorUtils {
             case ACCUSATIVE:
                 return getNumWithString(count, noun.getAccusativeForm(), noun.getCountingGenitive(), noun.getCountingForm(), noun.getGender(), wordCase);
             case GENITIVE:
+            case DATIVE: // TODO: add dative case for nouns
                 return getNumWithString(count, noun.getGenitive(), noun.getCountingGenitive(), noun.getCountingForm(), noun.getGender(), wordCase);
         }
 
@@ -145,11 +146,9 @@ public class GeneratorUtils {
                 .filter(problemScenario -> !availableScenarios.contains(problemScenario) || !problemScenario.isSingleProblem())
                 .collect(Collectors.toCollection(HashSet::new));
         final Map<ProblemScenario, Map<Boolean, Set<Difficulty>>> problemsByScenario = new HashMap<>();
+        boolean easierProblemIsSolved = false;
         for (Problem problem : alreadySolvedProblems) {
             final ProblemScenario problemScenario = problem.getProblemScenario();
-            if (problem.getDifficulty() != difficulty && (difficulty == EASY || problem.getDifficulty() != difficulty.getPrevious())) {
-                continue;
-            }
             if (availableScenarios.contains(problemScenario)) {
                 if (!problemsByScenario.containsKey(problemScenario)) {
                     problemsByScenario.put(problemScenario, new HashMap<>());
@@ -160,10 +159,16 @@ public class GeneratorUtils {
                 }
                 problemsByScenario.get(problemScenario).get(solved).add(problem.getDifficulty());
             }
+
             if (difficulty != EASY && problem.getDifficulty() == difficulty.getPrevious()) {
                 easierScenariosSet.remove(problem.getProblemScenario());
+                if (problem.getState() == Problem.State.SOLVED) {
+                    easierProblemIsSolved = true;
+                }
             }
         }
+
+        System.out.println("problemsByScenario = " + problemsByScenario);
 
         for (ProblemScenario scenario : availableScenarios) {
             if (!problemsByScenario.containsKey(scenario)) {
@@ -183,7 +188,11 @@ public class GeneratorUtils {
                         }
                     }
                 } else {
-                    if (difficulty != EASY && stateDifficultyMap.get(false).contains(difficulty.getPrevious())) {
+                    if (easierProblemIsSolved && !easierScenarios.contains(scenario)) {
+                        if (!scenario.isSingleProblem()) {
+                            scenarioToProblemAvailability.put(scenario, ProblemAvailabilityType.trainProblem);
+                        }
+                    } else if (difficulty != EASY && stateDifficultyMap.get(false).contains(difficulty.getPrevious())) {
                         if (!easierScenariosSet.isEmpty()) {
                             scenarioToProblemAvailability.put(chooseRandomElement(easierScenariosSet), ProblemAvailabilityType.easierProblem);
                         } else {

@@ -113,8 +113,7 @@ public class EilerCirclesGenerator implements ProblemGenerator {
                     getNumWithString(intersection, PEOPLE) + " купили и торт, и коробку конфет?";
             String hint = "Нарисуйте схему из двух кругов. В один круг поместите людей, которые купили торты, а в другой тех, " +
                     "кто купил коробки конфет. Не забудьте, что " + getNumWithString(intersection, PEOPLE) + " купили и торт, и коробку конфет.";
-            return new ProblemWithPossibleTextAnswers(text, answer, ProblemCollection.EILER_CIRCLES,
-                    Sets.newHashSet(getNumWithString(answer, BUYER), getNumWithString(answer, PEOPLE)), hint, CANDIES_STORE_SCENARIO, difficulty);
+            return new ProblemWithPossibleTextAnswers.Builder().text(text).answer(answer).theme(ProblemCollection.EILER_CIRCLES).possibleTextAnswers(Sets.newHashSet(getNumWithString(answer, BUYER), getNumWithString(answer, PEOPLE))).hint(hint).scenario(CANDIES_STORE_SCENARIO).difficulty(difficulty).create();
         } else if (problemAvailability.getScenario().equals(EXPERT_CANDIES_SCENARIO)) {
             String text = "В школе на новогодней елке дети получили сладкие подарки: троечники - леденец, хорошисты - шоколадку, а отличники - леденец и шоколаднку. " +
                     "Известно, что хорошистов в два раза больше, чем тех, кто получил леденец, а троечников на 12 меньше, чем тех, кто получил шоколадку. " +
@@ -123,8 +122,7 @@ public class EilerCirclesGenerator implements ProblemGenerator {
                     "В пересечении кругов будут находиться отличники. " +
                     "Если хорошистов в два раза больше, чем тех, кто получил леденец, то можно общее число школьников разделить на три равные части: " +
                     "две части - это хорошисты, а одна часть - это те, кто получил леденец.";
-            return new ProblemWithPossibleTextAnswers(text, 2, ProblemCollection.EILER_CIRCLES,
-                    Sets.newHashSet("2 отличника"), hint, EXPERT_CANDIES_SCENARIO, difficulty);
+            return new ProblemWithPossibleTextAnswers.Builder().text(text).answer(2).theme(ProblemCollection.EILER_CIRCLES).possibleTextAnswers(Sets.newHashSet("2 отличника")).hint(hint).scenario(EXPERT_CANDIES_SCENARIO).difficulty(difficulty).create();
         } else if (problemAvailability.getScenario().equals(CUBES_SCENARIO)) {
             int red = randomInt(4, 10);
             int blue = randomInt(4, 10);
@@ -134,8 +132,7 @@ public class EilerCirclesGenerator implements ProblemGenerator {
                     blue + " из них c синими буквами, а " + red + " – с красными. На скольких кубиках написаны буквы двух цветов?";
             String hint = "Нарисуйте " + getNumWithString(total, BRICK) + " и попробуйте отметить, на каких синие буквы, а на каких красные, " +
                     "но только так, чтобы на каждом кубике была хотя бы одна красная или синяя буква.";
-            return new ProblemWithPossibleTextAnswers(text, intersection, ProblemCollection.EILER_CIRCLES,
-                    Sets.newHashSet("На " + NumberWord.getStringForNumber(intersection, Gender.MASCULINE, Case.GENITIVE) + " кубиках"), hint, CUBES_SCENARIO, difficulty);
+            return new ProblemWithPossibleTextAnswers.Builder().text(text).answer(intersection).theme(ProblemCollection.EILER_CIRCLES).possibleTextAnswers(Sets.newHashSet("на " + NumberWord.getStringForNumber(intersection, Gender.MASCULINE, Case.GENITIVE) + " кубиках")).hint(hint).scenario(CUBES_SCENARIO).difficulty(difficulty).create();
         }
 
         final EilerCirclesScenario scenario = (EilerCirclesScenario) problemAvailability.getScenario();
@@ -317,7 +314,7 @@ public class EilerCirclesGenerator implements ProblemGenerator {
 
         final String hint = "Нарисуйте схему. В один круг поместите всех детей, которые любят " + chosenSubjects[0].getAccusativePluralForm() +
                 ", а в в другой всех детей, которые любят " + chosenSubjects[1].getAccusativePluralForm();
-        return new ProblemWithPossibleTextAnswers(text.getText(), text.getTTS(), answer, EILER_CIRCLES, possibleTextAnswers, hint, scenario, difficulty);//пример TTS
+        return new ProblemWithPossibleTextAnswers.Builder().text(text.getText()).tts(text.getTTS()).answer(answer).theme(EILER_CIRCLES).possibleTextAnswers(possibleTextAnswers).hint(hint).scenario(scenario).difficulty(difficulty).create();//пример TTS
 
     }
 

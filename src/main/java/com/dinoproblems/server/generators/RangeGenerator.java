@@ -158,7 +158,7 @@ public class RangeGenerator implements ProblemGenerator {
             hint = "Вычтите из количества дней в" + monthsInstr[monthIndex] + "дату начала отпуска. " +
                     "Не забывайте, что день начала и день конца отпуска входят в количество дней в отпуске.";
         }
-        return new ProblemWithPossibleTextAnswers(text.getText(), text.getTTS(), answer, RANGE, possibleTextAnswers, hint, scenario, difficulty);
+        return new ProblemWithPossibleTextAnswers.Builder().text(text.getText()).tts(text.getTTS()).answer(answer).theme(RANGE).possibleTextAnswers(possibleTextAnswers).hint(hint).scenario(scenario).difficulty(difficulty).create();
     }
 
     @Override

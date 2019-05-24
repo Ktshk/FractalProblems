@@ -23,10 +23,9 @@ public class UserInfo {
     private Problem currentProblem;
     private int points;
 
-    UserInfo(String deviceId, String name, Multimap<String, Problem> solvedProblemsByTheme) {
+    UserInfo(String deviceId, String name) {
         this.deviceId = deviceId;
         this.name = name;
-        this.solvedProblemsByTheme = solvedProblemsByTheme;
     }
 
     String getDeviceId() {
@@ -104,7 +103,7 @@ public class UserInfo {
         return result;
     }
 
-    void addSolvedProblem(String theme, Problem problem) {
+    void addSolvedProblem(String theme, Problem problem, int points) {
         solvedProblemsByTheme.put(theme, problem);
         if (VariousProblems.THEME.equals(theme)) {
             if (!variousProblems.containsKey(problem.getDifficulty())) {
@@ -124,5 +123,14 @@ public class UserInfo {
                 }
             }
         }
+        addPoints(points);
+    }
+
+    @Override
+    public String toString() {
+        return "UserInfo{" +
+                "deviceId='" + deviceId + '\'' +
+                ", name='" + name + '\'' +
+                '}';
     }
 }

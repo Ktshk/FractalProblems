@@ -21,6 +21,9 @@ public interface Problem {
     @Nullable
     String getComment();
 
+    @Nullable
+    String getCommentTTS();
+
     String getNextHint();
 
     String getLastHint();

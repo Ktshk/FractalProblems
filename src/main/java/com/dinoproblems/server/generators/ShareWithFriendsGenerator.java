@@ -48,8 +48,7 @@ public class ShareWithFriendsGenerator implements ProblemGenerator {
                     "И на сколько конфет у " + hero1[1] + " стало меньше, чем было.";
             final HashSet<String> possibleTextAnswers = Sets.newHashSet("На " + getNumWithString(answer, CANDY, Case.ACCUSATIVE),
                     "На " + getNumWithString(answer, CANDY, Case.ACCUSATIVE) + " больше");
-            return new ProblemWithPossibleTextAnswers(text.getText(), text.getTTS(), answer, SHARE_WITH_FRIENDS,
-                    possibleTextAnswers, hint, scenario, difficulty);
+            return new ProblemWithPossibleTextAnswers.Builder().text(text.getText()).tts(text.getTTS()).answer(answer).theme(SHARE_WITH_FRIENDS).possibleTextAnswers(possibleTextAnswers).hint(hint).scenario(scenario).difficulty(difficulty).create();
         } else {
             throw new IllegalArgumentException();
         }

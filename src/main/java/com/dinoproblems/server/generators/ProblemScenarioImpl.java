@@ -44,4 +44,9 @@ public class ProblemScenarioImpl implements ProblemScenario {
     public boolean isSingleProblem() {
         return singleProblem;
     }
+
+    @Override
+    public String toString() {
+        return id;
+    }
 }
