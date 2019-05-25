@@ -33,14 +33,15 @@ public class MainServlet extends HttpServlet {
     private Map<String, UserInfo> userInfos = new HashMap<>();
 
     private Set<String> yesAnswers = Sets.newHashSet("да", "давай", "давайте", "ну давай", "хочу", "валяй",
-            "можно", "ага", "угу", "конечно", "хорошо", "окей", "правильно");
+            "можно", "ага", "угу", "конечно", "хорошо", "окей", "правильно", "я не против", "точно", "ок");
     private Set<String> continueAnswers = Sets.newHashSet("продолжим", "продолжаем", "давай задачу", "решаем",
-            "дальше", "еще одну", "ещё одну", "еще 1", "давай решим", "давай решим еще одну", "давай решим еще 1",
-            "решаем дальше", "говори", "говори следующую задачу", "хочу решить задачу", "жги", "еще", "решаем решаем");
+            "дальше", "еще 1", "еще 1", "давай решим", "давай решим еще 1", "давайте решим еще 1",
+            "решаем дальше", "говори", "говори следующую задачу", "хочу решить задачу", "жги", "еще", "решаем решаем",
+            "гоу", "поехали", "хотим");
     private Set<String> noAnswers = Sets.newHashSet("нет", "не", "неправильно");
     private Set<String> enoughAnswers = Sets.newHashSet("нет", "нет спасибо", "не хочу", "хватит", "не надо",
             "не", "все не хочу", "больше не хочу", "не хочу больше", "не хочу еще задачу", "не хочу решить задачу",
-            "нет спасибо");
+            "нет спасибо", "заканчивай", "выйти");
     private Set<String> endSessionAnswers = Sets.newHashSet("хватит", "больше не хочу", "давай закончим", "надоело", "закончить", "заканчивай", "кончай");
     private Set<String> askAnswer = Sets.newHashSet("ответ", "сдаюсь", "сказать ответ", "скажи ответ",
             "скажи решение", "можно решение", "расскажи мне какой ответ", "какой ответ", "скажи ответ пожалуйста",
@@ -79,7 +80,7 @@ public class MainServlet extends HttpServlet {
             new ProblemTextBuilder().append("У меня есть для вас новые задачи от ").append("кружка", "кружк+а").append(" Фрактал! "),
             new ProblemTextBuilder().append("Предлагаю вам подумать над новой задачей от ").append("кружка", "кружк+а").append(" Фрактал! ")
     };
-    private final HashSet<String> easy = Sets.newHashSet("простая", "простую", "простой", "простую задачу");
+    private final HashSet<String> easy = Sets.newHashSet("простая", "простую", "простой", "простое", "простую задачу");
     private final HashSet<String> medium = Sets.newHashSet("средняя", "среднюю", "средний", "средне", "среднюю задачу");
     private final HashSet<String> hard = Sets.newHashSet("сложная", "сложную", "сложный", "сложно", "сложную задачу");
     private final HashSet<String> expert = Sets.newHashSet("эксперт", "экспертная", "задачу для экспертов");

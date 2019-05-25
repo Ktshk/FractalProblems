@@ -86,7 +86,7 @@ public class RangeGenerator implements ProblemGenerator {
             answer = second + first - 1;
             final String pagesWithText = getNumWithString(second, PAGE, GeneratorUtils.Case.ACCUSATIVE);
             possibleTextAnswers = Sets.newHashSet(answer + " странице");
-            text.append(hero + " начала читать книгу с ").append(String.valueOf(first), OrdinalNumber.getOrdinalTwoDigitNum(first).getGenitiveForm(FEMININE));
+            text.append(hero + " начала читать книгу ").append(getFromText(first)).append(" ").append(String.valueOf(first), OrdinalNumber.getOrdinalTwoDigitNum(first).getGenitiveForm(FEMININE));
             text.append(" страницы и прочитала ровно " + pagesWithText +
                     ". На какой странице " + hero + " закончила?");
             hint = "Попробуйте сложить страницы, но не забывайте, что страница, с которой " + hero +
@@ -159,6 +159,10 @@ public class RangeGenerator implements ProblemGenerator {
                     "Не забывайте, что день начала и день конца отпуска входят в количество дней в отпуске.";
         }
         return new ProblemWithPossibleTextAnswers.Builder().text(text.getText()).tts(text.getTTS()).answer(answer).theme(RANGE).possibleTextAnswers(possibleTextAnswers).hint(hint).scenario(scenario).difficulty(difficulty).create();
+    }
+
+    private String getFromText(int fromPage) {
+        return fromPage == 2 ? "со" : "с";
     }
 
     @Override

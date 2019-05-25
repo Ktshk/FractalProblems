@@ -7,7 +7,8 @@ import java.util.Map;
 import com.dinoproblems.server.generators.ProblemScenarioImpl;
 
 /**
- * Created by Katushka on 21.03.2019.
+ * Created by Katushka
+ * on 21.03.2019.
  */
 public class DataBaseService {
     static final DataBaseService INSTANCE = new DataBaseService();
