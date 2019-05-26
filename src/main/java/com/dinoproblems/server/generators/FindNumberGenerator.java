@@ -32,7 +32,7 @@ public class FindNumberGenerator implements ProblemGenerator {
         EASY_PROBLEMS.put(scenario, new ProblemWithPossibleTextAnswers.Builder().text(text.getText()).tts(text.getTTS()).answer(16).theme(ProblemCollection.FIND_NUMBER).possibleTextAnswers(Sets.newHashSet("16 цифр")).hint(hint).scenario(scenario).difficulty(Problem.Difficulty.EASY).create());
 
         text = new ProblemTextBuilder();
-        text.append("Найди самое маленькое трехзначное число, сумма цифр в которого равна четырём, и при этом ")
+        text.append("Найди самое маленькое трехзначное число, сумма цифр которого равна четырём, и при этом ")
                 .append("все", "все")
                 .append(" три цифры различные.");
         hint = "Подумайте, какие три различных числа в сумме дадут 4.";

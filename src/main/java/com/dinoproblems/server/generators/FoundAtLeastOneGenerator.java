@@ -67,12 +67,12 @@ public class FoundAtLeastOneGenerator implements ProblemGenerator {
         tts += getNumWithString(total, things[theme])+ ". Известно, что среди любых ";
 
         text += (count1 + 1);
-        tts += NumberWord.getStringForNumber(count1 + 1, things[0].getGender(), Case.GENITIVE);
+        tts += NumberWord.getStringForNumber(count1 + 1, things[theme].getGender(), Case.GENITIVE);
 
         text += " найдется хотя бы " + getNumWithString(1, chosenParticularThings[1]) + ", а среди любых "
                 + (count2 + 1);
-        tts += " найдется хотя бы " + getNumWithString(1, things[1]) + ", а среди любых "
-                + NumberWord.getStringForNumber(count2 + 1, chosenParticularThings[0].getGender(), Case.GENITIVE);;
+        tts += " найдется хотя бы " + getNumWithString(1, chosenParticularThings[1]) + ", а среди любых "
+                + NumberWord.getStringForNumber(count2 + 1, things[theme].getGender(), Case.GENITIVE);;
 
         String textEnd = " найдется хотя бы " + getNumWithString(1, chosenParticularThings[0])
                 + ". Сколько " + chosenParticularThings[question].getCountingForm() + getWhere(theme);
