@@ -63,6 +63,20 @@ public interface Problem {
             }
             throw new IllegalStateException();
         }
+
+        public Difficulty getNext() {
+            switch (this) {
+                case EASY:
+                    return MEDIUM;
+                case MEDIUM:
+                    return HARD;
+                case HARD:
+                    return EXPERT;
+                case EXPERT:
+                    throw new IllegalStateException();
+            }
+            throw new IllegalStateException();
+        }
     }
 
     State getState();//вынести в TaskResult с удалением из Problem

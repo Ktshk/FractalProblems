@@ -133,7 +133,7 @@
             </hint>
         </hints>
         <text_answers>
-            <answer text="15 слив  "/>
+            <answer text="15 слив"/>
         </text_answers>
     </problem>
     <problem answer="1" scenarioId="DIFFERENCE_CAT_DOG_WEIGHING">

@@ -20,7 +20,9 @@ public class UserInfo {
     private Map<Difficulty, List<Problem>> variousProblems = new HashMap<>();
     private Map<Difficulty, Set<String>> solvedVariousProblems = new HashMap<>(); // for the initialization only
 
-    private Problem currentProblem;
+    private Map<Difficulty, Problem> currentProblemByDifficulty = new HashMap<>();
+    private Problem currentProblem = null;
+
     private int points;
 
     UserInfo(String deviceId, String name) {
@@ -40,11 +42,16 @@ public class UserInfo {
         return solvedProblemsByTheme.get(theme);
     }
 
-    Problem getCurrentProblem() {
-        return currentProblem;
+    Problem getCurrentProblem(Difficulty difficulty) {
+        return currentProblemByDifficulty.get(difficulty);
     }
 
-    void setCurrentProblem(Problem currentProblem) {
+    void setCurrentProblem(Problem currentProblem, Difficulty difficulty) {
+        if (currentProblem == null) {
+            this.currentProblemByDifficulty.remove(difficulty);
+        } else {
+            this.currentProblemByDifficulty.put(difficulty, currentProblem);
+        }
         this.currentProblem = currentProblem;
     }
 
@@ -132,5 +139,9 @@ public class UserInfo {
                 "deviceId='" + deviceId + '\'' +
                 ", name='" + name + '\'' +
                 '}';
+    }
+
+    public Problem getCurrentProblem() {
+        return currentProblem;
     }
 }

@@ -2,6 +2,7 @@ package com.dinoproblems.server.generators;
 
 import com.dinoproblems.server.*;
 import com.dinoproblems.server.utils.GeneratorUtils;
+import com.dinoproblems.server.utils.ProblemTextBuilder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -41,7 +42,7 @@ public class LegsAndHeadsGenerator implements ProblemGenerator {
         final int i4 = randomInt(0, 3);
         final int quest2 = quest == 0 ? i2 : i4;
 
-        final String text;
+        final ProblemTextBuilder text = new ProblemTextBuilder();
         final String hint;
         final HashSet<String> possibleTextAnswers = new HashSet<>();
         if (!scenario.equals(COINS)) {
@@ -71,10 +72,10 @@ public class LegsAndHeadsGenerator implements ProblemGenerator {
                         + ", сколько тогда у них ног? А сколько ног надо добавить " + animalsDat[0][i2] + ", чтобы превратить " + (i2 < 2 ? "её" : "его")
                         + " в " + animalsAcc[1][i4] + ". ";
 
-                text = "Во дворе гуляют " + animals[0][i2] + " и " + animals[1][i4]
+                text.append("Во дворе гуляют " + animals[0][i2] + " и " + animals[1][i4]
                         + ". У них вместе " + GeneratorUtils.getNumWithString(heads, "голова", "головы", "голов", FEMININE)
                         + " и " + getLegsString((ducks * 2 + cows * 4)) + ". "
-                        + "Сколько " + animals5more[quest][quest2] + " гуляет во дворе?";
+                        + "Сколько " + animals5more[quest][quest2] + " гуляет во дворе?");
             } else if (scenario.equals(EGGS)) {
                 animals = new String[][]{{"цыплята", "утята", "страусы"},
                         {"ящерицы", "утконосы", "крокодилы"}};
@@ -95,9 +96,9 @@ public class LegsAndHeadsGenerator implements ProblemGenerator {
                         + ". А потом подумайте, сколько ног надо добавить " + animalsDat[0][i2] + ", чтобы превратить его"
                         + " в " + animalsAcc[1][i4] + ". ";
 
-                text = "Из " + heads + " яиц вылупились " + animals[0][i2] + " и " + animals[1][i4]
+                text.append("Из " + heads + " яиц ").append("вылупились", "в+ылупились").append(animals[0][i2] + " и " + animals[1][i4]
                         + ". У них вместе " + getLegsString((ducks * 2 + cows * 4)) + ". "
-                        + "Сколько вылупилось " + animals5more[quest][quest2] + "?";
+                        + "Сколько вылупилось " + animals5more[quest][quest2] + "?");
 
             } else if (scenario.equals(INSECTS)) {
                 heads = difficulty == Problem.Difficulty.HARD ? randomInt(6, 11) : randomInt(3, 6);
@@ -124,9 +125,9 @@ public class LegsAndHeadsGenerator implements ProblemGenerator {
                         + ". А потом подумайте, сколько ног надо добавить " + animalsDat[0][i2] + ", чтобы превратить " + (i2 < 2 ? "её" : "его")
                         + " в " + animalsAcc[1][i4] + ". ";
 
-                text = "Вася поймал несколько " + animals5more[0][i2] + " и " + animals5more[1][i4]
+                text.append("Вася поймал несколько " + animals5more[0][i2] + " и " + animals5more[1][i4]
                         + ". Получилось всего " + getInsectString(heads) + " и у них на всех " + getLegsString(ducks * 6 + cows * 8) + ". "
-                        + "Сколько " + animals5more[quest][quest2] + " у Васи?";
+                        + "Сколько " + animals5more[quest][quest2] + " у Васи?");
             } else {
                 throw new IllegalArgumentException();
             }
@@ -150,12 +151,14 @@ public class LegsAndHeadsGenerator implements ProblemGenerator {
             possibleTextAnswers.add(Integer.toString(answer));
 
             hint = "Подумайте, какой стороной могли лежать " + heads + " монет, если сумма на них равна " + sum + ". Что если на всех монетах " + firstCoin + "?";
-            text = "У Пети есть " + heads + " фишек, на одной стороне которых написана цифра " + firstCoin + ", а на другой " + secondCoin +
+            text.append("У Пети есть " + heads + " фишек, на одной стороне которых написана цифра " + firstCoin + ", а на другой " + secondCoin +
                     ". Он выложил их на стол случайным образом и посчитал сумму. Получилось " + sum +
-                    ". Затем он перевернул каждую фишку на другую сторону и снова посчитал сумму. Сколько у него получилось?";
+                    ". Затем он перевернул каждую фишку на другую сторону и снова посчитал сумму. Сколько у него получилось?");
         }
 
-        return new ProblemWithPossibleTextAnswers.Builder().text(text).answer(answer).theme(ProblemCollection.LEGS_AND_HEADS).possibleTextAnswers(possibleTextAnswers).hint(hint).scenario(scenario).difficulty(difficulty).create();
+        return new ProblemWithPossibleTextAnswers.Builder().text(text.getText()).text(text.getTTS()).answer(answer)
+                .theme(ProblemCollection.LEGS_AND_HEADS).possibleTextAnswers(possibleTextAnswers).hint(hint)
+                .scenario(scenario).difficulty(difficulty).create();
     }
 
     @Override

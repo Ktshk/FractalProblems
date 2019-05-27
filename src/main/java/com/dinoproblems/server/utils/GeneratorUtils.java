@@ -5,14 +5,12 @@ import com.dinoproblems.server.Problem.Difficulty;
 import com.dinoproblems.server.ProblemGenerator.ProblemAvailability;
 import com.dinoproblems.server.ProblemGenerator.ProblemAvailabilityType;
 import com.dinoproblems.server.ProblemScenario;
-import com.google.common.collect.Lists;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.dinoproblems.server.Problem.Difficulty.EASY;
@@ -193,24 +191,12 @@ public class GeneratorUtils {
                             scenarioToProblemAvailability.put(scenario, ProblemAvailabilityType.trainProblem);
                         }
                     } else if (difficulty != EASY && stateDifficultyMap.get(false).contains(difficulty.getPrevious())) {
-                        if (!easierScenariosSet.isEmpty()) {
-                            scenarioToProblemAvailability.put(chooseRandomElement(easierScenariosSet), ProblemAvailabilityType.easierProblem);
-                        } else {
-                            if (!scenario.isSingleProblem()) {
-                                scenarioToProblemAvailability.put(scenario, ProblemAvailabilityType.trainProblem);
-                            }
+                        if (!scenario.isSingleProblem()) {
+                            scenarioToProblemAvailability.put(scenario, ProblemAvailabilityType.trainProblem);
                         }
                     } else {
-                        if (!easierScenariosSet.isEmpty()) {
-                            if (easierScenarios.contains(scenario)) {
-                                scenarioToProblemAvailability.put(scenario, ProblemAvailabilityType.easierProblem);
-                            } else {
-                                scenarioToProblemAvailability.put(chooseRandomElement(easierScenariosSet), ProblemAvailabilityType.easierProblem);
-                            }
-                        } else {
-                            if (!scenario.isSingleProblem()) {
-                                scenarioToProblemAvailability.put(scenario, ProblemAvailabilityType.trainProblem);
-                            }
+                        if (!scenario.isSingleProblem()) {
+                            scenarioToProblemAvailability.put(scenario, ProblemAvailabilityType.trainProblem);
                         }
                     }
                 }
@@ -221,11 +207,7 @@ public class GeneratorUtils {
             return null;
         }
 
-        final ArrayList<ProblemScenario> sortedList = scenarioToProblemAvailability.keySet()
-                .stream()
-                .filter(problemScenario -> availableScenarios.contains(problemScenario) ||
-                        (scenarioToProblemAvailability.get(problemScenario) == ProblemAvailabilityType.easierProblem && easierScenarios.contains(problemScenario)))
-                .collect(Collectors.toCollection(ArrayList::new));
+        final ArrayList<ProblemScenario> sortedList = new ArrayList<>(scenarioToProblemAvailability.keySet());
         if (sortedList.isEmpty()) {
             return null;
         }

@@ -98,7 +98,8 @@ public class SpacesGenerator implements ProblemGenerator {
                 break;
             case PILLS:
                 int pills = randomInt(4, 10);
-                text.append("Совунья прописала Крошу ").append(Integer.toString(pills)).append(" таблеток, которые нужно принимать по одной каждый час. Сколько времени займёт лечение?");
+                text.append("Совунья прописала ").append("Крошу ", "Кр+ошу ").append(getNumWithString(pills, PILL, ACCUSATIVE))
+                        .append(", которые нужно принимать по одной каждый час. Сколько времени займёт лечение?");
                 answer = pills - 1;
                 hint = "Подумайте, сколько пройдет времени, когда Крош примет вторую таблетку? А когда третью?";
                 possibleTextAnswers = Sets.newHashSet(answer + " часов");

@@ -8,6 +8,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import javax.annotation.Nullable;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -24,7 +25,8 @@ import static com.dinoproblems.server.utils.GeneratorUtils.randomInt;
 
 
 /**
- * Created by Katushka on 07.01.2019.
+ * Created by Katushka
+ * on 07.01.2019.
  */
 @WebServlet("/DemoServlet")
 public class MainServlet extends HttpServlet {
@@ -35,14 +37,15 @@ public class MainServlet extends HttpServlet {
     private Set<String> yesAnswers = Sets.newHashSet("да", "давай", "давайте", "ну давай", "хочу", "валяй",
             "можно", "ага", "угу", "конечно", "хорошо", "окей", "правильно", "я не против", "точно", "ок");
     private Set<String> continueAnswers = Sets.newHashSet("продолжим", "продолжаем", "давай задачу", "решаем",
-            "дальше", "еще 1", "еще 1", "давай решим", "давай решим еще 1", "давайте решим еще 1",
+            "дальше", "еще 1", "еще 1 задачу", "давай решим", "давай решим еще 1", "давайте решим еще 1",
             "решаем дальше", "говори", "говори следующую задачу", "хочу решить задачу", "жги", "еще", "решаем решаем",
-            "гоу", "поехали", "хотим");
+            "гоу", "поехали", "хотим", "новая задача", "новую задачу");
     private Set<String> noAnswers = Sets.newHashSet("нет", "не", "неправильно");
     private Set<String> enoughAnswers = Sets.newHashSet("нет", "нет спасибо", "не хочу", "хватит", "не надо",
             "не", "все не хочу", "больше не хочу", "не хочу больше", "не хочу еще задачу", "не хочу решить задачу",
             "нет спасибо", "заканчивай", "выйти");
-    private Set<String> endSessionAnswers = Sets.newHashSet("хватит", "больше не хочу", "давай закончим", "надоело", "закончить", "заканчивай", "кончай");
+    private Set<String> endSessionAnswers = Sets.newHashSet("хватит", "больше не хочу", "давай закончим",
+            "надоело", "закончить", "заканчивай", "кончай", "мне надоело");
     private Set<String> askAnswer = Sets.newHashSet("ответ", "сдаюсь", "сказать ответ", "скажи ответ",
             "скажи решение", "можно решение", "расскажи мне какой ответ", "какой ответ", "скажи ответ пожалуйста",
             "можно ответ сказать", "дай ответ", "скажи мне ответ", "я хочу узнать ответ", "хочу узнать ответ");
@@ -57,18 +60,21 @@ public class MainServlet extends HttpServlet {
     private String[] soundPraises = {"<speaker audio=\"alice-sounds-game-win-1.opus\">",
             "<speaker audio=\"alice-sounds-game-win-2.opus\">",
             "<speaker audio=\"alice-sounds-game-win-3.opus\">"};
-    private String[] oneMoreQuestion = {"Хотите ещё задачу?", "Решаем дальше?", "Давайте решим еще одну!", "Предлагаю решить ещё одну"};
+    private String[] oneMoreQuestion = {"Хотите ещё задачу?", "Решаем дальше?", "Давайте решим еще одну!", "Предлагаю решить ещё одну."};
     private String[] wrongAnswer = {"Нет, это неверно.", "Неверно.", "Это неправильный ответ.", "Нет.", "Нет, это точно неправильно."};
-    private String[] notAnAnswer = {"Хотите скажу подсказку или повторю задачу?", "Я могу повторить задачу.", "Могу дать вам подсказку.",
+    private String[] proposeAnswerOrHint = {"Хотите скажу подсказку или повторю задачу?", "Я могу повторить задачу.", "Могу дать вам подсказку.",
             "Задача не из лёгких, но я могу помочь", "Я могу подсказать."};
+    private String[] notANumber = {"Это точно не ответ на задачу. ", "Даже не знаю, как на это реагировать. ",
+            "Я почти уверена, что в ответе на задачу должно быть число. ", "Всё ещё жду ответа на задачу. "};
     private String[] almost = {"Почти.", "Почти верно.", "Близко, но нет."};
     private String[] didNotUnderstand = {"Не поняла вас. ", "Не понимаю. ", "Мне кажется, это не было ответом на мой вопрос. ",
-            "Не уверена, что поняла вас правильно. "};
+            "Не уверена, что поняла вас правильно. ", "Даже не знаю, как на это реагировать. "};
     private String[] wantAProblemQuestion = {"Хотите решить задачу?", "Хотите решить ещё одну задачу?", "Продолжаем решать задачи?"};
     private String[] allHintAreGiven = {"Я уже давала вам подсказку. ", "У меня закончились подсказки, но могу повторить ещё раз. ",
             "Больше подсказок нет, но могу повторить. ", "Подсказка была такая. ", "К сожалению, больше подсказок нет, но могу повторить. "};
     private String[] nextHint = {"Следующая подсказка. ", "У меня есть ещё одна подсказка. ",
-            "Одну подсказку я вам уже давала, но могу подсказать ещё. ", "Слушайте следующую подсказку. "};
+            "Одну подсказку я вам уже давала, но могу подсказать ещё. ", "Слушайте следующую подсказку. ",
+            "Вам повезло, для этой задачи у меня есть ещё одна подсказка"};
     private String meetOnceMore[] = {"Рада снова слышать вас, ", "Здравствуйте, ", "Очень приятно снова слышать вас, "};
     private String niceToMeet[] = {"Приятно познакомиться, ", "Очень приятно, ", "Рада знакомству, "};
     private String myNameIs[] = {"меня зовут", "мое имя", "моё имя"};
@@ -84,6 +90,27 @@ public class MainServlet extends HttpServlet {
     private final HashSet<String> medium = Sets.newHashSet("средняя", "среднюю", "средний", "средне", "среднюю задачу");
     private final HashSet<String> hard = Sets.newHashSet("сложная", "сложную", "сложный", "сложно", "сложную задачу");
     private final HashSet<String> expert = Sets.newHashSet("эксперт", "экспертная", "задачу для экспертов");
+    private final HashSet<String> easier = Sets.newHashSet("попроще", "проще", "еще проще", "еще попроще", "более простую задачу", "простую", "простую задачу");
+    private final HashSet<String> harder = Sets.newHashSet("сложнее", "посложнее", "более сложную задачу", "сложную", "сложную задачу");
+    private final HashSet<String> anotherProblem = Sets.newHashSet("другую", "другая", "другую задачу", "другая задача", "новую задачу");
+    private final String[] dontHaveEasier = new String[]{"Извините, но проще уже некуда. Продолжаем на этом уровне сложности?",
+            "Простите, но это самые простые мои задачи, но я верю, что вы сможете их решить, если хорошенько подумаете. Продолжаем?",
+            "К сожалению, проще задач у меня для вас нет. Продолжаем решать?"};
+    private final String[] easierProblem = new String[]{"Хорошо, давайте попробуем попроще. ", "Попроще так попроще. ",
+            "Попроще задачи у меня тоже есть. ", "Согласна, давайте сначала потренируемся решать задачи попроще. ",
+            "Пожалуй, и правда, задача была сложновата. Но у меня есть и попроще. "};
+    private final String[] harderProblem = new String[]{"Хорошо, давайте попробуем посложнее. ", "Ну хорошо, перейдем на уровень посложнее. ",
+            "Посложнее задачи у меня тоже есть. ", "Ну что ж, у меня есть задача и посложнее. ",
+            "Есть задача и посложнее, посмотрим, как вы с ней справитесь. "};
+    private final String[] dontHaveHarder = new String[]{"Давайте попробуем другую задачу, может быть она будет посложнее.",
+            "Мне кажется, это была и так довольно сложная задача. Давайте попробуем другую на этом уровне. ",
+            "К сожалению, сложнее задач у меня пока нет, но я попрошу программистов их добавить. А пока посмотрим, как вы справитесь со следующей задачей. "};
+    private final ProblemTextBuilder[] dontGiveAnother = new ProblemTextBuilder[]{
+            new ProblemTextBuilder().append("Сначала надо решить эту задачу. Я верю, у вас получится, если хорошенько подумать. "),
+            new ProblemTextBuilder().append("Нет, сначала давайте решим эту задачу. Я могу помочь. "),
+            new ProblemTextBuilder().append("Сначала надо разобраться с моей задачей. Я могу её повторить или дать подсказку. "),
+            new ProblemTextBuilder().append("Боюсь, что я не могу дать вам другую задачу, пока вы не решите эту. Могу дать вам подсказку. "),
+            new ProblemTextBuilder().append("К сожалению, мои программисты запретили мне давать новую задачу, пока вы не решите ").append("эту", "+эту").append(". ")};
     private final static String HELP = "Я предлагаю Вам решить несколько олимпиадных задач от системы кружков олимпиадной математики Фрактал. " +
             "Сначала вы выбираете сложность: простую, среднюю, сложную или эксперт. " +
             "За каждую решенную задачу я буду начислять вам баллы. За нерешенные задачи, баллы будут сниматься. " +
@@ -230,7 +257,7 @@ public class MainServlet extends HttpServlet {
                     responseJson.addProperty("tts", sessionResult.getTTS());//корректное произношение итогов сессии
                     responseJson.addProperty("end_session", true);
                     result.add("response", responseJson);
-                } else if (session.getNextProblem() == null || session.getCurrentDifficulty() == null) {
+                } else if (session.getCurrentProblem() == null && (session.getNextProblem() == null || session.getCurrentDifficulty() == null)) {
                     final Problem.Difficulty currentDifficulty = parseDifficulty(command);
                     if (currentDifficulty == null) {
                         dataBaseService.updateMiscAnswersTable(command, "", session.getLastServerResponse());
@@ -243,14 +270,39 @@ public class MainServlet extends HttpServlet {
                         result.add("response", responseJson);
                     } else {
                         session.setCurrentDifficulty(currentDifficulty);
-                        addProblemTextToResponse(responseJson, session);
+                        addProblemTextToResponse(responseJson, session, null);
                         result.add("response", responseJson);
                     }
-                } else if (session.getCurrentProblem() == null && (checkAnswer(command, yesAnswers) || checkAnswer(command, continueAnswers, yesAnswers))) {
-                    addProblemTextToResponse(responseJson, session);
+                } else if (checkAnswer(command, easier, yesAnswers) || checkAnswer(command, easier, continueAnswers)) {
+                    if (session.getCurrentDifficulty() == Problem.Difficulty.EASY) {
+                        String text = chooseRandomElement(dontHaveEasier);
+                        responseJson.addProperty("text", text);
+                        if (session.getCurrentProblem() != null) {
+                            addProblemButtons(responseJson, session.getCurrentProblem());
+                        }
+                        session.setLastServerResponse(text);
+                    } else {
+                        session.setCurrentDifficulty(session.getCurrentDifficulty().getPrevious());
+                        addProblemTextToResponse(responseJson, session, chooseRandomElement(easierProblem));
+                    }
+
                     responseJson.addProperty("end_session", false);
                     result.add("response", responseJson);
-
+                } else if (session.getCurrentProblem() == null && (checkAnswer(command, harder, yesAnswers) || checkAnswer(command, harder, continueAnswers))) {
+                    if (session.getCurrentDifficulty() == Problem.Difficulty.EXPERT) {
+                        final String text = chooseRandomElement(dontHaveHarder);
+                        responseJson.addProperty("text", text);
+                        session.setLastServerResponse(text);
+                    } else {
+                        session.setCurrentDifficulty(session.getCurrentDifficulty().getNext());
+                        addProblemTextToResponse(responseJson, session, chooseRandomElement(harderProblem));
+                    }
+                    responseJson.addProperty("end_session", false);
+                    result.add("response", responseJson);
+                } else if (session.getCurrentProblem() == null && (checkAnswer(command, yesAnswers) || checkAnswer(command, continueAnswers, yesAnswers))) {
+                    addProblemTextToResponse(responseJson, session, null);
+                    responseJson.addProperty("end_session", false);
+                    result.add("response", responseJson);
                 } else {
                     final Problem problem = session.getCurrentProblem();
 
@@ -258,9 +310,17 @@ public class MainServlet extends HttpServlet {
                         dataBaseService.updateMiscAnswersTable(command, "", session.getLastServerResponse());
 
                         final String responseText = chooseRandomElement(didNotUnderstand) + chooseRandomElement(wantAProblemQuestion);
+//                        responseJson.add("buttons", createNewProblemButtons(session, true));
                         session.setLastServerResponse(responseText);
                         responseJson.addProperty("text", responseText);
                         result.add("response", responseJson);
+                    } else if (checkAnswer(command, anotherProblem) || checkAnswer(command, anotherProblem, yesAnswers)) {
+                        final ProblemTextBuilder answer = GeneratorUtils.chooseRandomElement(dontGiveAnother);
+                        responseJson.addProperty("text", answer.getText());
+                        responseJson.addProperty("tts", answer.getTTS());
+                        session.setLastServerResponse(answer.getText());
+                        result.add("response", responseJson);
+                        addProblemButtons(responseJson, problem);
                     } else if (checkAnswer(command, askHint, yesAnswers)) {
                         if (!problem.hasHint()) {
                             giveHint(result, responseJson, session, problem, chooseRandomElement(allHintAreGiven), problem.getLastHint());
@@ -331,7 +391,7 @@ public class MainServlet extends HttpServlet {
 
         if (problemState != Problem.State.ANSWER_GIVEN && session.getNextProblem() != null) {
             final int solvedInARow = session.getSessionResult().getSolvedInARow();
-            if (solvedInARow > 0 && solvedInARow % 3 == 0){
+            if (solvedInARow > 0 && solvedInARow % 3 == 0) {
                 text += "Вы решили " + getNumWithString(solvedInARow, PROBLEM) + " подряд. " + chooseRandomElement(praiseShort);
             } else /*if (randomInt(0, 3) == 0)*/ {
                 text += chooseRandomElement(sessionScore) + getNumWithString(session.getUserInfo().getTotalScore(), SCORE) + ". " + chooseRandomElement(praiseShort);
@@ -341,6 +401,8 @@ public class MainServlet extends HttpServlet {
         text += (session.getNextProblem() != null ? chooseRandomElement(oneMoreQuestion) : "Поздравляю! Вы решили все задачи на этом уровне сложности. Порешаем другие задачи?");
         if (session.getNextProblem() == null) {
             responseJson.add("buttons", createDifficultyButtons(session));
+        } else {
+            responseJson.add("buttons", createNewProblemButtons(session, problemState != Problem.State.ANSWER_GIVEN));
         }
         responseJson.addProperty("text", text);
         if (problemState != Problem.State.ANSWER_GIVEN) {
@@ -366,9 +428,9 @@ public class MainServlet extends HttpServlet {
 
         boolean correctAnswer = problem.checkAnswer(command);
         boolean almostCorrect = false;
+        boolean numberFound = false;
 
         if (!correctAnswer && problem.isNumericAnswer()) {
-            boolean numberFound = false;
 
             for (JsonElement jsonElement : entitiesArray) {
                 final String type = jsonElement.getAsJsonObject().get("type").getAsString();
@@ -383,20 +445,24 @@ public class MainServlet extends HttpServlet {
                     numberFound = true;
                 }
             }
-            if (!numberFound) {
-                responseJson.addProperty("text", chooseRandomElement(notAnAnswer));
-            }
+
         }
 
         if (correctAnswer) {
             finishWithProblem(result, responseJson, session, problem, problem.wasHintGiven() ? Problem.State.SOLVED_WITH_HINT : Problem.State.SOLVED, clientId);
         } else {
-            final String text = chooseRandomElement(almostCorrect ? almost : wrongAnswer) + " " + chooseRandomElement(notAnAnswer);
+            DataBaseService.INSTANCE.updateMiscAnswersTable(command, problem.getText(), session.getLastServerResponse());
+
+            final String text;
+            if (!numberFound) {
+                text = chooseRandomElement(notANumber) + " " + chooseRandomElement(proposeAnswerOrHint);
+            } else {
+                text = chooseRandomElement(almostCorrect ? almost : wrongAnswer) + " " + chooseRandomElement(proposeAnswerOrHint);
+            }
             responseJson.addProperty("text", text);
             addProblemButtons(responseJson, problem);
             result.add("response", responseJson);
             session.setLastServerResponse(text);
-            // score.getProblemAnswerGiven();
         }
     }
 
@@ -404,8 +470,13 @@ public class MainServlet extends HttpServlet {
         return array[randomInt(0, array.length)];
     }
 
-    private void addProblemTextToResponse(JsonObject responseJson, Session session) {
-        final Problem problem = session.getNextProblem();
+    private void addProblemTextToResponse(JsonObject responseJson, Session session, @Nullable String prefix) {
+        final Problem problem;
+        if (session.getCurrentProblem() == null) {
+            problem = session.getNextProblem();
+        } else {
+            problem = session.getCurrentProblem();
+        }
         session.setCurrentProblem(problem);
         if (problem == null) {
             final String text = "Извините, но вы уже решили все мои задачи на этом уровне сложности. Может быть, порешаем задачи другой сложности?";
@@ -413,12 +484,14 @@ public class MainServlet extends HttpServlet {
             responseJson.add("buttons", createDifficultyButtons(session));
             session.setLastServerResponse(text);
         } else {
-            final String text = (problem.getComment() != null ? (problem.getComment() + " ") : "") + problem.getText();
+            final String text = (prefix != null ? prefix : "") +
+                    (problem.getComment() != null ? (problem.getComment() + " ") : "") + problem.getText();
             responseJson.addProperty("text", text);
             addProblemButtons(responseJson, problem);
             if (problem.getTTS() != null || problem.getCommentTTS() != null) {
-                responseJson.addProperty("tts", (problem.getCommentTTS() != null ? problem.getCommentTTS() :
-                        (problem.getComment() != null ? (problem.getComment() + " ") : ""))
+                responseJson.addProperty("tts", (prefix != null ? prefix : "") +
+                        (problem.getCommentTTS() != null ? problem.getCommentTTS() :
+                                (problem.getComment() != null ? (problem.getComment() + " ") : ""))
                         + (problem.getTTS() != null ? problem.getTTS() : problem.getText()));
             }
             session.setLastServerResponse(text);
@@ -466,6 +539,20 @@ public class MainServlet extends HttpServlet {
         }
         if (currentDifficulty != null) {
             buttons.add(createButton("закончить"));
+        }
+        return buttons;
+    }
+
+    private JsonArray createNewProblemButtons(Session session, boolean lastProblemSolved) {
+        final JsonArray buttons = new JsonArray();
+        final Problem.Difficulty currentDifficulty = session.getCurrentDifficulty();
+        buttons.add(createButton("новая задача"));
+
+        if (currentDifficulty != Problem.Difficulty.EASY) {
+            buttons.add(createButton("попроще"));
+        }
+        if (currentDifficulty != Problem.Difficulty.EXPERT && lastProblemSolved) {
+            buttons.add(createButton("посложнее"));
         }
         return buttons;
     }

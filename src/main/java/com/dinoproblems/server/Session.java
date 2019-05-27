@@ -1,9 +1,5 @@
 package com.dinoproblems.server;
 
-import com.dinoproblems.server.generators.VariousProblems;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
@@ -14,8 +10,7 @@ import java.util.*;
 public class Session {
     private final String sessionId;
     private final SessionResult sessionResult = new SessionResult();
-    private Problem currentProblem;
-    private Problem nextProblem;
+    private final Map<Problem.Difficulty, Problem> nextProblem = new HashMap<>();
 
     private Problem.Difficulty currentDifficulty = null;
     private String lastServerResponse;
@@ -49,13 +44,11 @@ public class Session {
     }
 
     public Problem getCurrentProblem() {
-        return currentProblem;
+        return userInfo.getCurrentProblem(getCurrentDifficulty());
     }
 
     public void setCurrentProblem(Problem currentProblem) {
-        this.currentProblem = currentProblem;
-        userInfo.setCurrentProblem(currentProblem);
-
+        userInfo.setCurrentProblem(currentProblem, getCurrentDifficulty());
     }
 
     public Problem.Difficulty getCurrentDifficulty() {
@@ -64,7 +57,28 @@ public class Session {
 
     public void setCurrentDifficulty(Problem.Difficulty currentDifficulty) {
         this.currentDifficulty = currentDifficulty;
-        nextProblem = ProblemCollection.INSTANCE.generateProblem(this);
+
+        populateNextProblem();
+    }
+
+    private void generateNextProblem() {
+        final Problem currentDifficultyProblem = ProblemCollection.INSTANCE.generateProblem(this, getCurrentDifficulty());
+        if (currentDifficultyProblem == null) {
+            nextProblem.remove(getCurrentDifficulty());
+        } else {
+            nextProblem.put(getCurrentDifficulty(), currentDifficultyProblem);
+        }
+    }
+
+    private void populateNextProblem() {
+        for (Problem.Difficulty difficulty : Problem.Difficulty.values()) {
+            if (!nextProblem.containsKey(difficulty)) {
+                final Problem problem = ProblemCollection.INSTANCE.generateProblem(this, difficulty);
+                if (problem != null) {
+                    nextProblem.put(difficulty, problem);
+                }
+            }
+        }
     }
 
     public String getLastServerResponse() {
@@ -80,11 +94,11 @@ public class Session {
     }
 
     public int updateScore(Problem problem) {
-        currentProblem = null;
+        userInfo.setCurrentProblem(null, getCurrentDifficulty());
         final int points = sessionResult.updateScore(problem);
         userInfo.addSolvedProblem(problem.getTheme(), problem, points);
 
-        nextProblem = ProblemCollection.INSTANCE.generateProblem(this);
+        generateNextProblem();
         return points;
     }
 
@@ -107,7 +121,6 @@ public class Session {
     public String toString() {
         return "Session{" +
                 "sessionId='" + sessionId + '\'' +
-                ", currentProblem=" + currentProblem +
                 '}';
     }
 
@@ -127,7 +140,9 @@ public class Session {
 
     @Nullable
     public Problem getNextProblem() {
-        return nextProblem;
+        return nextProblem.getOrDefault(getCurrentDifficulty(), null);
     }
+
+
 
 }

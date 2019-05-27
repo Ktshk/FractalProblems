@@ -50,6 +50,7 @@ public class Dictionary {
     public final static Noun SWEETS = new NounBuilder().nom("сладость").gen("сладости").counting("сладостей").plural("сладости").gender(FEMININE).createNoun();
     public final static Noun SPORT = new NounBuilder().nom("спорт").gen("спорта").instr("спортом").acc("спорт").gender(MASCULINE).createNoun();
     public final static Noun PAGE = new NounBuilder().nom("страница").gen("страницы").instr("страницей").acc("страницу").counting("страниц").gender(MASCULINE).createNoun();
+    public final static Noun PILL = new NounBuilder().nom("таблетка").gen("такблетки").counting("таблеток").plural("таблетки").acc("таблетку").gender(MASCULINE).createNoun();
     public final static Noun CAKE = new NounBuilder().nom("торт").gen("торта").counting("тортов").plural("торты").gender(MASCULINE).createNoun();
     public final static Noun TULIP = new NounBuilder().nom("тюльпан").gen("тюльпана").counting("тюльпанов").plural("тюльпаны").gender(MASCULINE).createNoun();
     public final static Noun STUDENT = new NounBuilder().nom("ученик").gen("ученика").counting("учеников").plural("ученики").gender(MASCULINE).createNoun();
