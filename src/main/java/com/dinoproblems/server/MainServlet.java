@@ -92,7 +92,8 @@ public class MainServlet extends HttpServlet {
     private final HashSet<String> expert = Sets.newHashSet("эксперт", "экспертная", "задачу для экспертов");
     private final HashSet<String> easier = Sets.newHashSet("попроще", "проще", "еще проще", "еще попроще", "более простую задачу", "простую", "простую задачу");
     private final HashSet<String> harder = Sets.newHashSet("сложнее", "посложнее", "более сложную задачу", "сложную", "сложную задачу");
-    private final HashSet<String> anotherProblem = Sets.newHashSet("другую", "другая", "другую задачу", "другая задача", "новую задачу");
+    private final HashSet<String> anotherProblem = Sets.newHashSet("другую", "другая", "другую задачу",
+            "другая задача", "новую задачу", "дай другую задачу", "дай мне новую задачу", "дай другую", "дай другую задачу");
     private final String[] dontHaveEasier = new String[]{"Извините, но проще уже некуда. Продолжаем на этом уровне сложности?",
             "Простите, но это самые простые мои задачи, но я верю, что вы сможете их решить, если хорошенько подумаете. Продолжаем?",
             "К сожалению, проще задач у меня для вас нет. Продолжаем решать?"};
