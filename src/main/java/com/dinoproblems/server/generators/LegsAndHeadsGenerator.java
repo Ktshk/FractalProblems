@@ -156,7 +156,7 @@ public class LegsAndHeadsGenerator implements ProblemGenerator {
                     ". Затем он перевернул каждую фишку на другую сторону и снова посчитал сумму. Сколько у него получилось?");
         }
 
-        return new ProblemWithPossibleTextAnswers.Builder().text(text.getText()).text(text.getTTS()).answer(answer)
+        return new ProblemWithPossibleTextAnswers.Builder().text(text.getText()).tts(text.getTTS()).answer(answer)
                 .theme(ProblemCollection.LEGS_AND_HEADS).possibleTextAnswers(possibleTextAnswers).hint(hint)
                 .scenario(scenario).difficulty(difficulty).create();
     }
