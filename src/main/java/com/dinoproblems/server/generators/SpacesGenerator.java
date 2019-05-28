@@ -107,7 +107,8 @@ public class SpacesGenerator implements ProblemGenerator {
             case ELEVATOR:
                 int firstFloor = difficulty == Problem.Difficulty.EASY ? 1 : randomInt(2, 10);
                 int lastFloor = difficulty == Problem.Difficulty.EASY ? randomInt(5, 8) : randomInt(firstFloor + 3, firstFloor + 7);
-                text.append("Лифт поднимается с 1 на 3 этаж за 6 секунд. За какое время лифт поднимется с ")
+                text.append("Лифт поднимается с ").append("1", "первого").append(" на ").append("3", "третий")
+                        .append(" этаж за 6 секунд. За какое время лифт поднимется с ")
                         .append(OrdinalNumber.number(firstFloor).getGenitiveMasculine()).append(" на ")
                         .append(OrdinalNumber.number(lastFloor).getAccusativeForm(MASCULINE)).append(" этаж?");
                 answer = 3 * (lastFloor - firstFloor);

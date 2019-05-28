@@ -74,7 +74,7 @@ public class UserInfo {
     }
 
     private void initVariousProblems(Difficulty difficulty) {
-        System.out.println("initVariousProblems");
+        System.out.println("initVariousProblems " + name);
         System.out.println("solvedVariousProblems = " + solvedVariousProblems);
         final ArrayList<Problem> problems = VariousProblems.INSTANCE.getProblems(difficulty)
                 .stream()

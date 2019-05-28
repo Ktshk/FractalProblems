@@ -57,11 +57,11 @@ public class ProblemCollection {
     }
 
     @Nullable
-    public Problem generateProblem(Session session, Problem.Difficulty difficulty) {
-        if (session.hasVariousProblems() &&
+    public Problem generateProblem(UserInfo userInfo, Problem.Difficulty difficulty) {
+        if (userInfo.hasVariousProblems(difficulty) &&
                 ((difficulty == Problem.Difficulty.EXPERT && randomInt(0, 2) == 0)
                         || ((difficulty != Problem.Difficulty.EXPERT && randomInt(0, 3) == 0))) ) {
-            final Problem randomVariousProblem = session.getRandomVariousProblem();
+            final Problem randomVariousProblem = userInfo.getRandomVariousProblem(difficulty);
             if (randomVariousProblem != null)
                 System.out.println("randomVariousProblem.getDifficulty() = " + randomVariousProblem.getDifficulty());
             return randomVariousProblem;
@@ -70,7 +70,7 @@ public class ProblemCollection {
                 new TreeMap<>(Comparator.comparingInt(problemAvailabilityType -> -problemAvailabilityType.getWeight()));
         for (Map.Entry<String, ProblemGenerator> problemGeneratorEntry : generators.entrySet()) {
             final ProblemGenerator problemGenerator = problemGeneratorEntry.getValue();
-            final Collection<Problem> themedProblems = session.getSolvedProblems(problemGeneratorEntry.getKey());
+            final Collection<Problem> themedProblems = userInfo.getSolvedProblemsByTheme(problemGeneratorEntry.getKey());
             final ProblemAvailability problemAvailability = problemGenerator.hasProblem(themedProblems, difficulty);
             if (problemAvailability != null) {
                 if (!availabilityTypeToGenerator.containsKey(problemAvailability.getType())) {
@@ -81,14 +81,14 @@ public class ProblemCollection {
         }
 
         if (availabilityTypeToGenerator.isEmpty()) {
-            return session.getRandomVariousProblem();
+            return userInfo.getRandomVariousProblem(difficulty);
         }
         final Map<ProblemGenerator, ProblemAvailability> bestGenerators = availabilityTypeToGenerator.get(availabilityTypeToGenerator.keySet().iterator().next());
 
         final Map<ProblemGenerator, Set<Problem>> bestSolvedProblems = new HashMap<>();
         bestGenerators.keySet().forEach(gen -> {
             final String generatorKey = generators.inverse().get(gen);
-            bestSolvedProblems.put(gen, new HashSet<>(session.getSolvedProblems(generatorKey)));
+            bestSolvedProblems.put(gen, new HashSet<>(userInfo.getSolvedProblemsByTheme(generatorKey)));
         });
 
         final Optional<Map.Entry<ProblemGenerator, Set<Problem>>> min = bestSolvedProblems.entrySet().stream()
@@ -104,7 +104,7 @@ public class ProblemCollection {
         System.out.println("difficulty = " + difficulty);
         final Problem problem = entry.getKey().generateProblem(difficulty, problemAvailability);
         System.out.println("theme = " + problem.getTheme());
-        System.out.println("solved problems = " + session.getSolvedProblems(problem.getTheme()));
+        System.out.println("solved problems = " + userInfo.getSolvedProblemsByTheme(problem.getTheme()));
         return problem;
     }
 

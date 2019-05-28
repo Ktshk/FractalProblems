@@ -5,7 +5,8 @@ import javax.annotation.Nullable;
 import java.util.*;
 
 /**
- * Created by Katushka on 10.02.2019.
+ * Created by Katushka
+ * on 10.02.2019.
  */
 public class Session {
     private final String sessionId;
@@ -62,7 +63,7 @@ public class Session {
     }
 
     private void generateNextProblem() {
-        final Problem currentDifficultyProblem = ProblemCollection.INSTANCE.generateProblem(this, getCurrentDifficulty());
+        final Problem currentDifficultyProblem = ProblemCollection.INSTANCE.generateProblem(getUserInfo(), getCurrentDifficulty());
         if (currentDifficultyProblem == null) {
             nextProblem.remove(getCurrentDifficulty());
         } else {
@@ -73,7 +74,7 @@ public class Session {
     private void populateNextProblem() {
         for (Problem.Difficulty difficulty : Problem.Difficulty.values()) {
             if (!nextProblem.containsKey(difficulty)) {
-                final Problem problem = ProblemCollection.INSTANCE.generateProblem(this, difficulty);
+                final Problem problem = ProblemCollection.INSTANCE.generateProblem(getUserInfo(), difficulty);
                 if (problem != null) {
                     nextProblem.put(difficulty, problem);
                 }
@@ -87,10 +88,6 @@ public class Session {
 
     public void setLastServerResponse(String lastServerResponse) {
         this.lastServerResponse = lastServerResponse;
-    }
-
-    public Collection<Problem> getSolvedProblems(String theme) {
-        return userInfo.getSolvedProblemsByTheme(theme);
     }
 
     public int updateScore(Problem problem) {
@@ -130,19 +127,8 @@ public class Session {
     }
 
     @Nullable
-    public Problem getRandomVariousProblem() {
-        return userInfo.getRandomVariousProblem(getCurrentDifficulty());
-    }
-
-    public boolean hasVariousProblems() {
-        return userInfo.hasVariousProblems(getCurrentDifficulty());
-    }
-
-    @Nullable
     public Problem getNextProblem() {
         return nextProblem.getOrDefault(getCurrentDifficulty(), null);
     }
-
-
 
 }

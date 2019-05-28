@@ -35,6 +35,7 @@ public class MainServlet extends HttpServlet {
     private Map<String, UserInfo> userInfos = new HashMap<>();
     private String url = "localhost:8080";
 
+    private Set<String> meaninglessWords = Sets.newHashSet("ну", "пожалуйста", "а", "спасибо");
     private Set<String> yesAnswers = Sets.newHashSet("да", "давай", "давайте", "ну давай", "хочу", "валяй",
             "можно", "ага", "угу", "конечно", "хорошо", "окей", "правильно", "я не против", "точно", "ок");
     private Set<String> continueAnswers = Sets.newHashSet("продолжим", "продолжаем", "давай задачу", "решаем",
@@ -53,7 +54,8 @@ public class MainServlet extends HttpServlet {
     private Set<String> askHint = Sets.newHashSet("подсказка", "подсказку", "сказать подсказку", "помощь",
             "дать подсказку", "дай", "давай", "дай подсказку", "подскажи", "есть еще подсказка", "помоги");
     private Set<String> askToRepeat = Sets.newHashSet("повтори", "повторить", "повтори задачу", "повтори условие",
-            "еще раз", "прочитай еще раз", "расскажи еще раз", "повтори еще раз", "задачу повтори", "еще раз повтори");
+            "еще раз", "прочитай еще раз", "расскажи еще раз", "повтори еще раз", "задачу повтори", "еще раз повтори",
+            "можешь повторить");
     private String[] praises = {"Да, верно!", "Это правильный ответ.", "Ну конечно! Так и есть.",
             "Я не сомневалась, что у вы справитесь.", "Правильно!", "Верно! ", "Точно!", "Абсолютно верно! "};
     private String[] praiseShort = {"Отлично! ", "Здорово! ", "Отличный результат! ", "Молодец! ", "Класс! ",
@@ -75,7 +77,7 @@ public class MainServlet extends HttpServlet {
             "Больше подсказок нет, но могу повторить. ", "Подсказка была такая. ", "К сожалению, больше подсказок нет, но могу повторить. "};
     private String[] nextHint = {"Следующая подсказка. ", "У меня есть ещё одна подсказка. ",
             "Одну подсказку я вам уже давала, но могу подсказать ещё. ", "Слушайте следующую подсказку. ",
-            "Вам повезло, для этой задачи у меня есть ещё одна подсказка"};
+            "Вам повезло, для этой задачи у меня есть ещё одна подсказка. "};
     private String meetOnceMore[] = {"Рада снова слышать вас, ", "Здравствуйте, ", "Очень приятно снова слышать вас, "};
     private String niceToMeet[] = {"Приятно познакомиться, ", "Очень приятно, ", "Рада знакомству, "};
     private String myNameIs[] = {"меня зовут", "мое имя", "моё имя"};
@@ -369,7 +371,6 @@ public class MainServlet extends HttpServlet {
             response.getOutputStream().print("Error");
             response.getOutputStream().flush();
         }
-
     }
 
     private String upperCaseFirstLetter(String userNameFromCommand) {
@@ -581,7 +582,7 @@ public class MainServlet extends HttpServlet {
         buttonJson.addProperty("hide", true);
         String url = "http://" + this.url + "/records";
         if (userInfo != null) {
-            url += "?user_id="+userInfo.getDeviceId() +"#selected";
+            url += "?user_id=" + userInfo.getDeviceId() + "#selected";
         }
         buttonJson.addProperty("url", url);
         return buttonJson;
@@ -595,15 +596,36 @@ public class MainServlet extends HttpServlet {
         if (answer == null) {
             return false;
         }
-        answer = answer.trim();
+        if (answerCollection.contains(answer.toLowerCase())) {
+            return true;
+        }
+
         StringBuilder answerMod = new StringBuilder().append(answer.charAt(0));
         for (int i = 1; i < answer.length(); i++) {
             if (answer.charAt(i - 1) == ' ' && answer.charAt(i) == ' ') {
                 continue;
             }
+            if (answer.charAt(i) == '.' || answer.charAt(i) == ',' || answer.charAt(i) == '!' || answer.charAt(i) == '?') {
+                continue;
+            }
             answerMod.append(answer.charAt(i));
         }
         answer = answerMod.toString();
+
+        final String[] words = answer.split(" ");
+        answerMod = new StringBuilder();
+        for (int i = 0; i < words.length; i++) {
+            String word = words[i];
+            if (!meaninglessWords.contains(word)) {
+                answerMod.append(word);
+                if (i < words.length - 1) {
+                    answerMod.append(' ');
+                }
+            }
+        }
+        answer = answerMod.toString();
+        answer = answer.trim();
+
         if (answerCollection.contains(answer.toLowerCase())) {
             return true;
         }

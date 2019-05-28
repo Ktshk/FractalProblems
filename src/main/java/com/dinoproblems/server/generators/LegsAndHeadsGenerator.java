@@ -1,18 +1,22 @@
 package com.dinoproblems.server.generators;
 
 import com.dinoproblems.server.*;
+import com.dinoproblems.server.utils.AdjectiveWithNoun;
 import com.dinoproblems.server.utils.GeneratorUtils;
 import com.dinoproblems.server.utils.ProblemTextBuilder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
+import static com.dinoproblems.server.utils.Dictionary.*;
 import static com.dinoproblems.server.utils.GeneratorUtils.Gender.FEMININE;
 import static com.dinoproblems.server.utils.GeneratorUtils.Gender.MASCULINE;
 import static com.dinoproblems.server.utils.GeneratorUtils.findAvailableScenario;
+import static com.dinoproblems.server.utils.GeneratorUtils.getNumWithString;
 import static com.dinoproblems.server.utils.GeneratorUtils.randomInt;
 
 /**
@@ -24,15 +28,18 @@ public class LegsAndHeadsGenerator implements ProblemGenerator {
     private final static ProblemScenario EGGS = new ProblemScenarioImpl(ProblemCollection.LEGS_AND_HEADS + "_" + "EGGS");
     private final static ProblemScenario INSECTS = new ProblemScenarioImpl(ProblemCollection.LEGS_AND_HEADS + "_" + "INSECTS");
     private final static ProblemScenario COINS = new ProblemScenarioImpl(ProblemCollection.LEGS_AND_HEADS + "_" + "COINS");
+    private final static ProblemScenario BICYCLES = new ProblemScenarioImpl(ProblemCollection.LEGS_AND_HEADS + "_" + "BICYCLES");
 
-    private static final ProblemScenario[] MEDIUM_SCENARIOS = {ANIMALS, EGGS, INSECTS};
+    private static final ProblemScenario[] MEDIUM_SCENARIOS = {ANIMALS, EGGS, INSECTS, BICYCLES};
+    private static final ArrayList<ProblemScenario> HARD_SCENARIOS = Lists.newArrayList(ANIMALS, EGGS, INSECTS, COINS);
+    private static final ArrayList<ProblemScenario> EASY_SCENARIOS = Lists.newArrayList(ANIMALS, EGGS, BICYCLES);
 
     @Nonnull
     @Override
     public Problem generateProblem(Problem.Difficulty difficulty, ProblemAvailability problemAvailability) {
         final ProblemScenario scenario = problemAvailability.getScenario();
-        int heads = difficulty == Problem.Difficulty.EASY ? randomInt(3, 5) :
-                difficulty == Problem.Difficulty.MEDIUM ? randomInt(5, 9) : randomInt(9, 16);
+        int heads = difficulty == Problem.Difficulty.EASY ? randomInt(3, 6) :
+                difficulty == Problem.Difficulty.MEDIUM ? randomInt(6, 10) : randomInt(10, 17);
         int ducks = randomInt(1, heads);
         int cows = heads - ducks;
         final int quest = randomInt(0, 2);
@@ -45,7 +52,37 @@ public class LegsAndHeadsGenerator implements ProblemGenerator {
         final ProblemTextBuilder text = new ProblemTextBuilder();
         final String hint;
         final HashSet<String> possibleTextAnswers = new HashSet<>();
-        if (!scenario.equals(COINS)) {
+        if (scenario.equals(BICYCLES)) {
+            heads = difficulty == Problem.Difficulty.EASY ? randomInt(4, 6) : randomInt(6, 12);
+            ducks = randomInt(2, heads - 1);
+            cows = heads - ducks;
+            answer = quest == 0 ? ducks : cows;
+
+            possibleTextAnswers.add(getNumWithString(answer, BICYCLE));
+            possibleTextAnswers.add(getNumWithString(answer,
+                    quest == 0 ? new AdjectiveWithNoun(TWO_WHEEL, BICYCLE) : new AdjectiveWithNoun(THREE_WHEEL, BICYCLE)));
+
+            hint = "Допустим, что все велосипеды были двухколесные. Сколько тогда у них колес? Подумайте, сколько колес надо добавить, чтобы превратить каждый двухколесный велосипед в трехколёсный?";
+            text.append(getNumWithString(heads, CHILD)).append(" катались во дворе на велосипедах. Большие на двухколесных, маленькие – на трех.")
+                    .append(" Сколько было ").append(quest == 0 ? "двухколёсных велосипедов" : "велосипедов у малышей")
+                    .append(", если у всех велосипедов было ").append(getNumWithString(ducks * 2 + cows * 3, WHEEL)).append("?");
+
+        } else if (scenario.equals(COINS)) {
+            heads = randomInt(5, 11);
+            int firstCoin = randomInt(1, 3);
+            int secondCoin = randomInt(firstCoin + 1, firstCoin + 4);
+            ducks = randomInt(2, heads - 2);
+            cows = heads - ducks;
+            int sum = firstCoin * ducks + secondCoin * cows;
+            answer = firstCoin * cows + secondCoin * ducks;
+
+            possibleTextAnswers.add(Integer.toString(answer));
+
+            hint = "Подумайте, какой стороной могли лежать " + heads + " монет, если сумма на них равна " + sum + ". Что если на всех монетах " + firstCoin + "?";
+            text.append("У Пети есть " + heads + " фишек, на одной стороне которых написана цифра " + firstCoin + ", а на другой " + secondCoin +
+                    ". Он выложил их на стол случайным образом и посчитал сумму. Получилось " + sum +
+                    ". Затем он перевернул каждую фишку на другую сторону и снова посчитал сумму. Сколько у него получилось?");
+        } else {
             final String[][] animals;
             final GeneratorUtils.Gender[][] animalGender;
             final String[][] animals5more;
@@ -139,21 +176,6 @@ public class LegsAndHeadsGenerator implements ProblemGenerator {
             if (answer == 2) {
                 possibleTextAnswers.add("двое");
             }
-        } else {
-            heads = randomInt(5, 11);
-            int firstCoin = randomInt(1, 3);
-            int secondCoin = randomInt(firstCoin + 1, firstCoin + 4);
-            ducks = randomInt(2, heads - 2);
-            cows = heads - ducks;
-            int sum = firstCoin * ducks + secondCoin * cows;
-            answer = firstCoin * cows + secondCoin * ducks;
-
-            possibleTextAnswers.add(Integer.toString(answer));
-
-            hint = "Подумайте, какой стороной могли лежать " + heads + " монет, если сумма на них равна " + sum + ". Что если на всех монетах " + firstCoin + "?";
-            text.append("У Пети есть " + heads + " фишек, на одной стороне которых написана цифра " + firstCoin + ", а на другой " + secondCoin +
-                    ". Он выложил их на стол случайным образом и посчитал сумму. Получилось " + sum +
-                    ". Затем он перевернул каждую фишку на другую сторону и снова посчитал сумму. Сколько у него получилось?");
         }
 
         return new ProblemWithPossibleTextAnswers.Builder().text(text.getText()).tts(text.getTTS()).answer(answer)
@@ -165,11 +187,11 @@ public class LegsAndHeadsGenerator implements ProblemGenerator {
     public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty) {
         switch (difficulty) {
             case EASY:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(ANIMALS, EGGS), new HashSet<>());
+                return findAvailableScenario(difficulty, alreadySolvedProblems, EASY_SCENARIOS, new HashSet<>());
             case MEDIUM:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(MEDIUM_SCENARIOS), Lists.newArrayList(ANIMALS, EGGS));
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(MEDIUM_SCENARIOS), EASY_SCENARIOS);
             case HARD:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(ANIMALS, EGGS, INSECTS, COINS), Sets.newHashSet(MEDIUM_SCENARIOS));
+                return findAvailableScenario(difficulty, alreadySolvedProblems, HARD_SCENARIOS, Sets.newHashSet(MEDIUM_SCENARIOS));
             case EXPERT:
                 return null;
 

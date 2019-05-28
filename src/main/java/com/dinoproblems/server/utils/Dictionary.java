@@ -16,6 +16,7 @@ public class Dictionary {
     public final static Noun SHOE = new NounBuilder().nom("ботинок").gen("ботинка").counting("ботинок").plural("ботинки").gender(MASCULINE).createNoun();
     public final static Noun BROTHER = new NounBuilder().nom("брат").gen("брата").counting("братьев").plural("братья").gender(MASCULINE).createNoun();
     public final static Noun BOUQUET = new NounBuilder().nom("букет").gen("букета").counting("букетов").plural("букеты").gender(MASCULINE).createNoun();
+    public final static Noun BICYCLE = new NounBuilder().nom("велосипед").gen("велосипеда").counting("велосипедов").plural("велосипеды").gender(MASCULINE).createNoun();
     public final static Noun PINK_FLOWER = new NounBuilder().nom("гвоздика").gen("гвоздики").counting("гвоздик").plural("гвоздики").gender(FEMININE).createNoun();
     public final static Noun PEAR = new NounBuilder().nom("груша").gen("груши").acc("грушу").counting("груш").plural("груши").gender(FEMININE).createNoun();
     public final static Noun GIRL = new NounBuilder().nom("девочка").gen("девочки").counting("девочек").plural("девочки").gender(FEMININE).createNoun();
@@ -23,6 +24,7 @@ public class Dictionary {
     public final static Noun STAR = new NounBuilder().nom("звёздочка").gen("звёздочки").counting("звёздочек").plural("звёздочки").acc("звёздочку").gender(FEMININE).createNoun();
     public final static Noun HISTORY = new NounBuilder().nom("история").gen("истории").instr("историей").acc("историю").gender(FEMININE).createNoun();
     public final static Noun PENCIL = new NounBuilder().nom("карандаш").gen("карандаша").counting("карандашей").plural("карандаши").gender(MASCULINE).createNoun();
+    public final static Noun WHEEL = new NounBuilder().nom("колесо").gen("колеса").counting("колёс").plural("колёса").gender(NEUTER).createNoun();
     public final static Noun CANDY = new NounBuilder().nom("конфета").gen("конфеты").counting("конфет").acc("конфету").plural("конфеты").gender(FEMININE).createNoun();
     public final static Noun SKATES = new NounBuilder().nom("конёк").gen("конька").counting("коньков").plural("коньки").gender(MASCULINE).createNoun();
     public final static Noun CANDY_BOX = new NounBuilder().nom("коробка конфет").gen("коробки конфет").counting("коробок конфет").plural("коробки конфет").gender(FEMININE).createNoun();
@@ -42,6 +44,7 @@ public class Dictionary {
     public final static Noun BUYER = new NounBuilder().nom("покупатель").gen("покупателя").counting("покупателей").plural("покупатели").gender(MASCULINE).createNoun();
     public final static Noun SUBJECT = new NounBuilder().nom("предмет").gen("предмета").acc("предмет").instr("предметом").counting("предметов").plural("предметы").gender(FEMININE).createNoun();
     public final static Noun BUTTON = new NounBuilder().nom("пуговица").gen("пуговицы").counting("пуговиц").plural("пуговицы").acc("пуговицу").gender(FEMININE).createNoun();
+    public final static Noun TIMES = new NounBuilder().nom("раз").gen("раза").counting("раз").gender(MASCULINE).createNoun();
     public final static Noun CHILD = new NounBuilder().nom("ребенок").gen("ребенка").counting("детей").plural("дети").gender(MASCULINE).createNoun();
     public final static Noun ROSE = new NounBuilder().nom("роза").gen("розы").counting("роз").plural("розы").gender(FEMININE).createNoun();
     public final static Noun CAMOMILE = new NounBuilder().nom("ромашка").gen("ромашки").counting("ромашек").plural("ромашки").gender(FEMININE).createNoun();
@@ -69,10 +72,12 @@ public class Dictionary {
     public static final AbstractNoun[] SUBJECTS = {MUSIC, BIOLOGY, MATH, PHYSICS, CHEMISTRY, HISTORY};
     public static final AbstractNoun[] FLOWERS = {TULIP, ROSE, DAFFODIL, CAMOMILE, ASTER, PINK_FLOWER};
 
+    public final static Adjective TWO_WHEEL = new Adjective("двухколёсный", "двухколёсная", "двухколёсное", "двухколёсных", "двухколёсного", "двухколёсной", "двухколёсные");
     public final static Adjective YELLOW = new Adjective("жёлтый", "жёлтая", "жёлтое", "жёлтых", "жёлтого", "жёлтой", "жёлтые");
     public final static Adjective GREEN = new Adjective("зелёный", "зелёная", "зелёное", "зелёных", "зелёного", "зелёной", "зелёные");
     public final static Adjective RED = new Adjective("красный", "красная", "красное", "красных", "красного", "красной", "красные");
     public final static Adjective BLUE = new Adjective("синий", "синяя", "синее", "синих", "синего", "синей", "синие");
+    public final static Adjective THREE_WHEEL = new Adjective("трехколёсный", "трехколёсная", "трехколёсное", "трехколёсных", "трехколёсного", "трехколёсной", "трехколёсные");
     public final static Adjective BLACK = new Adjective("чёрный", "чёрная", "чёрное", "чёрных", "чёрного", "чёрной", "чёрные");
 
 

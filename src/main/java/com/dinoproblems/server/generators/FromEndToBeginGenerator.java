@@ -9,7 +9,6 @@ import com.google.common.collect.Sets;
 
 import javax.annotation.Nonnull;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.concurrent.ThreadLocalRandom;
@@ -24,7 +23,6 @@ Modified by Simar 28.04.19
 public class FromEndToBeginGenerator implements ProblemGenerator {
     private static final ProblemScenario LILY_SCENARIO = new ProblemScenarioImpl(ProblemCollection.FROM_END_TO_BEGIN + "_LILY");
     private static final ProblemScenario DEFAULT_SCENARIO = new ProblemScenarioImpl(ProblemCollection.FROM_END_TO_BEGIN + "_DEFAULT");
-    private static final ArrayList<ProblemScenario> SCENARIOS = Lists.newArrayList(DEFAULT_SCENARIO, LILY_SCENARIO);
 
     @Nonnull
     @Override
@@ -48,13 +46,11 @@ public class FromEndToBeginGenerator implements ProblemGenerator {
         final String[] choiceofactions;//действия с числом
         final String[] hobbies;//Интересы для 3-его действия
         final String[] beginning;//фон
-        final int[] growing;//скорость увеличения цветков лилий на озере
         final String[] questions1;//вопросы первого типа для задачи 2
         int day;//день заполнения лилиями озера
         final String[] times;//склонения раз и раза
         int token1 = ThreadLocalRandom.current().nextInt(0, 8);//выбор первого героя
         int token2 = ThreadLocalRandom.current().nextInt(0, 8);//выбор второго героя
-        int token3 = 0;
         //int token3 = ThreadLocalRandom.current().nextInt(0, 5);//выбор первого вопроса
         //int token3 = difficulty == Difficulty.EASY ? randomInt(0, 3)
         //  : randomInt(3, 5);
@@ -62,9 +58,9 @@ public class FromEndToBeginGenerator implements ProblemGenerator {
         //  final int secondoperand = ThreadLocalRandom.current().nextInt(10, 100);//операнд второго действия
         // final int thirdoperand = ThreadLocalRandom.current().nextInt(10, 100);//операнд третьего действия для лёгкой сложности
         int answer = 0;
-        int firstoperand = 0;
-        int secondoperand = 0;
-        int thirdoperand = 0;
+        int firstoperand;
+        int secondoperand;
+        int thirdoperand;
         // final int answer=92;
         int actionnumber1 = 0;//число 1, полученное из загаданного после первого действия
         int actionnumber2 = 0;//число 2, полученное из числа 1 после второго действия
@@ -85,8 +81,7 @@ public class FromEndToBeginGenerator implements ProblemGenerator {
                 "Как-то раз, гуляя по лесу, ", "Во время прогулки по пляжу, "
                 , "Считая звёзды ночью, ", "Сидя у потрескивающего костра, "
                 , "Желая испытать друга, ", "Выполняя задание Совуньи, "};
-        growing = new int[]{2, 3, 4, 5, 10};//скорость заполнения озера лилиями (
-        //growing=2;
+
         day = ThreadLocalRandom.current().nextInt(10, 100);//день, когда озеро заполнено
         questions1 = new String[]{
                 "На который день покрылась цветами половина озера?",
@@ -95,7 +90,6 @@ public class FromEndToBeginGenerator implements ProblemGenerator {
                 "На который день покралось цветами 20% озера?",
                 "На который день покрылось цветами 10% озера?"};
         times = new String[]{" раз", " раза"};
-        String choice;
         String text = null;//итоговый текст задачи
         String tts = null;
         int i = 10;
@@ -184,16 +178,14 @@ public class FromEndToBeginGenerator implements ProblemGenerator {
 
                     hint = "Подумайте, какое число было до того, как " + hero1[token1] + " " + choiceofactions[actions[2]] + operands[2] + ". ";
                 } else if (scenario.equals(LILY_SCENARIO)) {
-                    token3 = 0;
                     for (; ; ) {
                         if (day % 2 == 0) break;
                         else day = ThreadLocalRandom.current().nextInt(10, 100);
                     }
-                    if (growing[token3] < 5) choice = times[1];
-                    else choice = times[0];
+
                     answer = day - 1;
-                    text = "На озере расцвела одна лилия. Каждый день число её цветков становилось в " + Integer.toString(growing[token3]) + choice + " больше, а на " + day +
-                            " день всё озеро покрылось цветами. " + questions1[token3];
+                    text = "На озере расцвела одна лилия. Каждый день число её цветков становилось в два раза больше, а на " + day +
+                            " день всё озеро покрылось цветами. " + questions1[0];
                     hint = "Подумайте, что было накануне дня, когда все озеро было покрыто цветами. ";
 
                 }
@@ -283,12 +275,10 @@ public class FromEndToBeginGenerator implements ProblemGenerator {
                         else day = ThreadLocalRandom.current().nextInt(10, 100);
                     }
 
-                    if (growing[token3] < 5) choice = times[1];
-                    else choice = times[0];
                     answer = day - 1;
 
-                    text = "На озере расцвела одна лилия. Каждый день число её цветков становилось в " + Integer.toString(growing[token3]) + choice + " больше, а на " + day +
-                            " день всё озеро покрылось цветами. " + questions1[token3];
+                    text = "На озере расцвела одна лилия. Каждый день число её цветков становилось в два раза больше, а на " + day +
+                            " день всё озеро покрылось цветами. " + questions1[0];
 
                     hint = "Подумайте, что было накануне дня, когда все озеро было покрыто цветами. ";
                 } else {
@@ -299,8 +289,8 @@ public class FromEndToBeginGenerator implements ProblemGenerator {
         String possibleAnswer = Integer.toString(answer);
         final HashSet<String> possibleTextAnswers = Sets.newHashSet(Integer.toString(answer));
         possibleTextAnswers.add(possibleAnswer);
-        return new ProblemWithPossibleTextAnswers.Builder().text(text).tts(tts).answer(answer).theme(ProblemCollection.FROM_END_TO_BEGIN).possibleTextAnswers(possibleTextAnswers).hint(hint).scenario(scenario).difficulty(difficulty).create();
-
+        return new ProblemWithPossibleTextAnswers.Builder().text(text).tts(tts).answer(answer).theme(ProblemCollection.FROM_END_TO_BEGIN)
+                .possibleTextAnswers(possibleTextAnswers).hint(hint).scenario(scenario).difficulty(difficulty).create();
     }
 
     @Override
