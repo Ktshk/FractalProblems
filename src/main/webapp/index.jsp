@@ -1,6 +1,5 @@
 <html>
 <body>
-<h2>Hello World!</h2>
-<a href="demo">Click here to see servlet</a>
+<a href="records">Click here to see leaderboard</a>
 </body>
 </html>

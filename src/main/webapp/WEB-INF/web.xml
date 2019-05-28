@@ -8,9 +8,19 @@
     <servlet-class>com.dinoproblems.server.MainServlet</servlet-class>
   </servlet>
 
+  <servlet>
+    <servlet-name>records</servlet-name>
+    <servlet-class>com.dinoproblems.server.ShowRecordsServlet</servlet-class>
+  </servlet>
+
   <servlet-mapping>
     <servlet-name>demo</servlet-name>
     <url-pattern>/demo</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>records</servlet-name>
+    <url-pattern>/records</url-pattern>
   </servlet-mapping>
 
   <security-constraint>

@@ -33,6 +33,7 @@ public class MainServlet extends HttpServlet {
 
     private Map<String, Session> currentSessions = new HashMap<>();
     private Map<String, UserInfo> userInfos = new HashMap<>();
+    private String url = "localhost:8080";
 
     private Set<String> yesAnswers = Sets.newHashSet("да", "давай", "давайте", "ну давай", "хочу", "валяй",
             "можно", "ага", "угу", "конечно", "хорошо", "окей", "правильно", "я не против", "точно", "ок");
@@ -120,6 +121,9 @@ public class MainServlet extends HttpServlet {
 
     public MainServlet() {
         userInfos = DataBaseService.INSTANCE.getUserInfoFromDB();
+        if (System.getProperty("URL") != null) {
+            url = System.getProperty("URL");
+        }
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -526,6 +530,8 @@ public class MainServlet extends HttpServlet {
     private JsonArray createDifficultyButtons(Session session) {
         final JsonArray buttons = new JsonArray();
         final Problem.Difficulty currentDifficulty = session.getCurrentDifficulty();
+        buttons.add(createLeaderboardButton(session.getUserInfo()));
+
         if (currentDifficulty != Problem.Difficulty.EASY) {
             buttons.add(createButton("простая"));
         }
@@ -547,6 +553,9 @@ public class MainServlet extends HttpServlet {
     private JsonArray createNewProblemButtons(Session session, boolean lastProblemSolved) {
         final JsonArray buttons = new JsonArray();
         final Problem.Difficulty currentDifficulty = session.getCurrentDifficulty();
+
+        buttons.add(createLeaderboardButton(session.getUserInfo()));
+
         buttons.add(createButton("новая задача"));
 
         if (currentDifficulty != Problem.Difficulty.EASY) {
@@ -555,6 +564,7 @@ public class MainServlet extends HttpServlet {
         if (currentDifficulty != Problem.Difficulty.EXPERT && lastProblemSolved) {
             buttons.add(createButton("посложнее"));
         }
+
         return buttons;
     }
 
@@ -562,6 +572,18 @@ public class MainServlet extends HttpServlet {
         final JsonObject buttonJson = new JsonObject();
         buttonJson.addProperty("title", title);
         buttonJson.addProperty("hide", true);
+        return buttonJson;
+    }
+
+    private JsonObject createLeaderboardButton(UserInfo userInfo) {
+        final JsonObject buttonJson = new JsonObject();
+        buttonJson.addProperty("title", "рекорды");
+        buttonJson.addProperty("hide", true);
+        String url = "http://" + this.url + "/records";
+        if (userInfo != null) {
+            url += "?user_id="+userInfo.getDeviceId() +"#selected";
+        }
+        buttonJson.addProperty("url", url);
         return buttonJson;
     }
 

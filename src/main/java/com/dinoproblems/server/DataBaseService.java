@@ -1,10 +1,13 @@
 package com.dinoproblems.server;
 
-import java.sql.*;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.dinoproblems.server.generators.ProblemScenarioImpl;
+
+import javax.annotation.Nullable;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.sql.*;
+import java.util.*;
 
 /**
  * Created by Katushka
@@ -285,5 +288,74 @@ public class DataBaseService {
         }
 
         return dbUserInfo;
+    }
+
+    private Set<String> ignoredRecords = null;
+
+    @Nullable
+    public List<RecordRow> getRecords() {
+        if (connection == null) {
+            return null;
+        }
+
+        if (ignoredRecords == null) {
+            ignoredRecords = new HashSet<>();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("ignored_records.txt")))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    ignoredRecords.add(line);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        final String selectAllRecords = "select " + schemeName + ".users.username, " + schemeName + ".problems.difficulty, "
+                + schemeName + ".devices.device_id, " + schemeName + ".solutions.points"
+                + " from " + schemeName + ".users, " + schemeName + ".solutions, " + schemeName + ".reference, "
+                + schemeName + ".devices, " + schemeName + ".problems"
+                + " where " + schemeName + ".reference.user_id=" + schemeName + ".users.user_id and "
+                + schemeName + ".solutions.reference_id=" + schemeName + ".reference.reference_id"
+                + " and " + schemeName + ".reference.device_id=" + schemeName + ".devices.device_id and "
+                + schemeName + ".problems.problem_id=" + schemeName + ".solutions.problem_id";
+
+        System.out.println(selectAllRecords);
+
+        try (Statement statement = connection.createStatement()) {
+            ResultSet resultSet = statement.executeQuery(selectAllRecords);
+
+            Map<RecordRow, RecordRow> records = new HashMap<>();
+
+            while (resultSet.next()) {
+                final String deviceId = resultSet.getString("device_id");
+                if (ignoredRecords.contains(deviceId)) {
+                    continue;
+                }
+
+                final String userName = upperCaseFirstLetter(resultSet.getString("username"));
+                final Problem.Difficulty difficulty = Problem.Difficulty.valueOf(resultSet.getString("difficulty"));
+                final int points = resultSet.getInt("points");
+
+                RecordRow recordRow = new RecordRow(userName, deviceId);
+                if (!records.containsKey(recordRow)) {
+                    records.put(recordRow, recordRow);
+                }
+                records.get(recordRow).addPoints(points, difficulty);
+            }
+
+            final List<RecordRow> result = new ArrayList<>(records.values());
+            result.sort((o1, o2) -> o2.getTotalPoints() - o1.getTotalPoints());
+            for (int i = 0; i < result.size(); i++) {
+                result.get(i).setPosition(i + 1);
+            }
+            return result;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private String upperCaseFirstLetter(String userNameFromCommand) {
+        return userNameFromCommand.substring(0, 1).toUpperCase() + userNameFromCommand.substring(1);
     }
 }
