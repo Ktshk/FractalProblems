@@ -148,7 +148,7 @@ public class EilerCirclesGenerator implements ProblemGenerator {
 
         String[][] heroes = new String[][]{{"Петя", "Петином", "Пете"},
                 {"Вася", "Васином", "Васе"},
-                {"Миша", "Мишином", "Мише"},
+                {"Дима", "Димином", "Диме"},
                 {"Саша", "Сашином", "Саше"}};
         boolean excludeHero = randomInt(0, 2) == 0;
         String[] hero = heroes[randomInt(0, heroes.length)];

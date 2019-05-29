@@ -133,7 +133,7 @@ public class LegsAndHeadsGenerator implements ProblemGenerator {
                         + ". А потом подумайте, сколько ног надо добавить " + animalsDat[0][i2] + ", чтобы превратить его"
                         + " в " + animalsAcc[1][i4] + ". ";
 
-                text.append("Из " + heads + " яиц ").append("вылупились", "в+ылупились").append(animals[0][i2] + " и " + animals[1][i4]
+                text.append("Из " + heads + " яиц ").append("вылупились ", "в+ылупились ").append(animals[0][i2] + " и " + animals[1][i4]
                         + ". У них вместе " + getLegsString((ducks * 2 + cows * 4)) + ". "
                         + "Сколько вылупилось " + animals5more[quest][quest2] + "?");
 

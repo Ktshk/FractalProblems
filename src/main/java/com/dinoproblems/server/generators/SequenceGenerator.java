@@ -1,6 +1,7 @@
 package com.dinoproblems.server.generators;
 
 import com.dinoproblems.server.*;
+import com.dinoproblems.server.utils.ProblemTextBuilder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -45,7 +46,6 @@ public class SequenceGenerator implements ProblemGenerator {
         int operand1 = 0;// = difficulty == EASY ? randomInt(2, 10) : randomInt(10, 30);// малый операнд для одинарной арифметической прогрессии
         int operand2 = 0;// = difficulty == EASY ? randomInt(2, 4) : randomInt(2, 6);//большой операнд для двойной арифметической прогрессии
         int operand3 = 0;//операнд для геометрической прогрессии
-        String text = null;//итоговый текст задачи
         int answer = 0;
         String hint = null;
         ProblemScenario scenario = problemAvailability.getScenario();
@@ -129,11 +129,15 @@ public class SequenceGenerator implements ProblemGenerator {
 
         sequenceShow = Arrays.copyOf(sequence, sequenceShow.length);
         answer = sequence[6];
-        text = "Дана последовательность из шести натуральных чисел. " + Arrays.toString(sequenceShow) + " Какое число может быть следующим?";
+        ProblemTextBuilder text = new ProblemTextBuilder().append("Дана", "Дан+а")
+                .append(" последовательность из шести натуральных чисел. ").append(Arrays.toString(sequenceShow))
+                .append(" Какое число может быть следующим?");
         String possibleAnswer = Integer.toString(answer);
         final HashSet<String> possibleTextAnswers = Sets.newHashSet(Integer.toString(answer));
         possibleTextAnswers.add(possibleAnswer);
-        return new ProblemWithPossibleTextAnswers.Builder().text(text).answer(answer).theme(ProblemCollection.SEQUENCE).possibleTextAnswers(possibleTextAnswers).hint(hint).scenario(scenario).difficulty(difficulty).create();
+        return new ProblemWithPossibleTextAnswers.Builder().text(text.getText()).tts(text.getTTS()).answer(answer)
+                .theme(ProblemCollection.SEQUENCE).possibleTextAnswers(possibleTextAnswers).hint(hint).scenario(scenario)
+                .difficulty(difficulty).create();
     }
 
     private void DoubleArithmeticSequence(int[] sequence, int operand1, int operand2) {
