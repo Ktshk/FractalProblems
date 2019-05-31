@@ -30,6 +30,7 @@ public class Dictionary {
     public final static Noun CANDY_BOX = new NounBuilder().nom("коробка конфет").gen("коробки конфет").counting("коробок конфет").plural("коробки конфет").gender(FEMININE).createNoun();
     public final static Noun BRICK = new NounBuilder().nom("кубик").gen("кубика").counting("кубиков").plural("кубики").gender(MASCULINE).createNoun();
     public final static Noun LOLLIPOP = new NounBuilder().nom("леденец").acc("леденец").gen("леденца").counting("леденцов").plural("леденцы").instr("леденцом").gender(MASCULINE).createNoun();
+    public final static Noun LIAR = new NounBuilder().nom("лжец").gen("лжеца").counting("лжецов").plural("лжецы").gender(MASCULINE).createNoun();
     public final static Noun BOY = new NounBuilder().nom("мальчик").gen("мальчика").counting("мальчиков").plural("мальчики").gender(MASCULINE).createNoun();
     public final static Noun JELLY_CANDY = new NounBuilder().nom("мармеладная конфета").acc("мармеладную конфету").gen("мармеладных конфеты").counting("мармеладных конфет").instr("мармеладной конфетой").plural("мармеладные конфеты").gender(FEMININE).createNoun();
     public final static Noun MATH = new NounBuilder().nom("математика").gen("математики").instr("математикой").acc("математику").gender(FEMININE).createNoun();

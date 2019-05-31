@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.dinoproblems.server.utils.GeneratorUtils.chooseRandomElement;
 import static com.dinoproblems.server.utils.GeneratorUtils.randomInt;
 
 /**
@@ -35,6 +36,7 @@ public class ProblemCollection {
     public static final String FIND_NUMBER = "Find number";
     public static final String COMBINATORICS = "Combinatorics";
     public static final String BROTHERS_AND_SISTERS = "Brothers and sisters";
+    public static final String LOGIC = "Logic";
 
     private BiMap<String, ProblemGenerator> generators = HashBiMap.create();
 
@@ -54,6 +56,7 @@ public class ProblemCollection {
         generators.put(FIND_NUMBER, new FindNumberGenerator());
         generators.put(COMBINATORICS, new CombinatoricsGenerator());
         generators.put(BROTHERS_AND_SISTERS, new BrothersAndSistersGenerator());
+        generators.put(LOGIC, new LogicGenerator());
     }
 
     @Nullable

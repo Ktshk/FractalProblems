@@ -113,4 +113,15 @@
             <answer text="8 вариантов букетов"/>
         </text_answers>
     </problem>
+    <problem answer="4" scenarioId="TABLE_COLUMNS">
+        <text>В прямоугольной таблице 8 столбцов чисел. Сумма чисел в каждом столбце равна 10, а в каждой строке — 20. Сколько в таблице строк?</text>
+        <hints>
+            <hint>
+                <text>Посчитайте сумму чисел во всей таблице</text>
+            </hint>
+        </hints>
+        <text_answers>
+            <answer text="4 строки"/>
+        </text_answers>
+    </problem>
 </problems>
