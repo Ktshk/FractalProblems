@@ -79,7 +79,8 @@ public enum NumberWord {
 
     public static String getStringForNumber(int number, GeneratorUtils.Gender gender, GeneratorUtils.Case wordCase) {
         if (number >= 1000) {
-            throw new IllegalArgumentException();
+            // TODO: implement
+            return String.valueOf(number);
         }
         String result = "";
         if (number / 100 > 0) {

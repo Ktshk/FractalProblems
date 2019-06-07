@@ -10,7 +10,7 @@ import static com.dinoproblems.server.utils.GeneratorUtils.Gender.NEUTER;
 public class Dictionary {
     public final static Noun ORANGE = new NounBuilder().nom("апельсин").gen("апельсина").counting("апельсинов").plural("апельсины").gender(MASCULINE).createNoun();
     public final static Noun ASTER = new NounBuilder().nom("астра").gen("астры").counting("астр").plural("астры").gender(FEMININE).createNoun();
-    public final static Noun SCORE=new NounBuilder().nom("балл").gen("балла").counting("баллов").plural("баллы").gender(MASCULINE).createNoun();
+    public final static Noun SCORE = new NounBuilder().nom("балл").gen("балла").counting("баллов").plural("баллы").gender(MASCULINE).createNoun();
     public final static Noun BANANA = new NounBuilder().nom("банан").gen("банана").counting("бананов").plural("бананы").gender(MASCULINE).createNoun();
     public final static Noun BIOLOGY = new NounBuilder().nom("биология").gen("биологии").instr("биологией").acc("биологию").gender(FEMININE).createNoun();
     public final static Noun SHOE = new NounBuilder().nom("ботинок").gen("ботинка").counting("ботинок").plural("ботинки").gender(MASCULINE).createNoun();

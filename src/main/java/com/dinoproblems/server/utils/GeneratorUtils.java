@@ -71,7 +71,7 @@ public class GeneratorUtils {
     }
 
     public static String getNumWithString(int count, final String one, final String lessThanFive, final String moreThanFive, Gender gender, Case wordCase) {
-        if (count >= 5 && count <= 20) {
+        if (count % 100 >= 5 && count % 100 <= 20) {
             return count + " " + moreThanFive;
         } else {
             final int lastDigit = count % 10;
