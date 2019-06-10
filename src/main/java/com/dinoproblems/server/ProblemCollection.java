@@ -19,7 +19,7 @@ import static com.dinoproblems.server.utils.GeneratorUtils.randomInt;
  * on 10.02.2019.
  */
 public class ProblemCollection {
-    static final ProblemCollection INSTANCE = new ProblemCollection();
+    public static final ProblemCollection INSTANCE = new ProblemCollection();
 
     public static final String LEGS_AND_HEADS = "Legs and heads";
     public static final String BRICK_AND_HALF = "Brick and a half";

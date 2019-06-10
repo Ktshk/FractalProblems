@@ -76,6 +76,7 @@ public class TestRequest {
 
 
     public static final String ELASTICBEANSTALK_URL = "alisa-release.us-east-2.elasticbeanstalk.com/demo";
+    private String sessionId = UUID.randomUUID().toString();;
 
     @Ignore
     @Test
@@ -151,7 +152,9 @@ public class TestRequest {
             };
 
             executeHttpRequest(url, httpclient, responseHandler, "");
-            executeHttpRequest(url, httpclient, responseHandler, "средняя");
+            executeHttpRequest(url, httpclient, responseHandler, "разные задачи");
+            executeHttpRequest(url, httpclient, responseHandler, "простая");
+            executeHttpRequest(url, httpclient, responseHandler, "подсказка");
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -202,7 +205,7 @@ public class TestRequest {
                 "    \"message_id\": 3,\n" +
                 "    \"new\": " + text.isEmpty() + ",\n" +
                //"    \"session_id\": \"e58cb037-712e3090-33e4d929-cca75a07\",\n" +
-               "    \"session_id\": \""+ UUID.randomUUID().toString() +"\",\n" +
+               "    \"session_id\": \""+ sessionId +"\",\n" +
                 "    \"skill_id\": \"f99fbe77-b15a-4c5f-91a7-ab2595febe32\",\n" +
                 "    \"user_id\": \"AA23058EB00BD2097FAE781A72ABF8AB303994B20C8DB2D0E281FA101296A015\"\n" +
                 "  },\n" +

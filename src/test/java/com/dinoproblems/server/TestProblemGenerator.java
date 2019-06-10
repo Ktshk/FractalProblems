@@ -1,7 +1,7 @@
 package com.dinoproblems.server;
 
 import com.dinoproblems.server.generators.*;
-import com.google.common.collect.HashMultimap;
+import com.dinoproblems.server.session.Session;
 import org.junit.Test;
 
 import java.util.HashSet;
@@ -13,7 +13,7 @@ import java.util.Set;
  */
 public class TestProblemGenerator {
 
-    private static final ProblemGenerator GENERATOR = new FromEndToBeginGenerator();
+    private static final ProblemGenerator GENERATOR = new LegsAndHeadsGenerator();
 
     public void testAllGenerators() {
         for (ProblemGenerator generator : ProblemCollection.INSTANCE.getGenerators()) {
@@ -29,7 +29,7 @@ public class TestProblemGenerator {
 
     @Test
     public void testProblemCollectionGeneration() {
-        final Session session = new Session(new UserInfo("test", "test"), "test");
+        final Session session = new Session(new UserInfo("test", "test"), "test", "test");
 
         for (Problem.Difficulty difficulty : Problem.Difficulty.values()) {
 //        Problem.Difficulty difficulty = Problem.Difficulty.EXPERT;

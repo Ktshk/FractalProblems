@@ -25,16 +25,16 @@ public class UserInfo {
 
     private int points;
 
-    UserInfo(String deviceId, String name) {
+    public UserInfo(String deviceId, String name) {
         this.deviceId = deviceId;
         this.name = name;
     }
 
-    String getDeviceId() {
+    public String getDeviceId() {
         return deviceId;
     }
 
-    String getName() {
+    public String getName() {
         return name;
     }
 
@@ -42,11 +42,11 @@ public class UserInfo {
         return solvedProblemsByTheme.get(theme);
     }
 
-    Problem getCurrentProblem(Difficulty difficulty) {
+    public Problem getCurrentProblem(Difficulty difficulty) {
         return currentProblemByDifficulty.get(difficulty);
     }
 
-    void setCurrentProblem(Problem currentProblem, Difficulty difficulty) {
+    public void setCurrentProblem(Problem currentProblem, Difficulty difficulty) {
         if (currentProblem == null) {
             this.currentProblemByDifficulty.remove(difficulty);
         } else {
@@ -110,7 +110,7 @@ public class UserInfo {
         return result;
     }
 
-    void addSolvedProblem(String theme, Problem problem, int points) {
+    public void addSolvedProblem(String theme, Problem problem, int points) {
         solvedProblemsByTheme.put(theme, problem);
         if (VariousProblems.THEME.equals(theme)) {
             if (!variousProblems.containsKey(problem.getDifficulty())) {

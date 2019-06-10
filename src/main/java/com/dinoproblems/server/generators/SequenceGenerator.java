@@ -20,7 +20,6 @@ Hard modified by Simar 18.04.19
   */
 public class SequenceGenerator implements ProblemGenerator {
 
-    private final static ProblemScenario DEFAULT_SCENARIO = new ProblemScenarioImpl(ProblemCollection.SEQUENCE);
     private final static ProblemScenario ARITHMETIC = new ProblemScenarioImpl(ProblemCollection.SEQUENCE + "_" + "ARITHMETIC");
     private final static ProblemScenario DOUBLEARITHMETIC = new ProblemScenarioImpl(ProblemCollection.SEQUENCE + "_" + "DOUBLEARITHMETIC");
     private final static ProblemScenario GEOMETRIC = new ProblemScenarioImpl(ProblemCollection.SEQUENCE + "_" + "GEOMETRIC");
@@ -30,7 +29,6 @@ public class SequenceGenerator implements ProblemGenerator {
     private final static ProblemScenario PRIME_NUMBERS = new ProblemScenarioImpl(ProblemCollection.SEQUENCE + "_" + "PRIME_NUMBERS", true);
     private final static ProblemScenario FAST_GROWING_SEQ = new ProblemScenarioImpl(ProblemCollection.SEQUENCE + "_" + "FAST_GROWING_SEQ", true);
     private final static ProblemScenario ELEVEN = new ProblemScenarioImpl(ProblemCollection.SEQUENCE + "_" + "ELEVEN", true);
-
 
     @Nonnull
     @Override

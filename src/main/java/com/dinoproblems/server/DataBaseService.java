@@ -1,6 +1,7 @@
 package com.dinoproblems.server;
 
 import com.dinoproblems.server.generators.ProblemScenarioImpl;
+import com.dinoproblems.server.utils.GeneratorUtils;
 
 import javax.annotation.Nullable;
 import java.io.BufferedReader;
@@ -14,7 +15,7 @@ import java.util.*;
  * on 21.03.2019.
  */
 public class DataBaseService {
-    static final DataBaseService INSTANCE = new DataBaseService();
+    public static final DataBaseService INSTANCE = new DataBaseService();
     private String schemeName = "alisa";
 
     private Connection connection;
@@ -332,7 +333,7 @@ public class DataBaseService {
                     continue;
                 }
 
-                final String userName = upperCaseFirstLetter(resultSet.getString("username"));
+                final String userName = GeneratorUtils.upperCaseFirstLetter(resultSet.getString("username"));
                 final Problem.Difficulty difficulty = Problem.Difficulty.valueOf(resultSet.getString("difficulty"));
                 final int points = resultSet.getInt("points");
 
@@ -355,7 +356,4 @@ public class DataBaseService {
         }
     }
 
-    private String upperCaseFirstLetter(String userNameFromCommand) {
-        return userNameFromCommand.substring(0, 1).toUpperCase() + userNameFromCommand.substring(1);
-    }
 }

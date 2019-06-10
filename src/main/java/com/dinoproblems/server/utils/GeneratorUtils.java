@@ -166,8 +166,6 @@ public class GeneratorUtils {
             }
         }
 
-        System.out.println("problemsByScenario = " + problemsByScenario);
-
         for (ProblemScenario scenario : availableScenarios) {
             if (!problemsByScenario.containsKey(scenario)) {
                 scenarioToProblemAvailability.put(scenario, ProblemAvailabilityType.newScenarioProblem);
@@ -216,4 +214,9 @@ public class GeneratorUtils {
         return max.map(problemScenario -> new ProblemAvailability(scenarioToProblemAvailability.get(problemScenario), problemScenario)).orElse(null);
 
     }
+
+    public static String upperCaseFirstLetter(String userNameFromCommand) {
+        return userNameFromCommand.substring(0, 1).toUpperCase() + userNameFromCommand.substring(1);
+    }
+
 }

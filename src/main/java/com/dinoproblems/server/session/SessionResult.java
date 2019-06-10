@@ -1,5 +1,6 @@
-package com.dinoproblems.server;
+package com.dinoproblems.server.session;
 
+import com.dinoproblems.server.Problem;
 import com.dinoproblems.server.utils.GeneratorUtils;
 import com.dinoproblems.server.utils.NumberWord;
 import com.dinoproblems.server.utils.ProblemTextBuilder;
@@ -188,9 +189,9 @@ public class SessionResult {
             text.append(" из которых решили с моей помощью.");
         } else {
             if (problemSolved == 1) {
-                text.append("правда, решили её только с моей мпомощью.");
+                text.append("правда, решили её только с моей помощью.");
             } else {
-                text.append("правда, решили их только с моей мпомощью.");
+                text.append("правда, решили их только с моей помощью.");
             }
         }
 
