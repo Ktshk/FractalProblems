@@ -44,7 +44,7 @@ public class ShareWithFriendsGenerator implements ProblemGenerator {
                     .append(hero1[0]).append(" отдал ").append(hero2[2]).append(" ").append(getNumWithString(candies, CANDY, Case.ACCUSATIVE)).append(". ")
                     .append("На сколько конфет у ").append(hero2[1]).append(" стало больше, чем у ").append(hero1[1]).append("?");
             int answer = candies * 2;
-            String hint = "Подумай, на сколько конфет у " + hero2[1] + " стало больше, чем было до этого. " +
+            String hint = "Подумайте, на сколько конфет у " + hero2[1] + " стало больше, чем было до этого. " +
                     "И на сколько конфет у " + hero1[1] + " стало меньше, чем было.";
             final HashSet<String> possibleTextAnswers = Sets.newHashSet("На " + getNumWithString(answer, CANDY, Case.ACCUSATIVE),
                     "На " + getNumWithString(answer, CANDY, Case.ACCUSATIVE) + " больше");

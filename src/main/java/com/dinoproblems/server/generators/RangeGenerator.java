@@ -85,7 +85,7 @@ public class RangeGenerator implements ProblemGenerator {
             second = difficulty == EASY ? randomInt(2, 13) : randomInt(8, 28);
             answer = second + first - 1;
             final String pagesWithText = getNumWithString(second, PAGE, GeneratorUtils.Case.ACCUSATIVE);
-            possibleTextAnswers = Sets.newHashSet(answer + " странице");
+            possibleTextAnswers = Sets.newHashSet("на странице " + answer);
             text.append(hero + " начала читать книгу ").append(getFromText(first)).append(" ").append(String.valueOf(first), OrdinalNumber.getOrdinalTwoDigitNum(first).getGenitiveForm(FEMININE));
             text.append(" страницы и прочитала ровно " + pagesWithText +
                     ". На какой странице " + hero + " закончила?");

@@ -18,7 +18,7 @@ public class ProblemWithPossibleTextAnswers implements Problem {
     private int answer;
     private Set<String> possibleTextAnswers;
     private State state = null;
-    private List<String> hints;
+    List<String> hints;
     private int currentHint = 0;
     private final Difficulty difficulty;
     private final ProblemScenario scenario;

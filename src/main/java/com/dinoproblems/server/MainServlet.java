@@ -162,6 +162,15 @@ public class MainServlet extends HttpServlet {
             result.addProperty("version", version);
             result.add("session", bodyJson.get("session"));
 
+            if (userInfos.containsKey(userId)) {
+                final UserInfo userInfo = userInfos.get(userId);
+                if (userInfo.getCurrentProblem() != null) {
+                    System.out.println("currentProblem.hasHint() = " + userInfo.getCurrentProblem().hasHint());
+                    System.out.println("currentProblem.wasHintGiven() = " + userInfo.getCurrentProblem().wasHintGiven());
+                    System.out.println("currentProblem.hints = " + ((ProblemWithPossibleTextAnswers) userInfo.getCurrentProblem()).hints);
+                }
+            }
+
             final Session session;
             if (newSession || !currentSessions.containsKey(sessionId)) {
                 if (!userInfos.containsKey(userId)) {
