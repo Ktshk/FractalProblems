@@ -4,7 +4,7 @@ import com.dinoproblems.server.MainServlet;
 import com.dinoproblems.server.Problem;
 import com.dinoproblems.server.ProblemCollection;
 import com.dinoproblems.server.UserInfo;
-import com.dinoproblems.server.utils.ProblemTextBuilder;
+import com.dinoproblems.server.utils.TextWithTTSBuilder;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -13,19 +13,22 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 
+import static com.dinoproblems.server.session.SessionResult.EXPERT_SOLVED_POINTS;
+import static com.dinoproblems.server.session.SessionResult.EXPERT_SOLVED_WITH_HINT_POINTS;
+
 /**
  * Created by Katushka
  * on 10.02.2019.
  */
 public class Session {
     private final static String HELP = "Я предлагаю Вам решить несколько олимпиадных задач от системы кружков олимпиадной математики Фрактал. " +
-            "Сначала вы выбираете сложность: простую, среднюю, сложную или эксперт. " +
+            "Сначала вы выбираете сложность: простую, среднюю или сложную. " +
             "За каждую решенную задачу я буду начислять вам баллы. За нерешенные задачи, баллы будут сниматься. " +
             "Если задача кажется вам слишком сложной, я могу повторить условие или дать вам подсказку. " +
             "Но, учтите, что за задачу, решенную с подсказкой, я буду давать вам меньше баллов.";
     private final static Set<String> END_SESSION_ANSWERS = Sets.newHashSet("хватит", "больше не хочу", "давай закончим",
             "надоело", "закончить", "заканчивай", "кончай", "мне надоело");
-    private final static Set<String> ENOUGH_ANSWERS = Sets.newHashSet("нет", "нет спасибо", "не хочу", "хватит", "не надо",
+    final static Set<String> ENOUGH_ANSWERS = Sets.newHashSet("нет", "нет спасибо", "не хочу", "хватит", "не надо",
             "не", "все не хочу", "больше не хочу", "не хочу больше", "не хочу еще задачу", "не хочу решить задачу",
             "нет спасибо", "заканчивай", "выйти");
     private final static Set<String> MEANINGLESS_WORDS = Sets.newHashSet("ну", "пожалуйста", "а", "спасибо");
@@ -126,11 +129,19 @@ public class Session {
     }
 
     public int updateScore(Problem problem) {
-        userInfo.setCurrentProblem(null, getCurrentDifficulty());
-        final int points = sessionResult.updateScore(problem);
+        final int points;
+        if (problem.getDifficulty() != Problem.Difficulty.EXPERT) {
+            userInfo.setCurrentProblem(null, getCurrentDifficulty());
+            points = sessionResult.updateScore(problem);
+        }  else {
+            points = problem.getState() == Problem.State.SOLVED ? EXPERT_SOLVED_POINTS :
+                    problem.getState() == Problem.State.SOLVED_WITH_HINT ? EXPERT_SOLVED_WITH_HINT_POINTS : 0;
+        }
         userInfo.addSolvedProblem(problem.getTheme(), problem, points);
 
-        generateNextProblem();
+        if (problem.getDifficulty() != Problem.Difficulty.EXPERT) {
+            generateNextProblem();
+        }
         return points;
     }
 
@@ -166,7 +177,7 @@ public class Session {
         return nextProblem.getOrDefault(getCurrentDifficulty(), null);
     }
 
-    public SessionState processRequest(@Nullable String command, JsonObject result, JsonArray entitiesArray) {
+    public SessionState processRequest(@Nullable String command, JsonObject result, JsonArray entitiesArray, String timeZone) {
         final JsonObject responseJson = new JsonObject();
         responseJson.addProperty("end_session", false);
 
@@ -176,20 +187,21 @@ public class Session {
             } else {
                 sessionState = new MenuSessionState(true);
             }
-            sessionState.processRequest(command, responseJson, this);
+            sessionState.processRequest(responseJson, this, timeZone);
         } else if ("помощь".equalsIgnoreCase(command) || "что ты умеешь".equalsIgnoreCase(command) || "правила".equalsIgnoreCase(command)) {
             responseJson.addProperty("text", HELP);
         } else if (Objects.equals(command, "end session") ||
-                checkAnswer(command, END_SESSION_ANSWERS) ||
-                (getCurrentProblem() == null && checkAnswer(command, ENOUGH_ANSWERS))) {
-            final ProblemTextBuilder sessionResult = getSessionResult().getResult(getUserInfo() == null ? 0 : getUserInfo().getTotalScore());
+                checkAnswer(command, END_SESSION_ANSWERS)) {
+            final TextWithTTSBuilder sessionResult = getSessionResult().getResult(getUserInfo() == null ? 0 : getUserInfo().getTotalScore());
             responseJson.addProperty("text", sessionResult.getText());//итоговое сообщение пользователю
             responseJson.addProperty("tts", sessionResult.getTTS());//корректное произношение итогов сессии
             responseJson.addProperty("end_session", true);
+        } else if (checkAnswer(command, RegistrationSessionState.CHANGE_NAME, YES_ANSWERS)) {
+            sessionState = new RegistrationSessionState(new MenuSessionState(false));
+            sessionState.processRequest(responseJson, this, timeZone);
         } else {
-            final SessionState nextState = sessionState.getNextState(command, entitiesArray, this);
-            nextState.processRequest(command, responseJson, this);
-            sessionState = nextState;
+            sessionState = sessionState.getNextState(command, entitiesArray, this, timeZone);
+            sessionState.processRequest(responseJson, this, timeZone);
         }
 
         setLastServerResponse(responseJson.get("text").getAsString());
@@ -259,11 +271,16 @@ public class Session {
         return buttonJson;
     }
 
-    static JsonObject createLeaderboardButton(UserInfo userInfo, boolean menuButton) {
-        final JsonObject buttonJson = createButton("рекорды", true);
+    static JsonObject createLeaderboardButton(UserInfo userInfo, boolean menuButton, boolean showExpertRecords) {
+        final JsonObject buttonJson = createButton("Рекорды", true);
         String url = "http://" + MainServlet.URL + "/records";
+        if (showExpertRecords) {
+            url += "?button=1";
+        } else {
+            url += "?button=0";
+        }
         if (userInfo != null) {
-            url += "?user_id=" + userInfo.getDeviceId() + "#selected";
+            url += "&user_id=" + userInfo.getDeviceId() + "#selected";
         }
         buttonJson.addProperty("url", url);
         if (menuButton) {

@@ -3,39 +3,36 @@ package com.dinoproblems.server.session;
 import com.dinoproblems.server.Problem;
 import com.dinoproblems.server.utils.GeneratorUtils;
 import com.dinoproblems.server.utils.NumberWord;
-import com.dinoproblems.server.utils.ProblemTextBuilder;
+import com.dinoproblems.server.utils.TextWithTTSBuilder;
 
 import static com.dinoproblems.server.utils.Dictionary.SCORE;
 import static com.dinoproblems.server.utils.GeneratorUtils.Gender.*;
+import static com.dinoproblems.server.utils.GeneratorUtils.chooseRandomElement;
 import static com.dinoproblems.server.utils.GeneratorUtils.getNumWithString;
 import static com.dinoproblems.server.utils.GeneratorUtils.randomInt;
 
-
 //First stable ver got by Simar 22.04.2019
-//не делаем import так как в одном package
 
-public class SessionResult {
+class SessionResult {
+
+    static final int EXPERT_SOLVED_POINTS = 10;
+    static final int EXPERT_SOLVED_WITH_HINT_POINTS = 5;
 
     private int problemSolved = 0;//кол-во решённых задач
     private int totalProblems = 0;//кол-во выданных задач
     private int hints = 0;//кол-во задач решённых с подсказкой
     private int sessionScore = 0;//суммарное кол-во баллов
-    private int token1 = randomInt(0, 5);//выбор фразы начала
-    private int token2 = randomInt(0, 5);//выбор фразы окончания
     private int solvedInARow = 0;
     private int solvedInARowWithHint = 0;
 
-    public SessionResult() {
-    }
-
-    public int updateScore(Problem problem) {
+    int updateScore(Problem problem) {
         totalProblems++;
         int points = 0;
         if (problem.getState() == Problem.State.SOLVED) {
             if (problem.getDifficulty() == Problem.Difficulty.EASY) points = 2;
             else if (problem.getDifficulty() == Problem.Difficulty.MEDIUM) points = 4;
             else if (problem.getDifficulty() == Problem.Difficulty.HARD) points = 6;
-            else points = 10;
+            else points = EXPERT_SOLVED_POINTS;
             problemSolved++;
             solvedInARow++;
             solvedInARowWithHint++;
@@ -48,7 +45,7 @@ public class SessionResult {
             if (problem.getDifficulty() == Problem.Difficulty.EASY) points = 1;
             else if (problem.getDifficulty() == Problem.Difficulty.MEDIUM) points = 2;
             else if (problem.getDifficulty() == Problem.Difficulty.HARD) points = 3;
-            else points = 5;
+            else points = EXPERT_SOLVED_WITH_HINT_POINTS;
             hints++;
             problemSolved++;
             solvedInARow = 0;
@@ -72,12 +69,12 @@ public class SessionResult {
         return points;
     }
 
-    public int getSolvedInARow() {
+    int getSolvedInARow() {
         return Math.max(solvedInARow, solvedInARowWithHint);
     }
 
-    public ProblemTextBuilder getResult(int totalScore) {
-        ProblemTextBuilder text = new ProblemTextBuilder();//Ctrl+o//окончания+остальные поля
+    TextWithTTSBuilder getResult(int totalScore) {
+        TextWithTTSBuilder text = new TextWithTTSBuilder();//Ctrl+o//окончания+остальные поля
         final String[] goodBeginning = new String[]{"Молодец! Вам удалось решить ",
                 "Невероятно! Вы дали верные ответы на ",
                 "Умница! Вы преуспели в решении ",
@@ -108,19 +105,19 @@ public class SessionResult {
             case 1:
                 if (problemSolved != 0)
                     if (hints != 0) {
-                        text.append(normalBeginning[token1]);
+                        text.append(chooseRandomElement(normalBeginning));
                         text.append(String.valueOf(problemSolved), NumberWord.getStringForNumber(problemSolved, FEMININE, GeneratorUtils.Case.ACCUSATIVE));
                         text.append(" из ");
                         text.append(String.valueOf(totalProblems), NumberWord.getStringForNumber(totalProblems, FEMININE, GeneratorUtils.Case.GENITIVE));
                         text.append(" предложенной задачи, ");
                         addHintsInfo(text);
                         addScore(totalScore, text);
-                        text.append(normalEnding[token2]);
+                        text.append(chooseRandomElement(normalEnding));
                         //return "Вы решили " + problemSolved + " из " + totalProblems + " предложенной задачи, " + hints + " из которых с нашей помощью. Ждём Вас снова!";}
                         return text;
                     }//как грамотно вернуть полученный итог?
                     else {
-                        text.append(normalBeginning[token1]);
+                        text.append(chooseRandomElement(normalBeginning));
                         text.append(String.valueOf(problemSolved), NumberWord.getStringForNumber(problemSolved, FEMININE, GeneratorUtils.Case.ACCUSATIVE));
                         text.append(" из ");
                         text.append(String.valueOf(totalProblems), NumberWord.getStringForNumber(totalProblems, FEMININE, GeneratorUtils.Case.GENITIVE));
@@ -128,21 +125,21 @@ public class SessionResult {
                         //  text.append(String.valueOf(hints), NumberWord.getStringForNumber(hints, NEUTER, GeneratorUtils.Case.NOMINATIVE));
                         text.append(". Вы обошлись без моей помощи.");
                         addScore(totalScore, text);
-                        text.append(normalEnding[token2]);
+                        text.append(chooseRandomElement(normalEnding));
                         return text;
                     }
                     //return "Вы решили " + problemSolved + " из " + totalProblems + " предложенной задачи и обошлись без нашей помощи. Ждём Вас снова!";
                 else {
-                    text.append(badBeginning[token1]);
-                    text.append(normalEnding[token2]);
+                    text.append(chooseRandomElement(badBeginning));
+                    text.append(chooseRandomElement(normalEnding));
                     return text;
                 }
                 //  return "Вы не решили ни одной задачи. Старайтесь лучше и приходите ещё!";
             default:
                 if (problemSolved != 0)
                     if (hints != 0) {
-                        if (sessionScore >= 20) text.append(goodBeginning[token1]);
-                        else text.append(normalBeginning[token1]);
+                        if (sessionScore >= 20) text.append(chooseRandomElement(goodBeginning));
+                        else text.append(chooseRandomElement(normalBeginning));
                         if (problemSolved == 1)
                             text.append(String.valueOf(problemSolved), NumberWord.getStringForNumber(problemSolved, FEMININE, GeneratorUtils.Case.ACCUSATIVE));
                         else
@@ -152,12 +149,12 @@ public class SessionResult {
                         text.append(" предложенных задач, ");
                         addHintsInfo(text);
                         addScore(totalScore, text);
-                        if (sessionScore >= 20) text.append(goodEnding[token2]);
-                        else text.append(normalEnding[token2]);
+                        if (sessionScore >= 20) text.append(chooseRandomElement(goodEnding));
+                        else text.append(chooseRandomElement(normalEnding));
                         return text;
                     } else {
-                        if (sessionScore >= 20) text.append(goodBeginning[token1]);
-                        else text.append(normalBeginning[token1]);
+                        if (sessionScore >= 20) text.append(chooseRandomElement(goodBeginning));
+                        else text.append(chooseRandomElement(normalBeginning));
                         if (problemSolved == 1)
                             text.append(String.valueOf(problemSolved), NumberWord.getStringForNumber(problemSolved, FEMININE, GeneratorUtils.Case.ACCUSATIVE));
                         else
@@ -168,22 +165,22 @@ public class SessionResult {
                         // text.append(String.valueOf(hints), NumberWord.getStringForNumber(hints, NEUTER, GeneratorUtils.Case.NOMINATIVE));
                         text.append(". Вы обошлись без нашей помощи.");
                         addScore(totalScore, text);
-                        if (sessionScore >= 20) text.append(goodEnding[token2]);
-                        else text.append(normalEnding[token2]);
+                        if (sessionScore >= 20) text.append(chooseRandomElement(goodEnding));
+                        else text.append(chooseRandomElement(normalEnding));
                         return text;
                     }//return "Вы решили " + problemSolved + " из " + totalProblems + " предложенных задач и обошлись без нашей помощи. Ждём Вас снова!";
                 else
                 // return "Вы не решили ни одной задачи. Старайтесь лучше и приходите ещё!";
                 {
-                    text.append(badBeginning[token1]);
-                    text.append(normalEnding[token2]);
+                    text.append(chooseRandomElement(badBeginning));
+                    text.append(chooseRandomElement(normalEnding));
                     return text;
                 }
 
         }
     }
 
-    private void addHintsInfo(ProblemTextBuilder text) {
+    private void addHintsInfo(TextWithTTSBuilder text) {
         if (hints < problemSolved) {
             text.append(String.valueOf(hints), NumberWord.getStringForNumber(hints, FEMININE, GeneratorUtils.Case.ACCUSATIVE));
             text.append(" из которых решили с моей помощью.");
@@ -197,7 +194,7 @@ public class SessionResult {
 
     }
 
-    private void addScore(int totalScore, ProblemTextBuilder text) {
+    private void addScore(int totalScore, TextWithTTSBuilder text) {
         text.append(" Вы набрали ").append(getNumWithString(sessionScore, SCORE));
         if (totalScore != sessionScore) {
             text.append(", а всего у вас ").append(getNumWithString(totalScore, SCORE));

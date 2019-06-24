@@ -4,7 +4,7 @@ import com.dinoproblems.server.MainServlet;
 import com.dinoproblems.server.UserInfo;
 import com.dinoproblems.server.utils.Dictionary;
 import com.dinoproblems.server.utils.GeneratorUtils;
-import com.dinoproblems.server.utils.ProblemTextBuilder;
+import com.dinoproblems.server.utils.TextWithTTSBuilder;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -22,8 +22,8 @@ import static com.dinoproblems.server.utils.GeneratorUtils.upperCaseFirstLetter;
  * Created by Katushka on 04.06.2019.
  */
 public class MenuSessionState implements SessionState {
-    private final static String MEET_ONCE_MORE[] = {"Рада снова слышать вас, ", "Здравствуйте, ", "Очень приятно снова слышать вас, "};
-    private final static String TOTAL_SCORE[] = {"У вас на счету ", "У вас уже ", "У меня записано, что вы набрали уже ", "Ваш счет: ", "Вы набрали уже "};
+    private final static String[] MEET_ONCE_MORE = {"Рада снова слышать вас, ", "Здравствуйте, ", "Очень приятно снова слышать вас, "};
+    private final static String[] TOTAL_SCORE = {"У вас на счету ", "У вас уже ", "У меня записано, что вы набрали уже ", "Ваш счет: ", "Вы набрали уже "};
     private final static Set<String> VARIOUS_PROBLEMS = Sets.newHashSet("разные", "разные задачи", "разнобой",
             "решать разные задачи", "решать разнобой", "порешаем разные задачи");
     private final static Set<String> PROBLEM_OF_THE_DAY = Sets.newHashSet("задачу дня", "задача дня", "решать задачу дня",
@@ -33,47 +33,51 @@ public class MenuSessionState implements SessionState {
             "Чтобы решить задачу дня, скажите: Задача дня. Если хотите посмотреть таблицу рекордов, нажмите на кнопку: Рекорды";
 
     private final boolean initial;
-    private final boolean giveRenameHint;
+    private final TextWithTTSBuilder prefixText;
 
     public MenuSessionState(boolean initial) {
         this.initial = initial;
-        this.giveRenameHint = false;
+        prefixText = null;
     }
 
-    public MenuSessionState(boolean initial, boolean giveRenameHint) {
-        this.initial = initial;
-        this.giveRenameHint = giveRenameHint;
+    public MenuSessionState(TextWithTTSBuilder prefixText) {
+        this.initial = false;
+        this.prefixText = prefixText;
     }
 
     @Nonnull
     @Override
-    public SessionState getNextState(String command, JsonArray entitiesArray, Session session) {
+    public SessionState getNextState(String command, JsonArray entitiesArray, Session session, String timeZone) {
         if (checkAnswer(command, VARIOUS_PROBLEMS, YES_ANSWERS)) {
             return new ChooseDifficultySessionState();
         } else if (checkAnswer(command, PROBLEM_OF_THE_DAY, YES_ANSWERS)) {
-            // TODO
-            return new ChooseDifficultySessionState();
+            return new ProblemOfTheDaySessionState(true);
         } else {
-            return new MenuSessionState(false, false);
+            return new MenuSessionState(null);
         }
     }
 
+    @Nonnull
     @Override
-    public void processRequest(String command, JsonObject responseJson, Session session) {
+    public SessionState addTextPrefix(String text) {
+        return new MenuSessionState(prefixText == null ? new TextWithTTSBuilder().append(text) : prefixText.append(text));
+    }
+
+    @Override
+    public void processRequest(JsonObject responseJson, Session session, String timeZone) {
         final UserInfo userInfo = session.getUserInfo();
-        final ProblemTextBuilder text;
+        final TextWithTTSBuilder text;
         if (initial) {
             String helloText = chooseRandomElement(MEET_ONCE_MORE) + upperCaseFirstLetter(userInfo.getName()) + "! ";
             if (userInfo.getTotalScore() > 0) {
                 helloText += chooseRandomElement(TOTAL_SCORE) + getNumWithString(userInfo.getTotalScore(), Dictionary.SCORE, GeneratorUtils.Case.NOMINATIVE) + ". ";
             }
-            text = new ProblemTextBuilder().append(helloText)
+            text = new TextWithTTSBuilder().append(helloText)
                     .append("Чем займёмся сегодня? ");
-        } else if (giveRenameHint) {
-            text = new ProblemTextBuilder().append("Добро пожаловать, " + userInfo.getName() + "! ")
-                    .append("Вы всегда можете поменять имя, сказав команду: поменять имя. ");
+        } else if (prefixText != null) {
+            text = new TextWithTTSBuilder().append(prefixText.getText(), prefixText.getTTS());
         } else {
-            text = new ProblemTextBuilder();
+            text = new TextWithTTSBuilder();
         }
         text.append(MENU_TEXT);
         responseJson.addProperty("text", text.getText());
@@ -81,8 +85,8 @@ public class MenuSessionState implements SessionState {
         session.setLastServerResponse(text.getText());
 
         createMenu(session, responseJson,
-                initial || giveRenameHint ? "Добро пожаловать, " + upperCaseFirstLetter(userInfo.getName()) + "!"
-                        : "Чем займёмся, " + userInfo.getName() + "?");
+                initial ? "Добро пожаловать, " + upperCaseFirstLetter(userInfo.getName()) + "!"
+                        : "Чем займёмся, " + upperCaseFirstLetter(userInfo.getName()) + "?");
     }
 
     private void createMenu(Session session, JsonObject responseJson, String text) {

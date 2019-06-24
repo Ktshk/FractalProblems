@@ -4,7 +4,7 @@ import com.dinoproblems.server.*;
 import com.dinoproblems.server.utils.AbstractNoun;
 import com.dinoproblems.server.utils.GeneratorUtils;
 import com.dinoproblems.server.utils.OrdinalNumber;
-import com.dinoproblems.server.utils.ProblemTextBuilder;
+import com.dinoproblems.server.utils.TextWithTTSBuilder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -81,7 +81,7 @@ public class SpacesGenerator implements ProblemGenerator {
 
         SpacesScenario scenario = (SpacesScenario) problemAvailability.getScenario();
 
-        ProblemTextBuilder text = new ProblemTextBuilder();
+        TextWithTTSBuilder text = new TextWithTTSBuilder();
         int answer;
         Set<String> possibleTextAnswers;
 

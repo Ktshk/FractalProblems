@@ -168,7 +168,7 @@ public class EilerCirclesGenerator implements ProblemGenerator {
         final Set<String> chosenVariables = scenario.getVars();
         final Set<String> scenarioVariables = new HashSet<>(chosenVariables);
 
-        ProblemTextBuilder text = new ProblemTextBuilder();
+        TextWithTTSBuilder text = new TextWithTTSBuilder();
 
         boolean startSentence = false;
         if (chosenVariables.contains(TOTAL)) {

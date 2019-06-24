@@ -2,7 +2,7 @@ package com.dinoproblems.server.generators;
 
 import com.dinoproblems.server.*;
 import com.dinoproblems.server.utils.NumberWord;
-import com.dinoproblems.server.utils.ProblemTextBuilder;
+import com.dinoproblems.server.utils.TextWithTTSBuilder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -25,7 +25,7 @@ public class LogicGenerator implements ProblemGenerator {
     private static final Problem NUMBER_FOUR_CHILDREN;
 
     static {
-        ProblemTextBuilder text = new ProblemTextBuilder();
+        TextWithTTSBuilder text = new TextWithTTSBuilder();
         text.append("На доске было написано число, и четверых ребят спросили, что это за число. ")
                 .append("Миша сказал: \"Это число 15\". Рома сказал: \"Это простое число\". Катя сказала: \"Это чётное число\".")
                 .append(" Наташа сказала: \"Это число делится на 6\". Один мальчик и одна девочка ответили верно, ")
@@ -44,7 +44,7 @@ public class LogicGenerator implements ProblemGenerator {
         if (scenario.equals(NUMBER_FOUR_CHILDREN_SCENARIO)) {
             return NUMBER_FOUR_CHILDREN;
         } else if (scenario.equals(YOU_ALL_LIARS)) {
-            ProblemTextBuilder text = new ProblemTextBuilder();
+            TextWithTTSBuilder text = new TextWithTTSBuilder();
             int num = randomInt(5, 11);
             text.append("В комнате собрались ").append(getNumWithString(num, PEOPLE)).append(" с острова Рыцарей и Лжецов. ")
                     .append("(Рыцари всегда говорят правду, а лдецы всегда врут.) " +
@@ -56,7 +56,7 @@ public class LogicGenerator implements ProblemGenerator {
                     .possibleTextAnswers(Sets.newHashSet(getNumWithString(answer, LIAR)))
                     .hint(hint1).scenario(YOU_ALL_LIARS).difficulty(Problem.Difficulty.MEDIUM).create();
         } else if (scenario.equals(MUSHROOMS)) {
-            final ProblemTextBuilder text = new ProblemTextBuilder();
+            final TextWithTTSBuilder text = new TextWithTTSBuilder();
             final String[] heroes = new String[]{"Миша", "Костя", "Влад", "Ричард", "Саша", "Андрей", "Леша"};
             final int heroesCount = randomInt(3, 5);
             final int startCount = randomInt(25, 50);

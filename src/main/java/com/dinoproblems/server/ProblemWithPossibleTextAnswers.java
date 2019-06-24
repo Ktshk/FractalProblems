@@ -1,6 +1,6 @@
 package com.dinoproblems.server;
 
-import com.google.common.collect.Lists;
+import com.dinoproblems.server.utils.TextWithTTSBuilder;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -24,8 +24,10 @@ public class ProblemWithPossibleTextAnswers implements Problem {
     private final ProblemScenario scenario;
     private String comment;
     private String commentTTS;
+    @Nullable
+    private final TextWithTTSBuilder solution;
 
-    public ProblemWithPossibleTextAnswers(String text, String tts, int answer, String theme, Set<String> possibleTextAnswers, List<String> hints, ProblemScenario scenario, Difficulty difficulty, String comment, String commentTTS) {
+    private ProblemWithPossibleTextAnswers(String text, String tts, int answer, String theme, Set<String> possibleTextAnswers, List<String> hints, ProblemScenario scenario, Difficulty difficulty, String comment, String commentTTS, @Nullable TextWithTTSBuilder solution) {
         this.text = text;
         this.tts = tts;
         this.answer = answer;
@@ -36,6 +38,7 @@ public class ProblemWithPossibleTextAnswers implements Problem {
         this.difficulty = difficulty;
         this.comment = comment;
         this.commentTTS = commentTTS;
+        this.solution = solution;
     }
 
     public String getText() {
@@ -86,6 +89,16 @@ public class ProblemWithPossibleTextAnswers implements Problem {
         return tts;
     }
 
+    @Override
+    public boolean hasSolution() {
+        return solution != null;
+    }
+
+    @Override
+    public TextWithTTSBuilder getSolution() {
+        return solution;
+    }
+
     public int getAnswer() {
         return answer;
     }
@@ -105,6 +118,7 @@ public class ProblemWithPossibleTextAnswers implements Problem {
         return true;
     }
 
+    @Nullable
     @Override
     public State getState() {
         return state;
@@ -172,6 +186,7 @@ public class ProblemWithPossibleTextAnswers implements Problem {
         private List<String> hints;
         private String comment;
         private String commentTTS;
+        private TextWithTTSBuilder solution;
 
         public Builder text(String text) {
             this.text = text;
@@ -231,8 +246,13 @@ public class ProblemWithPossibleTextAnswers implements Problem {
             return this;
         }
 
+        public Builder solution(TextWithTTSBuilder solution) {
+            this.solution = solution;
+            return this;
+        }
+
         public ProblemWithPossibleTextAnswers create() {
-            return new ProblemWithPossibleTextAnswers(text, tts, answer, theme, possibleTextAnswers, hints, scenario, difficulty, comment, commentTTS);
+            return new ProblemWithPossibleTextAnswers(text, tts, answer, theme, possibleTextAnswers, hints, scenario, difficulty, comment, commentTTS, solution);
         }
     }
 }

@@ -15,19 +15,26 @@ import java.util.stream.Collectors;
 public class UserInfo {
     private String deviceId;
     private String name;
+    private final String clientId;
+
     private Multimap<String, Problem> solvedProblemsByTheme = HashMultimap.create();
 
     private Map<Difficulty, List<Problem>> variousProblems = new HashMap<>();
-    private Map<Difficulty, Set<String>> solvedVariousProblems = new HashMap<>(); // for the initialization only
+    private Set<String> solvedVariousProblems = new HashSet<>(); // for the initialization only
 
     private Map<Difficulty, Problem> currentProblemByDifficulty = new HashMap<>();
+
     private Problem currentProblem = null;
+    private Problem expertProblem = null;
+    private Calendar expertProblemDate = null;
 
     private int points;
+    private int expertPoints;
 
-    public UserInfo(String deviceId, String name) {
+    public UserInfo(String deviceId, String name, String clientId) {
         this.deviceId = deviceId;
         this.name = name;
+        this.clientId = clientId;
     }
 
     public String getDeviceId() {
@@ -55,12 +62,43 @@ public class UserInfo {
         this.currentProblem = currentProblem;
     }
 
-    void addPoints(int pointsToAdd) {
-        this.points += pointsToAdd;
+    void addPoints(int pointsToAdd, Problem problem) {
+        if (problem.getDifficulty() == Difficulty.EXPERT) {
+            this.expertPoints += pointsToAdd;
+        } else {
+            this.points += pointsToAdd;
+        }
     }
 
     public int getTotalScore() {
         return points;
+    }
+
+    public int getExpertScore() {
+        return expertPoints;
+    }
+
+    public boolean hasProblemOfTheDay(String timeZone) {
+        final Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(timeZone));
+        return !(expertProblemDate == null
+                || calendar.get(Calendar.YEAR) != expertProblemDate.get(Calendar.YEAR)
+                || calendar.get(Calendar.MONTH) != expertProblemDate.get(Calendar.MONTH)
+                || calendar.get(Calendar.DAY_OF_MONTH) != expertProblemDate.get(Calendar.DAY_OF_MONTH));
+
+    }
+
+    public Problem getProblemOfTheDay(String timeZone) {
+        final Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(timeZone));
+        if (expertProblemDate == null
+                || calendar.get(Calendar.YEAR) != expertProblemDate.get(Calendar.YEAR)
+                || calendar.get(Calendar.MONTH) != expertProblemDate.get(Calendar.MONTH)
+                || calendar.get(Calendar.DAY_OF_MONTH) != expertProblemDate.get(Calendar.DAY_OF_MONTH)) {
+            expertProblemDate = calendar;
+            expertProblem = getRandomVariousProblem(Difficulty.EXPERT);
+
+            DataBaseService.INSTANCE.saveProblemOfTheDay(this, expertProblem, expertProblemDate);
+        }
+        return expertProblem;
     }
 
     Problem getRandomVariousProblem(Difficulty difficulty) {
@@ -78,8 +116,7 @@ public class UserInfo {
         System.out.println("solvedVariousProblems = " + solvedVariousProblems);
         final ArrayList<Problem> problems = VariousProblems.INSTANCE.getProblems(difficulty)
                 .stream()
-                .filter(problem -> !solvedVariousProblems.containsKey(difficulty) ||
-                        !solvedVariousProblems.get(difficulty).contains(problem.getProblemScenario().getScenarioId()))
+                .filter(problem -> !solvedVariousProblems.contains(problem.getProblemScenario().getScenarioId()))
                 .collect(Collectors.toCollection(ArrayList::new));
         variousProblems.put(difficulty, problems);
         Collections.shuffle(problems);
@@ -114,15 +151,11 @@ public class UserInfo {
         solvedProblemsByTheme.put(theme, problem);
         if (VariousProblems.THEME.equals(theme)) {
             if (!variousProblems.containsKey(problem.getDifficulty())) {
-                if (!solvedVariousProblems.containsKey(problem.getDifficulty())) {
-                    solvedVariousProblems.put(problem.getDifficulty(), new HashSet<>());
-                }
-                solvedVariousProblems.get(problem.getDifficulty()).add(problem.getProblemScenario().getScenarioId());
+                solvedVariousProblems.add(problem.getProblemScenario().getScenarioId());
             } else {
-                // very slow but in reality we should never get here
                 final List<Problem> problems = variousProblems.get(problem.getDifficulty());
                 for (int i = 0; i < problems.size(); i++) {
-                    Problem problem1 =  problems.get(i);
+                    Problem problem1 = problems.get(i);
                     if (problem1.getProblemScenario().getScenarioId().equals(problem.getProblemScenario().getScenarioId())) {
                         problems.remove(i);
                         break;
@@ -130,7 +163,7 @@ public class UserInfo {
                 }
             }
         }
-        addPoints(points);
+        addPoints(points, problem);
     }
 
     @Override
@@ -143,5 +176,14 @@ public class UserInfo {
 
     public Problem getCurrentProblem() {
         return currentProblem;
+    }
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setExpertProblem(Problem problem, Calendar calendar) {
+        this.expertProblem = problem;
+        this.expertProblemDate = calendar;
     }
 }

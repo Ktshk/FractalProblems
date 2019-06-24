@@ -1,7 +1,7 @@
 package com.dinoproblems.server.generators;
 
 import com.dinoproblems.server.*;
-import com.dinoproblems.server.utils.ProblemTextBuilder;
+import com.dinoproblems.server.utils.TextWithTTSBuilder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -109,15 +109,12 @@ public class SequenceGenerator implements ProblemGenerator {
                     if (operand2 >= 6) {
                         for (i = 1; i <= 6; i++) sequence[i] = sequence[i - 1] + operand2 - i;
                     } else for (i = 1; i <= 6; i++) sequence[i] = sequence[i - 1] + operand2 + i;
-                }
-                break;
-            case EXPERT:
-                int[] simpleSequence = {2, 3, 5, 7, 11, 13, 17};
-                if (scenario.equals(FAST_GROWING_SEQ)) {
+                } else if (scenario.equals(FAST_GROWING_SEQ)) {
                     hint = "Посмотрите, как местоположение элемента последовательности влияет на сам элемент";
                     for (i = 0; i <= 6; i++)
                         sequence[i] = (i + 1) * (i + 2);
                 } else if (scenario.equals(PRIME_NUMBERS)) {
+                    int[] simpleSequence = {2, 3, 5, 7, 11, 13, 17};
                     hint = "Посмотрите, у всех чисел данной последовательности есть общее свойство";
                     for (i = 0; i <= 6; i++)
                         sequence = Arrays.copyOf(simpleSequence, sequence.length);
@@ -127,7 +124,7 @@ public class SequenceGenerator implements ProblemGenerator {
 
         sequenceShow = Arrays.copyOf(sequence, sequenceShow.length);
         answer = sequence[6];
-        ProblemTextBuilder text = new ProblemTextBuilder().append("Дана", "Дан+а")
+        TextWithTTSBuilder text = new TextWithTTSBuilder().append("Дана", "Дан+а")
                 .append(" последовательность из шести натуральных чисел. ").append(Arrays.toString(sequenceShow))
                 .append(" Какое число может быть следующим?");
         String possibleAnswer = Integer.toString(answer);
@@ -183,9 +180,9 @@ public class SequenceGenerator implements ProblemGenerator {
             case MEDIUM:
                 return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(ARITHMETIC, DOUBLEARITHMETIC), Sets.newHashSet(ARITHMETIC, DOUBLEARITHMETIC));
             case HARD:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(FIBONACCI, PARITY_IMPARITY, MUL_ON_TWO, GEOMETRIC, DOUBLEARITHMETIC), Sets.newHashSet(ARITHMETIC, DOUBLEARITHMETIC));
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(FIBONACCI, PARITY_IMPARITY, MUL_ON_TWO, GEOMETRIC, DOUBLEARITHMETIC, FAST_GROWING_SEQ, PRIME_NUMBERS), Sets.newHashSet(ARITHMETIC, DOUBLEARITHMETIC));
             case EXPERT:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(FAST_GROWING_SEQ, PRIME_NUMBERS), Sets.newHashSet(FIBONACCI, PARITY_IMPARITY, MUL_ON_TWO, GEOMETRIC, DOUBLEARITHMETIC));
+                return null;
         }
         throw new IllegalArgumentException();
     }

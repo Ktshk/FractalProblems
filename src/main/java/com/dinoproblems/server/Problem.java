@@ -1,5 +1,7 @@
 package com.dinoproblems.server;
 
+import com.dinoproblems.server.utils.TextWithTTSBuilder;
+
 import javax.annotation.Nullable;
 
 /**
@@ -43,6 +45,10 @@ public interface Problem {
         return null;
     }
 
+    boolean hasSolution();
+
+    TextWithTTSBuilder getSolution();
+
     enum State {
         ANSWER_GIVEN, SOLVED, SOLVED_WITH_HINT
     }
@@ -79,6 +85,7 @@ public interface Problem {
         }
     }
 
+    @Nullable
     State getState();//вынести в TaskResult с удалением из Problem
 
     Difficulty getDifficulty();

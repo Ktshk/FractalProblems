@@ -4,7 +4,7 @@ import com.dinoproblems.server.*;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.dinoproblems.server.utils.NumberWord;
-import com.dinoproblems.server.utils.ProblemTextBuilder;
+import com.dinoproblems.server.utils.TextWithTTSBuilder;
 import com.dinoproblems.server.utils.OrdinalNumber;
 
 
@@ -51,7 +51,7 @@ public class RangeGenerator implements ProblemGenerator {
 
         final int answer;
         final String hero;
-        ProblemTextBuilder text = new ProblemTextBuilder();
+        TextWithTTSBuilder text = new TextWithTTSBuilder();
         String hint;
         Set<String> possibleTextAnswers;
 

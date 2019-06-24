@@ -67,6 +67,7 @@ public class MainServlet extends HttpServlet {
                     command = "";
                 }
             }
+            final String timeZone = bodyJson.get("meta").getAsJsonObject().get("timezone").getAsString();
             final boolean newSession = bodyJson.get("session").getAsJsonObject().get("new").getAsBoolean();
             final String sessionId = bodyJson.get("session").getAsJsonObject().get("session_id").getAsString();
             final String userId = bodyJson.get("session").getAsJsonObject().get("user_id").getAsString();
@@ -114,7 +115,7 @@ public class MainServlet extends HttpServlet {
             } else {
                 session = currentSessions.get(sessionId);
             }
-            session.processRequest(command, result, entitiesArray);
+            session.processRequest(command, result, entitiesArray, timeZone);
 
             if (session.getUserInfo() != null && !userInfos.containsKey(userId)) {
                 userInfos.put(userId, session.getUserInfo());

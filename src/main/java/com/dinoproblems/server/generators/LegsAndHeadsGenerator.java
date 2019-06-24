@@ -3,7 +3,7 @@ package com.dinoproblems.server.generators;
 import com.dinoproblems.server.*;
 import com.dinoproblems.server.utils.AdjectiveWithNoun;
 import com.dinoproblems.server.utils.GeneratorUtils;
-import com.dinoproblems.server.utils.ProblemTextBuilder;
+import com.dinoproblems.server.utils.TextWithTTSBuilder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -49,7 +49,7 @@ public class LegsAndHeadsGenerator implements ProblemGenerator {
         final int i4 = randomInt(0, 3);
         final int quest2 = quest == 0 ? i2 : i4;
 
-        final ProblemTextBuilder text = new ProblemTextBuilder();
+        final TextWithTTSBuilder text = new TextWithTTSBuilder();
         final String hint;
         final HashSet<String> possibleTextAnswers = new HashSet<>();
         if (scenario.equals(BICYCLES)) {

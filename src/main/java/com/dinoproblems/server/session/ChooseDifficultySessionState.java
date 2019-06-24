@@ -19,7 +19,7 @@ public class ChooseDifficultySessionState implements SessionState {
     private final static HashSet<String> EASY = Sets.newHashSet("простая", "простую", "простой", "простое", "простую задачу");
     private final static HashSet<String> MEDIUM = Sets.newHashSet("средняя", "среднюю", "средний", "средне", "среднюю задачу");
     private final static HashSet<String> HARD = Sets.newHashSet("сложная", "сложную", "сложный", "сложно", "сложную задачу");
-    private final static HashSet<String> EXPERT = Sets.newHashSet("эксперт", "экспертная", "задачу для экспертов");
+//    private final static HashSet<String> EXPERT = Sets.newHashSet("эксперт", "экспертная", "задачу для экспертов");
 
     private final String text;
 
@@ -34,7 +34,7 @@ public class ChooseDifficultySessionState implements SessionState {
 
     @Nonnull
     @Override
-    public SessionState getNextState(String command, JsonArray entitiesArray, Session session) {
+    public SessionState getNextState(String command, JsonArray entitiesArray, Session session, String timeZone) {
         final Problem.Difficulty currentDifficulty = parseDifficulty(command);
         if (currentDifficulty == null) {
             DataBaseService.INSTANCE.updateMiscAnswersTable(command, "", session.getLastServerResponse());
@@ -45,12 +45,12 @@ public class ChooseDifficultySessionState implements SessionState {
                 final String text = "Извините, но вы уже решили все мои задачи на этом уровне сложности. Может быть, порешаем задачи другой сложности?";
                 return new ChooseDifficultySessionState(text);
             }
-            return new SolvingProblemSessionState(true, session, true);
+            return new SolvingProblemSessionState(true, session);
         }
     }
 
     @Override
-    public void processRequest(String command, JsonObject responseJson, Session session) {
+    public void processRequest(JsonObject responseJson, Session session, String timeZone) {
         final String text;
         if (this.text != null) {
             text = this.text + "Выберите пожалуйста сложность задач";
@@ -60,6 +60,15 @@ public class ChooseDifficultySessionState implements SessionState {
         responseJson.addProperty("text", text);
         session.setLastServerResponse(text);
         responseJson.add("buttons", createDifficultyButtons(session));
+    }
+
+    @Nonnull
+    @Override
+    public SessionState addTextPrefix(String text) {
+        if (this.text == null) {
+            return new ChooseDifficultySessionState(text);
+        }
+        return new ChooseDifficultySessionState(text + this.text);
     }
 
     private JsonArray createDifficultyButtons(Session session) {
@@ -75,7 +84,7 @@ public class ChooseDifficultySessionState implements SessionState {
         if (currentDifficulty != Problem.Difficulty.HARD) {
             buttons.add(createButton("сложная", false));
         }
-        buttons.add(createLeaderboardButton(session.getUserInfo(), false));
+        buttons.add(createLeaderboardButton(session.getUserInfo(), false, false));
         if (currentDifficulty != null) {
             buttons.add(createButton("меню", false));
         }
@@ -89,8 +98,8 @@ public class ChooseDifficultySessionState implements SessionState {
             return Problem.Difficulty.MEDIUM;
         } else if (checkAnswer(command, HARD, YES_ANSWERS)) {
             return Problem.Difficulty.HARD;
-        } else if (checkAnswer(command, EXPERT, YES_ANSWERS)) {
-            return Problem.Difficulty.EXPERT;
+//        } else if (checkAnswer(command, EXPERT, YES_ANSWERS)) {
+//            return Problem.Difficulty.EXPERT;
         } else {
             return null;
         }

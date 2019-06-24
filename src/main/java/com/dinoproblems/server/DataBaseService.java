@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.*;
+import java.sql.Date;
 import java.util.*;
 
 /**
@@ -240,49 +241,48 @@ public class DataBaseService {
 
         Map<String, UserInfo> dbUserInfo = new HashMap<>();
 
-        Problem problem;
-
-        String currentDeviceId;
-        String theme;
-        String problemЕext;
-        String difficultyText;
-        ProblemScenario scenario;
-
-        String selectAllTables = "select " + schemeName + ".reference.device_id, username, problem_text, difficulty, scenario, points, hint_used, generator_id\n" +
-                "from " + schemeName + ".reference, " + schemeName + ".devices, " + schemeName + ".users, " + schemeName + ".problems, " + schemeName + ".solutions, " + schemeName + ".scenarios\n" +
-                "where " + schemeName + ".reference.device_id = " + schemeName + ".devices.device_id and " + schemeName + ".users.user_id = " + schemeName + ".reference.user_id\n" +
-                "and " + schemeName + ".solutions.reference_id = " + schemeName + ".reference.reference_id and " + schemeName + ".solutions.problem_id = " + schemeName + ".problems.problem_id\n" +
+        String selectAllTables = "select " + schemeName + ".reference.device_id, device_num, username, problem_text, difficulty, scenario, points, hint_used, generator_id " +
+                "from " + schemeName + ".reference, " + schemeName + ".devices, " + schemeName + ".users, " + schemeName + ".problems, " + schemeName + ".solutions, " + schemeName + ".scenarios " +
+                "where " + schemeName + ".reference.device_id = " + schemeName + ".devices.device_id and " + schemeName + ".users.user_id = " + schemeName + ".reference.user_id " +
+                "and " + schemeName + ".solutions.reference_id = " + schemeName + ".reference.reference_id and " + schemeName + ".solutions.problem_id = " + schemeName + ".problems.problem_id " +
                 "and " + schemeName + ".problems.scenario_id = " + schemeName + ".scenarios.scenario_id";
 
-        try (Statement selectAllTablesQuery = connection.createStatement()) {
+        String selectProblemOfTheDay = "select " + schemeName + ".reference.device_id, problem_text, scenario, problem_date, timezone, points, hint_used, generator_id " +
+                "from " + schemeName + ".problem_of_the_day, " + schemeName + ".reference, " + schemeName + ".devices, " + schemeName + ".problems, " + schemeName + ".scenarios " +
+                "where " + schemeName + ".reference.reference_id = " + schemeName + ".problem_of_the_day.reference_id " +
+                "and " + schemeName + ".problems.scenario_id = " + schemeName + ".scenarios.scenario_id" +
+                "and " + schemeName + ".problem_of_the_day.problem_id = " + schemeName + ".problems.problem_id";
+
+        try (Statement selectAllTablesQuery = connection.createStatement();
+             PreparedStatement selectProblemOfTheDayQuery = connection.prepareStatement(selectProblemOfTheDay)) {
+
             ResultSet allTables = selectAllTablesQuery.executeQuery(selectAllTables);
             while (allTables.next()) {
-                currentDeviceId = allTables.getString("device_id");
-                theme = allTables.getString("generator_id");
-                scenario = new ProblemScenarioImpl(allTables.getString("scenario"));
-
-                final boolean hintUsed = allTables.getBoolean("hint_used");
+                final String currentDeviceId = allTables.getString("device_id");
                 final int points = allTables.getInt("points");
+                final String theme = allTables.getString("generator_id");
 
-                problemЕext = allTables.getString("problem_text");
-                difficultyText = allTables.getString("difficulty");
+                final Problem problem = getProblemFromQuery(allTables, points, theme);
+                final UserInfo userInfo = getUserInfoFromQuery(dbUserInfo, allTables, currentDeviceId);
 
-                problem = new ProblemWithPossibleTextAnswers.Builder().text(problemЕext).answer(0).theme(theme)
-                        .possibleTextAnswers(null).hint("").scenario(scenario).difficulty(Problem.Difficulty.valueOf(difficultyText)).create();
-                problem.setState(points <= 0 ? Problem.State.ANSWER_GIVEN : (hintUsed ? Problem.State.SOLVED_WITH_HINT : Problem.State.SOLVED));
-
-                final UserInfo userInfo;
-                if (dbUserInfo.containsKey(currentDeviceId)) {
-                    userInfo = dbUserInfo.get(currentDeviceId);
-                    dbUserInfo.put(currentDeviceId, userInfo);
-                } else {
-                    final String username = allTables.getString("username");
-
-                    userInfo = new UserInfo(currentDeviceId, username);
-                    System.out.println("userInfo = " + userInfo);
-                    dbUserInfo.put(currentDeviceId, userInfo);
-                }
                 userInfo.addSolvedProblem(theme, problem, points);
+            }
+
+            ResultSet problemOfTheDayResultSet = selectProblemOfTheDayQuery.executeQuery(selectProblemOfTheDay);
+            while (problemOfTheDayResultSet.next()) {
+                final String currentDeviceId = problemOfTheDayResultSet.getString("device_id");
+                final int points = problemOfTheDayResultSet.getInt("points");
+                final String theme = problemOfTheDayResultSet.getString("generator_id");
+
+                final Problem problem = getProblemFromQuery(problemOfTheDayResultSet, points, theme);
+                final UserInfo userInfo = getUserInfoFromQuery(dbUserInfo, problemOfTheDayResultSet, currentDeviceId);
+
+                final String timeZone = problemOfTheDayResultSet.getString("timezone");
+                final Date problemDate = problemOfTheDayResultSet.getDate("problem_date");
+                final Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(timeZone));
+                calendar.setTime(problemDate);
+
+                userInfo.setExpertProblem(problem, calendar);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -291,10 +291,40 @@ public class DataBaseService {
         return dbUserInfo;
     }
 
+    private UserInfo getUserInfoFromQuery(Map<String, UserInfo> dbUserInfo, ResultSet allTables, String currentDeviceId) throws SQLException {
+        final UserInfo userInfo;
+        if (dbUserInfo.containsKey(currentDeviceId)) {
+            userInfo = dbUserInfo.get(currentDeviceId);
+        } else {
+            final String username = allTables.getString("username");
+            final String clientId = allTables.getString("device_num");
+
+            userInfo = new UserInfo(currentDeviceId, username, clientId);
+            System.out.println("userInfo = " + userInfo);
+        }
+        dbUserInfo.put(currentDeviceId, userInfo);
+        return userInfo;
+    }
+
+    private Problem getProblemFromQuery(ResultSet resultSet, int points, String theme) throws SQLException {
+        final ProblemScenario scenario = new ProblemScenarioImpl(resultSet.getString("scenario"));
+
+        final boolean hintUsed = resultSet.getBoolean("hint_used");
+
+
+        final String problemText = resultSet.getString("problem_text");
+        final String difficultyText = resultSet.getString("difficulty");
+
+        final Problem problem = new ProblemWithPossibleTextAnswers.Builder().text(problemText).answer(0).theme(theme)
+                .possibleTextAnswers(null).hint("").scenario(scenario).difficulty(Problem.Difficulty.valueOf(difficultyText)).create();
+        problem.setState(points <= 0 ? Problem.State.ANSWER_GIVEN : (hintUsed ? Problem.State.SOLVED_WITH_HINT : Problem.State.SOLVED));
+        return problem;
+    }
+
     private Set<String> ignoredRecords = null;
 
     @Nullable
-    public List<RecordRow> getRecords() {
+    public List<RecordRow> getRecords(boolean expert) {
         if (connection == null) {
             return null;
         }
@@ -318,7 +348,8 @@ public class DataBaseService {
                 + " where " + schemeName + ".reference.user_id=" + schemeName + ".users.user_id and "
                 + schemeName + ".solutions.reference_id=" + schemeName + ".reference.reference_id"
                 + " and " + schemeName + ".reference.device_id=" + schemeName + ".devices.device_id and "
-                + schemeName + ".problems.problem_id=" + schemeName + ".solutions.problem_id";
+                + schemeName + ".problems.problem_id=" + schemeName + ".solutions.problem_id"
+                + " and " + (expert ? schemeName + ".problems.difficulty='EXPERT'" : schemeName + ".problems.difficulty!='EXPERT'");
 
         System.out.println(selectAllRecords);
 
@@ -356,4 +387,64 @@ public class DataBaseService {
         }
     }
 
+    public void saveProblemOfTheDay(UserInfo userInfo, Problem expertProblem, Calendar date) {
+        if (connection == null) {
+            System.out.println("Could not connect to DB");
+            return;
+        }
+
+        final String deviceId = userInfo.getDeviceId();
+        String refCheck = "SELECT reference_id FROM " + schemeName + ".reference WHERE device_id = \'" + deviceId + "\'";
+
+        String scenarioCheck = "SELECT scenario_id FROM " + schemeName + ".scenarios WHERE scenario = \'" + expertProblem.getProblemScenario().getScenarioId() + "\'";
+
+        String problemCheck = "select problem_text, difficulty, problem_id FROM " + schemeName + ".problems WHERE problem_text = \'" + expertProblem.getText() + "\' and difficulty = \'" + expertProblem.getDifficulty() + "\'";
+
+        try (Statement refCheckStatement = connection.createStatement();
+             ResultSet refExists = refCheckStatement.executeQuery(refCheck);
+
+             Statement scenarioCheckStatement = connection.createStatement();
+             ResultSet scenarioExists = scenarioCheckStatement.executeQuery(scenarioCheck);
+
+             Statement problemCheckStatement = connection.createStatement();
+             ResultSet problemExists = problemCheckStatement.executeQuery(problemCheck)) {
+
+            connection.setAutoCommit(false);
+
+            final int referenceId;
+            if (refExists.next()) {
+                System.out.println("Reference already exists");
+                referenceId = refExists.getInt(1);
+            } else {
+                referenceId = insertReference(deviceId, userInfo.getClientId(), userInfo.getName());
+            }
+
+            final int scenarioId = getScenarioId(expertProblem.getProblemScenario().getScenarioId(), expertProblem.getTheme(), scenarioExists);
+            final int problemId = getProblemId(expertProblem.getText(), expertProblem.getDifficulty().toString(), scenarioId, problemExists);
+
+            String insertTableProblemOfTheDay = "INSERT INTO " + schemeName + ".problem_of_the_day " +
+                    "(reference_id, problem_id, problem_date, timezone) " +
+                    "VALUES" + "(?,?,?)" +
+                    "ON CONFLICT (reference_id) DO UPDATE SET problem_id=?, problem_date=?, timezone=?";
+
+            try (PreparedStatement preparedStatementProblemOfTheDay = connection.prepareStatement(insertTableProblemOfTheDay, Statement.RETURN_GENERATED_KEYS)) {
+                final Date sqlDate = new Date(date.getTimeInMillis());
+                final String timeZone = date.getTimeZone().getDisplayName(Locale.US);
+
+                preparedStatementProblemOfTheDay.setInt(1, referenceId);
+                preparedStatementProblemOfTheDay.setInt(2, problemId);
+                preparedStatementProblemOfTheDay.setDate(3, sqlDate);
+                preparedStatementProblemOfTheDay.setString(4, timeZone);
+                preparedStatementProblemOfTheDay.setInt(5, problemId);
+                preparedStatementProblemOfTheDay.setDate(6, sqlDate);
+                preparedStatementProblemOfTheDay.setString(7, timeZone);
+                preparedStatementProblemOfTheDay.executeUpdate();
+            }
+
+            connection.commit();
+            System.out.println("Records created successfully");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

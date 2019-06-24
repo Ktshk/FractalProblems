@@ -10,7 +10,10 @@ import javax.annotation.Nonnull;
  */
 public interface SessionState {
     @Nonnull
-    SessionState getNextState(String command, JsonArray entitiesArray, Session session);
+    SessionState getNextState(String command, JsonArray entitiesArray, Session session, String timeZone);
 
-    void processRequest(String command, JsonObject request, Session session);
+    void processRequest(JsonObject request, Session session, String timeZone);
+
+    @Nonnull
+    SessionState addTextPrefix(String text);
 }

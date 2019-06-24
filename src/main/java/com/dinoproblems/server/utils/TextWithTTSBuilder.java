@@ -3,15 +3,15 @@ package com.dinoproblems.server.utils;
 /**
  * Created by Katushka on 16.03.2019.
  */
-public class ProblemTextBuilder {//текст один, речь другая
+public class TextWithTTSBuilder {//текст один, речь другая
     private StringBuilder text;
     private StringBuilder tts = null;
 
-    public ProblemTextBuilder() {
+    public TextWithTTSBuilder() {
         text = new StringBuilder();
     }
 
-    public ProblemTextBuilder append(String text) {
+    public TextWithTTSBuilder append(String text) {
         this.text.append(text);
         if (tts != null) {
             tts.append(text);
@@ -19,7 +19,7 @@ public class ProblemTextBuilder {//текст один, речь другая
         return this;
     }
 
-    public ProblemTextBuilder append(String text, String tts) {
+    public TextWithTTSBuilder append(String text, String tts) {
         if (tts == null) {
             return append(text);
         }

@@ -4,7 +4,7 @@ import com.dinoproblems.server.*;
 import com.dinoproblems.server.Problem.Difficulty;
 import com.dinoproblems.server.utils.GeneratorUtils;
 import com.dinoproblems.server.utils.GeneratorUtils.Case;
-import com.dinoproblems.server.utils.ProblemTextBuilder;
+import com.dinoproblems.server.utils.TextWithTTSBuilder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -39,7 +39,7 @@ public class ShareWithFriendsGenerator implements ProblemGenerator {
 
         if (scenario.equals(DEFAULT_SCENARIO)) {
             int candies = randomInt(2, 7);
-            ProblemTextBuilder text = new ProblemTextBuilder();
+            TextWithTTSBuilder text = new TextWithTTSBuilder();
             text.append("У ").append(hero1[1]).append(" и ").append(hero2[1]).append(" было поровну конфет. ")
                     .append(hero1[0]).append(" отдал ").append(hero2[2]).append(" ").append(getNumWithString(candies, CANDY, Case.ACCUSATIVE)).append(". ")
                     .append("На сколько конфет у ").append(hero2[1]).append(" стало больше, чем у ").append(hero1[1]).append("?");

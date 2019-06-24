@@ -13,7 +13,7 @@ import java.util.Set;
  */
 public class TestProblemGenerator {
 
-    private static final ProblemGenerator GENERATOR = new LegsAndHeadsGenerator();
+    private static final ProblemGenerator GENERATOR = new LogicGenerator();
 
     public void testAllGenerators() {
         for (ProblemGenerator generator : ProblemCollection.INSTANCE.getGenerators()) {
@@ -29,19 +29,19 @@ public class TestProblemGenerator {
 
     @Test
     public void testProblemCollectionGeneration() {
-        final Session session = new Session(new UserInfo("test", "test"), "test", "test");
+        final Session session = new Session(new UserInfo("test", "test", "test"), "test", "test");
 
-        for (Problem.Difficulty difficulty : Problem.Difficulty.values()) {
-//        Problem.Difficulty difficulty = Problem.Difficulty.EXPERT;
+//        for (Problem.Difficulty difficulty : Problem.Difficulty.values()) {
+        Problem.Difficulty difficulty = Problem.Difficulty.EXPERT;
             System.out.println("************* " + difficulty);
             session.setCurrentDifficulty(difficulty);
 
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 30; i++) {
 //                solveProblem(problemCollection, session, Problem.State.SOLVED_WITH_HINT);
                 solveProblem(session, Problem.State.SOLVED);
                 solveProblem(session, Problem.State.ANSWER_GIVEN);
             }
-        }
+//        }
     }
 
     @Test
@@ -79,6 +79,7 @@ public class TestProblemGenerator {
         session.setCurrentProblem(problem);
 
         System.out.println("Problem: " + problem.getText());
+        System.out.println("Scenario: " + problem.getProblemScenario());
         System.out.println("Difficulty: " + problem.getDifficulty());
         System.out.println("Answer: " + problem.getTextAnswer());
         System.out.println("State: " + state);
