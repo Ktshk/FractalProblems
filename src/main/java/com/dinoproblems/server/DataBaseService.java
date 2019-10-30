@@ -2,6 +2,7 @@ package com.dinoproblems.server;
 
 import com.dinoproblems.server.generators.ProblemScenarioImpl;
 import com.dinoproblems.server.utils.GeneratorUtils;
+import com.dinoproblems.server.utils.TextWithTTSBuilder;
 
 import javax.annotation.Nullable;
 import java.io.BufferedReader;
@@ -85,11 +86,8 @@ public class DataBaseService {
 
     public void insertSessionInfo(String deviceId,
                                   String deviceNum,
-                                  String problemText,
-                                  String difficulty,
+                                  Problem problem,
                                   String username,
-                                  String scenario,
-                                  String generatorId,
                                   int points,
                                   boolean hintUsed) {
 
@@ -100,9 +98,9 @@ public class DataBaseService {
 
         String refCheck = "SELECT reference_id FROM " + schemeName + ".reference WHERE device_id = \'" + deviceId + "\'";
 
-        String scenarioCheck = "SELECT scenario_id FROM " + schemeName + ".scenarios WHERE scenario = \'" + scenario + "\'";
+        String scenarioCheck = "SELECT scenario_id FROM " + schemeName + ".scenarios WHERE scenario = \'" + problem.getProblemScenario().getScenarioId() + "\'";
 
-        String problemCheck = "select problem_text, difficulty, problem_id FROM " + schemeName + ".problems WHERE problem_text = \'" + problemText + "\' and difficulty = \'" + difficulty + "\'";
+        String problemCheck = "select problem_text, difficulty, problem_id FROM " + schemeName + ".problems WHERE problem_text = \'" + problem.getText() + "\' and difficulty = \'" + problem.getDifficulty() + "\'";
 
         try (Statement refCheckStatement = connection.createStatement();
              ResultSet refExists = refCheckStatement.executeQuery(refCheck);
@@ -123,8 +121,8 @@ public class DataBaseService {
                 referenceId = insertReference(deviceId, deviceNum, username);
             }
 
-            final int scenarioId = getScenarioId(scenario, generatorId, scenarioExists);
-            final int problemId = getProblemId(problemText, difficulty, scenarioId, problemExists);
+            final int scenarioId = getScenarioId(problem.getProblemScenario().getScenarioId(), problem.getTheme(), scenarioExists);
+            final int problemId = getProblemId(problem, scenarioId, problemExists);
 
             insertSolution(points, hintUsed, referenceId, problemId);
 
@@ -209,17 +207,47 @@ public class DataBaseService {
         }
     }
 
-    private int getProblemId(String problemText, String difficulty, int scenarioId, ResultSet problemExists) throws SQLException {
+    private int getProblemId(Problem problem, int scenarioId, ResultSet problemExists) throws SQLException {
         ResultSet problemLastId;
-        String insertTableProblems = "INSERT INTO " + schemeName + ".problems (problem_text, difficulty, scenario_id) " +
-                "VALUES" + "(?,?,?)";
+        String insertTableProblems;
 
+        if (problem.getDifficulty() == Problem.Difficulty.EXPERT) {
+            insertTableProblems = "INSERT INTO " + schemeName + ".problems (problem_text, difficulty, scenario_id, answer, " +
+                    "hints, text_answers, text_tts, solution, solution_tts" + ") " + "VALUES" + "(?,?,?,?,?,?,?,?,?)";
+        } else {
+            insertTableProblems = "INSERT INTO " + schemeName + ".problems (problem_text, difficulty, scenario_id) " +
+                    "VALUES" + "(?,?,?)";
+        }
         if (!problemExists.next()) {
             try (PreparedStatement preparedStatementInsertProblems = connection.prepareStatement(insertTableProblems, Statement.RETURN_GENERATED_KEYS)) {
 
-                preparedStatementInsertProblems.setString(1, problemText);
-                preparedStatementInsertProblems.setString(2, difficulty);
+                preparedStatementInsertProblems.setString(1, problem.getText());
+                preparedStatementInsertProblems.setString(2, problem.getDifficulty().toString());
                 preparedStatementInsertProblems.setInt(3, scenarioId);
+                if (problem.getDifficulty() == Problem.Difficulty.EXPERT) {
+                    preparedStatementInsertProblems.setInt(4, problem.getNumericAnswer());
+                    Array hintsArray = connection.createArrayOf("varchar", problem.getHints());
+                    preparedStatementInsertProblems.setArray(5, hintsArray);
+                    Array answersArray = connection.createArrayOf("varchar", problem.getTextAnswers());
+                    preparedStatementInsertProblems.setArray(6, answersArray);
+                    if (problem.getTTS() != null) {
+                        preparedStatementInsertProblems.setString(7, problem.getTTS());
+                    } else {
+                        preparedStatementInsertProblems.setNull(7, Types.VARCHAR);
+                    }
+                    if (problem.getSolution() != null) {
+                        preparedStatementInsertProblems.setString(8, problem.getSolution().getText());
+                        final String solutionTTS = problem.getSolution().getTTS();
+                        if (solutionTTS != null) {
+                            preparedStatementInsertProblems.setString(9, solutionTTS);
+                        } else {
+                            preparedStatementInsertProblems.setNull(9, Types.VARCHAR);
+                        }
+                    } else {
+                        preparedStatementInsertProblems.setNull(8, Types.VARCHAR);
+                        preparedStatementInsertProblems.setNull(9, Types.VARCHAR);
+                    }
+                }
                 preparedStatementInsertProblems.executeUpdate();
                 problemLastId = preparedStatementInsertProblems.getGeneratedKeys();
                 if (problemLastId.next()) {
@@ -241,20 +269,22 @@ public class DataBaseService {
 
         Map<String, UserInfo> dbUserInfo = new HashMap<>();
 
-        String selectAllTables = "select " + schemeName + ".reference.device_id, device_num, username, problem_text, difficulty, scenario, points, hint_used, generator_id " +
+        String selectAllTables = "select " + schemeName + ".reference.device_id, device_num, username, problem_text, difficulty, scenario, generator_id, points, hint_used, generator_id, hints, hints_tts, solution, solution_tts, answer, text_tts, text_answers " +
                 "from " + schemeName + ".reference, " + schemeName + ".devices, " + schemeName + ".users, " + schemeName + ".problems, " + schemeName + ".solutions, " + schemeName + ".scenarios " +
                 "where " + schemeName + ".reference.device_id = " + schemeName + ".devices.device_id and " + schemeName + ".users.user_id = " + schemeName + ".reference.user_id " +
                 "and " + schemeName + ".solutions.reference_id = " + schemeName + ".reference.reference_id and " + schemeName + ".solutions.problem_id = " + schemeName + ".problems.problem_id " +
                 "and " + schemeName + ".problems.scenario_id = " + schemeName + ".scenarios.scenario_id";
 
-        String selectProblemOfTheDay = "select " + schemeName + ".reference.device_id, problem_text, scenario, problem_date, timezone, points, hint_used, generator_id " +
-                "from " + schemeName + ".problem_of_the_day, " + schemeName + ".reference, " + schemeName + ".devices, " + schemeName + ".problems, " + schemeName + ".scenarios " +
-                "where " + schemeName + ".reference.reference_id = " + schemeName + ".problem_of_the_day.reference_id " +
-                "and " + schemeName + ".problems.scenario_id = " + schemeName + ".scenarios.scenario_id" +
-                "and " + schemeName + ".problem_of_the_day.problem_id = " + schemeName + ".problems.problem_id";
+        String selectProblemOfTheDay = "SELECT problem_date, timezone, problem_text, difficulty, scenario, device_id, username, points, hint_used, generator_id, hints, hints_tts, solution, solution_tts, answer, text_tts, text_answers " +
+                "FROM " + schemeName + ".problem_of_the_day " +
+                "JOIN " + schemeName + ".problems ON " + schemeName + ".problem_of_the_day.problem_id=" + schemeName + ".problems.problem_id " +
+                "JOIN " + schemeName + ".scenarios ON " + schemeName + ".scenarios.scenario_id=" + schemeName + ".problems.scenario_id " +
+                "JOIN " + schemeName + ".reference ON " + schemeName + ".reference.reference_id = " + schemeName + ".problem_of_the_day.reference_id " +
+                "JOIN " + schemeName + ".users ON " + schemeName + ".users.user_id=" + schemeName + ".reference.user_id " +
+                "LEFT JOIN " + schemeName + ".solutions ON " + schemeName + ".solutions.reference_id=" + schemeName + ".reference.reference_id AND " + schemeName + ".solutions.problem_id=" + schemeName + ".problem_of_the_day.problem_id ";
 
         try (Statement selectAllTablesQuery = connection.createStatement();
-             PreparedStatement selectProblemOfTheDayQuery = connection.prepareStatement(selectProblemOfTheDay)) {
+             Statement selectProblemOfTheDayQuery = connection.createStatement()) {
 
             ResultSet allTables = selectAllTablesQuery.executeQuery(selectAllTables);
             while (allTables.next()) {
@@ -268,13 +298,18 @@ public class DataBaseService {
                 userInfo.addSolvedProblem(theme, problem, points);
             }
 
+            System.out.println("Load problem of the day");
             ResultSet problemOfTheDayResultSet = selectProblemOfTheDayQuery.executeQuery(selectProblemOfTheDay);
             while (problemOfTheDayResultSet.next()) {
-                final String currentDeviceId = problemOfTheDayResultSet.getString("device_id");
-                final int points = problemOfTheDayResultSet.getInt("points");
                 final String theme = problemOfTheDayResultSet.getString("generator_id");
 
+                Integer points = problemOfTheDayResultSet.getInt("points");
+                if (problemOfTheDayResultSet.wasNull()) {
+                    points = null;
+                }
                 final Problem problem = getProblemFromQuery(problemOfTheDayResultSet, points, theme);
+
+                final String currentDeviceId = problemOfTheDayResultSet.getString("device_id");
                 final UserInfo userInfo = getUserInfoFromQuery(dbUserInfo, problemOfTheDayResultSet, currentDeviceId);
 
                 final String timeZone = problemOfTheDayResultSet.getString("timezone");
@@ -282,6 +317,9 @@ public class DataBaseService {
                 final Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(timeZone));
                 calendar.setTime(problemDate);
 
+                System.out.println("User: " + userInfo);
+                System.out.println("Expert problem: " + problem);
+                System.out.println("Expert problem date: " + calendar);
                 userInfo.setExpertProblem(problem, calendar);
             }
         } catch (Exception e) {
@@ -306,18 +344,53 @@ public class DataBaseService {
         return userInfo;
     }
 
-    private Problem getProblemFromQuery(ResultSet resultSet, int points, String theme) throws SQLException {
+    private Problem getProblemFromQuery(ResultSet resultSet, @Nullable Integer points, String theme) throws SQLException {
         final ProblemScenario scenario = new ProblemScenarioImpl(resultSet.getString("scenario"));
 
-        final boolean hintUsed = resultSet.getBoolean("hint_used");
-
+        Boolean hintUsed = resultSet.getBoolean("hint_used");
+        if (resultSet.wasNull()) {
+            hintUsed = null;
+        }
 
         final String problemText = resultSet.getString("problem_text");
         final String difficultyText = resultSet.getString("difficulty");
 
-        final Problem problem = new ProblemWithPossibleTextAnswers.Builder().text(problemText).answer(0).theme(theme)
-                .possibleTextAnswers(null).hint("").scenario(scenario).difficulty(Problem.Difficulty.valueOf(difficultyText)).create();
-        problem.setState(points <= 0 ? Problem.State.ANSWER_GIVEN : (hintUsed ? Problem.State.SOLVED_WITH_HINT : Problem.State.SOLVED));
+        final int answer = resultSet.getInt("answer");
+        final String textTTS = resultSet.getString("text_tts");
+
+        final ProblemWithPossibleTextAnswers.Builder problemBuilder = new ProblemWithPossibleTextAnswers.Builder()
+                .text(problemText).tts(textTTS).answer(answer).theme(theme)
+                .scenario(scenario).difficulty(Problem.Difficulty.valueOf(difficultyText));
+
+        final Array textAnswersArray = resultSet.getArray("text_answers");
+        if (textAnswersArray != null) {
+            final Set<String> possibleTextAnswers = new HashSet<>();
+            problemBuilder.possibleTextAnswers(possibleTextAnswers);
+            Collections.addAll(possibleTextAnswers, (String[]) textAnswersArray.getArray());
+        }
+
+        final String solution = resultSet.getString("solution");
+        final String solutionTTS = resultSet.getString("solution_tts");
+        if (solution != null) {
+            final TextWithTTSBuilder textWithTTS = solutionTTS != null ? new TextWithTTSBuilder().append(solution, solutionTTS)
+                    : new TextWithTTSBuilder().append(solution);
+            problemBuilder.solution(textWithTTS);
+        }
+
+        final Array hintsArray = resultSet.getArray("hints");
+        final Array hintsTTSArray = resultSet.getArray("hints_tts");
+        // TODO: add tts for hints
+        if (hintsArray != null) {
+            String[] hints = (String[]) hintsArray.getArray();
+            for (String hint : hints) {
+                problemBuilder.hint(hint);
+            }
+        }
+
+        final Problem problem = problemBuilder.create();
+        if (points != null && hintUsed != null) {
+            problem.setState(points <= 0 ? Problem.State.ANSWER_GIVEN : (hintUsed ? Problem.State.SOLVED_WITH_HINT : Problem.State.SOLVED));
+        }
         return problem;
     }
 
@@ -393,6 +466,8 @@ public class DataBaseService {
             return;
         }
 
+        System.out.println("Save problem of the day for " + userInfo.getName());
+
         final String deviceId = userInfo.getDeviceId();
         String refCheck = "SELECT reference_id FROM " + schemeName + ".reference WHERE device_id = \'" + deviceId + "\'";
 
@@ -420,11 +495,11 @@ public class DataBaseService {
             }
 
             final int scenarioId = getScenarioId(expertProblem.getProblemScenario().getScenarioId(), expertProblem.getTheme(), scenarioExists);
-            final int problemId = getProblemId(expertProblem.getText(), expertProblem.getDifficulty().toString(), scenarioId, problemExists);
+            final int problemId = getProblemId(expertProblem, scenarioId, problemExists);
 
             String insertTableProblemOfTheDay = "INSERT INTO " + schemeName + ".problem_of_the_day " +
                     "(reference_id, problem_id, problem_date, timezone) " +
-                    "VALUES" + "(?,?,?)" +
+                    "VALUES" + "(?,?,?,?)" +
                     "ON CONFLICT (reference_id) DO UPDATE SET problem_id=?, problem_date=?, timezone=?";
 
             try (PreparedStatement preparedStatementProblemOfTheDay = connection.prepareStatement(insertTableProblemOfTheDay, Statement.RETURN_GENERATED_KEYS)) {

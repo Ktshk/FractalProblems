@@ -13,7 +13,7 @@ import java.util.Set;
  */
 public class TestProblemGenerator {
 
-    private static final ProblemGenerator GENERATOR = new LogicGenerator();
+    private static final ProblemGenerator GENERATOR = new SpacesGenerator();
 
     public void testAllGenerators() {
         for (ProblemGenerator generator : ProblemCollection.INSTANCE.getGenerators()) {
@@ -28,11 +28,34 @@ public class TestProblemGenerator {
     }
 
     @Test
+    public void testGenerateExpertProblems() {
+        int count = 0;
+        Problem problem;
+        final UserInfo userInfo = new UserInfo("test", "test", "test");
+        while (count < 100 && ((problem = ProblemCollection.INSTANCE.generateProblem(userInfo, Problem.Difficulty.EXPERT)) != null)) {
+            problem.setState(Problem.State.SOLVED);
+            userInfo.addSolvedProblem(problem.getTheme(), problem, 0);
+
+            System.out.println("Problem: " + problem.getText());
+            System.out.println("Scenario: " + problem.getProblemScenario());
+            System.out.println("Difficulty: " + problem.getDifficulty());
+            System.out.println("Answer: " + problem.getTextAnswer());
+            System.out.println("*** ");
+
+            count++;
+        }
+
+        System.out.println("count = " + count);
+    }
+
+    @Test
     public void testProblemCollectionGeneration() {
         final Session session = new Session(new UserInfo("test", "test", "test"), "test", "test");
 
-//        for (Problem.Difficulty difficulty : Problem.Difficulty.values()) {
-        Problem.Difficulty difficulty = Problem.Difficulty.EXPERT;
+        for (Problem.Difficulty difficulty : Problem.Difficulty.values()) {
+            if (difficulty == Problem.Difficulty.EXPERT) {
+                continue;
+            }
             System.out.println("************* " + difficulty);
             session.setCurrentDifficulty(difficulty);
 
@@ -41,7 +64,7 @@ public class TestProblemGenerator {
                 solveProblem(session, Problem.State.SOLVED);
                 solveProblem(session, Problem.State.ANSWER_GIVEN);
             }
-//        }
+        }
     }
 
     @Test

@@ -49,6 +49,7 @@ public class Dictionary {
     public final static Noun CHILD = new NounBuilder().nom("ребенок").gen("ребенка").counting("детей").plural("дети").gender(MASCULINE).createNoun();
     public final static Noun ROSE = new NounBuilder().nom("роза").gen("розы").counting("роз").plural("розы").gender(FEMININE).createNoun();
     public final static Noun CAMOMILE = new NounBuilder().nom("ромашка").gen("ромашки").counting("ромашек").plural("ромашки").gender(FEMININE).createNoun();
+    public final static Noun KNIGHT = new NounBuilder().nom("рыцарь").gen("рыцаря").counting("рыцарей").plural("рыцарей").gender(MASCULINE).createNoun();
     public final static Noun SECOND = new NounBuilder().nom("секунда").gen("секунды").counting("секунд").plural("секунды").gender(FEMININE).createNoun();
     public final static Noun SISTER = new NounBuilder().nom("сестра").gen("сестры").counting("сестёр").plural("сёстры").gender(FEMININE).createNoun();
     public final static Noun SWEETS = new NounBuilder().nom("сладость").gen("сладости").counting("сладостей").plural("сладости").gender(FEMININE).createNoun();

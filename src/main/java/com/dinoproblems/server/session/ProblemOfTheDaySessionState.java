@@ -88,9 +88,9 @@ public class ProblemOfTheDaySessionState extends AbstractSolvingProblemState {
                 if (correctAnswer == CorrectAnswer.CORRECT) {
                     text = chooseRandomElement(PRAISES);
                 } else {
-                    if (correctAnswer == CorrectAnswer.NOT_ANUMBER) {
+                    if (correctAnswer == CorrectAnswer.NOT_A_NUMBER) {
                         DataBaseService.INSTANCE.updateMiscAnswersTable(command, problemOfTheDay.getText(), session.getLastServerResponse());
-                        text = chooseRandomElement(NOT_A_NUMBER);
+                        text = chooseRandomElement(DID_NOT_UNDERSTAND) + " Я могу повторить задачу, сказать ответ или вернуться в меню. Чтобы посмотреть таблицу рекордов, нажмите на кнопку Рекорды.";
                     } else {
                         text = chooseRandomElement(correctAnswer == CorrectAnswer.ALMOST_CORRECT ? ALMOST : WRONG_ANSWER);
                     }
@@ -225,12 +225,12 @@ public class ProblemOfTheDaySessionState extends AbstractSolvingProblemState {
         final JsonArray buttons = new JsonArray();
         final Problem problemOfTheDay = session.getUserInfo().getProblemOfTheDay(timeZone);
 
-        buttons.add(createButton("Повторить задачу", true));
+        buttons.add(createButton("Повторить задачу", false));
         if (problemOfTheDay.hasSolution()) {
-            buttons.add(createButton("Решение", true));
+            buttons.add(createButton("Решение", false));
         }
-        buttons.add(createLeaderboardButton(session.getUserInfo(), true, true));
-        buttons.add(createButton("Вернуться в меню", true));
+        buttons.add(createLeaderboardButton(session.getUserInfo(), false, true));
+        buttons.add(createButton("Вернуться в меню", false));
 
         return buttons;
     }

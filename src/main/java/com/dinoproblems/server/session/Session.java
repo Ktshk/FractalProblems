@@ -111,6 +111,9 @@ public class Session {
 
     private void populateNextProblem() {
         for (Problem.Difficulty difficulty : Problem.Difficulty.values()) {
+            if (difficulty == Problem.Difficulty.EXPERT) {
+                continue;
+            }
             if (!nextProblem.containsKey(difficulty)) {
                 final Problem problem = ProblemCollection.INSTANCE.generateProblem(getUserInfo(), difficulty);
                 if (problem != null) {
@@ -262,16 +265,16 @@ public class Session {
         return false;
     }
 
-    static JsonObject createButton(String title, boolean menuButton) {
+    static JsonObject createButton(String title, boolean hideButton) {
         final JsonObject buttonJson = new JsonObject();
         buttonJson.addProperty("title", title);
-        if (menuButton) {
+        if (hideButton) {
             buttonJson.addProperty("hide", true);
         }
         return buttonJson;
     }
 
-    static JsonObject createLeaderboardButton(UserInfo userInfo, boolean menuButton, boolean showExpertRecords) {
+    static JsonObject createLeaderboardButton(UserInfo userInfo, boolean hideButton, boolean showExpertRecords) {
         final JsonObject buttonJson = createButton("Рекорды", true);
         String url = "http://" + MainServlet.URL + "/records";
         if (showExpertRecords) {
@@ -283,7 +286,7 @@ public class Session {
             url += "&user_id=" + userInfo.getDeviceId() + "#selected";
         }
         buttonJson.addProperty("url", url);
-        if (menuButton) {
+        if (hideButton) {
             buttonJson.addProperty("hide", true);
         }
         return buttonJson;

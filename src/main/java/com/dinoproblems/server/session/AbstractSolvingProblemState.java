@@ -28,14 +28,14 @@ public abstract class AbstractSolvingProblemState implements SessionState {
             "дать подсказку", "дай", "давай", "дай подсказку", "подскажи", "есть еще подсказка", "помоги");
     final static Set<String> ASK_TO_REPEAT = Sets.newHashSet("повтори", "повторить", "повтори задачу", "повтори условие",
             "еще раз", "прочитай еще раз", "расскажи еще раз", "повтори еще раз", "задачу повтори", "еще раз повтори",
-            "можешь повторить");
+            "можешь повторить", "повторить задачу");
     final static Set<String> ASK_ANSWER = Sets.newHashSet("ответ", "сдаюсь", "сказать ответ", "скажи ответ",
             "скажи решение", "можно решение", "расскажи мне какой ответ", "какой ответ", "скажи ответ пожалуйста",
             "можно ответ сказать", "дай ответ", "скажи мне ответ", "я хочу узнать ответ", "хочу узнать ответ");
     private static final HashSet<String> ANOTHER_PROBLEM = Sets.newHashSet("другую", "другая", "другую задачу",
             "другая задача", "новую задачу", "дай другую задачу", "дай мне новую задачу", "дай другую", "дай другую задачу");
     final static Set<String> BACK_TO_MENU = Sets.newHashSet("вернуться в меню", "меню", "назад в меню", "назад",
-            "в меню", "вернись в меню");
+            "в меню", "вернись в меню", "вернись меню");
     final static String[] NOT_A_NUMBER = {"Это точно не ответ на задачу. ", "Даже не знаю, как на это реагировать. ",
             "Я почти уверена, что в ответе на задачу должно быть число. ", "Всё ещё жду ответа на задачу. "};
     final static String[] ALMOST = {"Почти.", "Почти верно.", "Близко, но нет."};
@@ -101,7 +101,7 @@ public abstract class AbstractSolvingProblemState implements SessionState {
                 DataBaseService.INSTANCE.updateMiscAnswersTable(command, currentProblem.getText(), session.getLastServerResponse());
 
                 final String text;
-                if (correctAnswer == CorrectAnswer.NOT_ANUMBER) {
+                if (correctAnswer == CorrectAnswer.NOT_A_NUMBER) {
                     text = chooseRandomElement(NOT_A_NUMBER) + " " + chooseRandomElement(PROPOSE_ANSWER_OR_HINT);
                 } else {
                     text = chooseRandomElement(correctAnswer == CorrectAnswer.ALMOST_CORRECT ? ALMOST : WRONG_ANSWER) + " " + chooseRandomElement(PROPOSE_ANSWER_OR_HINT);
@@ -114,7 +114,7 @@ public abstract class AbstractSolvingProblemState implements SessionState {
     abstract SessionState incorrectAnswerSessionState(Session session, String text);
 
     CorrectAnswer checkProblemAnswer(Problem currentProblem, String command, JsonArray entitiesArray) {
-        CorrectAnswer correctAnswer = currentProblem.checkAnswer(command) ? CorrectAnswer.CORRECT : CorrectAnswer.NOT_ANUMBER;
+        CorrectAnswer correctAnswer = currentProblem.checkAnswer(command) ? CorrectAnswer.CORRECT : CorrectAnswer.NOT_A_NUMBER;
 
         if (correctAnswer != CorrectAnswer.CORRECT && currentProblem.isNumericAnswer()) {
             for (JsonElement jsonElement : entitiesArray) {
@@ -128,7 +128,7 @@ public abstract class AbstractSolvingProblemState implements SessionState {
                     if (Math.abs(value - currentProblem.getNumericAnswer()) <= Math.ceil(currentProblem.getNumericAnswer() * 0.05)) {
                         correctAnswer = CorrectAnswer.ALMOST_CORRECT;
                     }
-                    if (correctAnswer == CorrectAnswer.NOT_ANUMBER) {
+                    if (correctAnswer == CorrectAnswer.NOT_A_NUMBER) {
                         correctAnswer = CorrectAnswer.INCORRECT_NUMBER;
                     }
                 }
@@ -139,7 +139,7 @@ public abstract class AbstractSolvingProblemState implements SessionState {
     }
 
     enum CorrectAnswer {
-        CORRECT, ALMOST_CORRECT, INCORRECT_NUMBER, NOT_ANUMBER
+        CORRECT, ALMOST_CORRECT, INCORRECT_NUMBER, NOT_A_NUMBER
     }
 
     void processRequest(Problem currentProblem, JsonObject request, Session session, String timeZone) {
@@ -222,9 +222,9 @@ public abstract class AbstractSolvingProblemState implements SessionState {
         problem.setState(state);
         final int points = session.updateScore(problem);
 
-        DataBaseService.INSTANCE.insertSessionInfo(session.getUserInfo().getDeviceId(), clientId, problem.getText(),
-                problem.getDifficulty().toString(), session.getUserInfo().getName(), problem.getProblemScenario().getScenarioId(),
-                problem.getTheme(), points, problem.wasHintGiven());
+        DataBaseService.INSTANCE.insertSessionInfo(session.getUserInfo().getDeviceId(), clientId, problem,
+                session.getUserInfo().getName(),
+                points, problem.wasHintGiven());
     }
 
     @Nonnull

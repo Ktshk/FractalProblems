@@ -79,26 +79,34 @@ public class UserInfo {
     }
 
     public boolean hasProblemOfTheDay(String timeZone) {
-        final Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(timeZone));
-        return !(expertProblemDate == null
-                || calendar.get(Calendar.YEAR) != expertProblemDate.get(Calendar.YEAR)
-                || calendar.get(Calendar.MONTH) != expertProblemDate.get(Calendar.MONTH)
-                || calendar.get(Calendar.DAY_OF_MONTH) != expertProblemDate.get(Calendar.DAY_OF_MONTH));
-
+        return !(expertProblemDate == null || isDayProblemExpired(timeZone));
     }
 
     public Problem getProblemOfTheDay(String timeZone) {
-        final Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(timeZone));
-        if (expertProblemDate == null
-                || calendar.get(Calendar.YEAR) != expertProblemDate.get(Calendar.YEAR)
-                || calendar.get(Calendar.MONTH) != expertProblemDate.get(Calendar.MONTH)
-                || calendar.get(Calendar.DAY_OF_MONTH) != expertProblemDate.get(Calendar.DAY_OF_MONTH)) {
-            expertProblemDate = calendar;
-            expertProblem = getRandomVariousProblem(Difficulty.EXPERT);
+        if (expertProblemDate == null || isDayProblemExpired(timeZone)) {
+            expertProblemDate = Calendar.getInstance(TimeZone.getTimeZone(timeZone));
+
+            if (expertProblem != null) {
+                if (expertProblem.getTheme().equals(VariousProblems.THEME)) {
+                    variousProblems.get(Difficulty.EXPERT).add(0, expertProblem);
+                }
+            }
+
+            expertProblem = ProblemCollection.INSTANCE.generateProblem(this, Difficulty.EXPERT);
 
             DataBaseService.INSTANCE.saveProblemOfTheDay(this, expertProblem, expertProblemDate);
         }
         return expertProblem;
+    }
+
+    private boolean isDayProblemExpired(String timeZone) {
+        final Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(timeZone));
+
+        final boolean result = calendar.get(Calendar.YEAR) != expertProblemDate.get(Calendar.YEAR)
+                || calendar.get(Calendar.MONTH) != expertProblemDate.get(Calendar.MONTH)
+                || calendar.get(Calendar.DAY_OF_MONTH) != expertProblemDate.get(Calendar.DAY_OF_MONTH);
+        System.out.println("Problem of the day is expired: " + result);
+        return result;
     }
 
     Problem getRandomVariousProblem(Difficulty difficulty) {

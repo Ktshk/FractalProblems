@@ -84,6 +84,7 @@ public class ProblemWithPossibleTextAnswers implements Problem {
         return scenario;
     }
 
+    @Nullable
     @Override
     public String getTTS() {
         return tts;
@@ -97,6 +98,16 @@ public class ProblemWithPossibleTextAnswers implements Problem {
     @Override
     public TextWithTTSBuilder getSolution() {
         return solution;
+    }
+
+    @Override
+    public String[] getHints() {
+        return hints.toArray(new String[hints.size()]);
+    }
+
+    @Override
+    public String[] getTextAnswers() {
+        return (String[]) possibleTextAnswers.toArray();
     }
 
     public int getAnswer() {

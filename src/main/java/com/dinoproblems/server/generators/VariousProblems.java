@@ -3,6 +3,7 @@ package com.dinoproblems.server.generators;
 import com.dinoproblems.server.Problem;
 import com.dinoproblems.server.Problem.Difficulty;
 import com.dinoproblems.server.ProblemWithPossibleTextAnswers;
+import com.dinoproblems.server.utils.TextWithTTSBuilder;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
@@ -58,6 +59,8 @@ public class VariousProblems {
                     String tts = null;
                     String comment = null;
                     String commentTTS = null;
+                    TextWithTTSBuilder solution = null;
+
                     List<String> hints = new ArrayList<>();
                     final HashSet<String> possibleTextAnswers = Sets.newHashSet();
 
@@ -94,29 +97,40 @@ public class VariousProblems {
                                     }
                                 }
                             } else if (problemChildNode.getNodeName().equals("comment")) {
-                                final NodeList commentChildNodes = problemChildNode.getChildNodes();
-                                for (int k = 0; k < commentChildNodes.getLength(); k++) {
-                                    final Node commentChildNode = commentChildNodes.item(k);
-                                    if (commentChildNode.getNodeType() == Node.ELEMENT_NODE) {
-                                        if (commentChildNode.getNodeName().equals("text")) {
-                                            comment = commentChildNode.getTextContent();
-                                        } else if (commentChildNode.getNodeName().equals("tts")) {
-                                            commentTTS = commentChildNode.getTextContent();
-                                        }
-                                    }
-                                }
+                                final TextWithTTSBuilder commentBuilder = parseTextWithTTS(problemChildNode);
+                                comment = commentBuilder.getText();
+                                commentTTS = commentBuilder.getTTS();
+                            } else if (problemChildNode.getNodeName().equals("solution")) {
+                                solution = parseTextWithTTS(problemChildNode);
                             }
                         }
                     }
 
                     problems.put(difficulty, new ProblemWithPossibleTextAnswers.Builder().text(text).tts(tts).answer(answer).theme(THEME)
                             .possibleTextAnswers(possibleTextAnswers).hints(hints).scenario(new ProblemScenarioImpl(THEME + "_" + id, true))
-                            .difficulty(difficulty).comment(comment).commentTTS(commentTTS).create());
+                            .difficulty(difficulty).comment(comment).commentTTS(commentTTS).solution(solution).create());
                 }
             }
         } catch (IOException | ParserConfigurationException | SAXException e) {
             e.printStackTrace();
         }
+    }
+
+    private TextWithTTSBuilder parseTextWithTTS(Node problemChildNode) {
+        String text = "";
+        String tts = "";
+        final NodeList commentChildNodes = problemChildNode.getChildNodes();
+        for (int k = 0; k < commentChildNodes.getLength(); k++) {
+            final Node commentChildNode = commentChildNodes.item(k);
+            if (commentChildNode.getNodeType() == Node.ELEMENT_NODE) {
+                if (commentChildNode.getNodeName().equals("text")) {
+                    text = commentChildNode.getTextContent();
+                } else if (commentChildNode.getNodeName().equals("tts")) {
+                    tts = commentChildNode.getTextContent();
+                }
+            }
+        }
+        return new TextWithTTSBuilder().append(text, tts == null ? text : tts);
     }
 
     public Collection<Problem> getProblems(Difficulty difficulty) {

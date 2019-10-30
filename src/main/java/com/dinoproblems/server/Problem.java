@@ -41,6 +41,7 @@ public interface Problem {
      *
      * @return tts for yandex dialog, null if not specified
      */
+    @Nullable
     default String getTTS() {
         return null;
     }
@@ -48,6 +49,10 @@ public interface Problem {
     boolean hasSolution();
 
     TextWithTTSBuilder getSolution();
+
+    String[] getHints();
+
+    String[] getTextAnswers();
 
     enum State {
         ANSWER_GIVEN, SOLVED, SOLVED_WITH_HINT

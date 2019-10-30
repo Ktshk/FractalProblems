@@ -32,17 +32,17 @@
     </div>
 </div>
 
-<div class="table-title">
-    <h1 class="table-title-text">Таблица рекордов</h1>
-</div>
+<%--<div class="table-title" >--%>
+    <%--<h1 class="table-title-text">Таблица рекордов</h1>--%>
+<%--</div>--%>
 
 <div class="buttons-row">
     <div>
     <span id="recordsButtonSpan" class="button-block">
-        <a id="recordsButton" href="#" onclick="toggleVisibility('recordsTable');">Разные задачи</a>
+        <a id="recordsButton" class="record-button" href="#" onclick="toggleVisibility('recordsTable');">Разные задачи</a>
     </span>
         <span id="expertRecordsButtonSpan" class="button-block">
-        <a id="expertRecordsButton" href="#" onclick="toggleVisibility('expertRecordsTable');">Задача дня</a>
+        <a id="expertRecordsButton" class="record-button" href="#" onclick="toggleVisibility('expertRecordsTable');">Задача дня</a>
     </span>
     </div>
 </div>
@@ -190,7 +190,7 @@
 
     .buttons-row {
         max-width: 960px;
-        margin: 0 auto 16px auto;
+        margin: 32px auto 16px auto;
         font-size: 32px;
         font-family: BlinkMacSystemFont, Roboto, Open Sans, Helvetica Neue, sans-serif;
         text-decoration: none;
@@ -198,6 +198,11 @@
 
     .button-block {
         padding: 0 0 16px 0;
+        margin-right: 16px;
+    }
+
+    .record-button {
+        text-decoration: none;
     }
 
     .records-table {

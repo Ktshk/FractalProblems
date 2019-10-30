@@ -25,7 +25,7 @@ public class MainServlet extends HttpServlet {
 
     private Map<String, Session> currentSessions = new HashMap<>();
     private Map<String, UserInfo> userInfos = new HashMap<>();
-    public static String URL = "localhost:8080";
+    public static String URL = "test-env.ha4x2kktxp.us-east-2.elasticbeanstalk.com";
 
 
     public MainServlet() {
