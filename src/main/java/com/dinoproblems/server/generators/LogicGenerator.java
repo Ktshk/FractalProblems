@@ -10,6 +10,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 
+import static com.dinoproblems.server.utils.Dictionary.KNIGHT;
 import static com.dinoproblems.server.utils.Dictionary.LIAR;
 import static com.dinoproblems.server.utils.Dictionary.PEOPLE;
 import static com.dinoproblems.server.utils.GeneratorUtils.*;
@@ -21,6 +22,7 @@ public class LogicGenerator implements ProblemGenerator {
     private static final ProblemScenario NUMBER_FOUR_CHILDREN_SCENARIO = new ProblemScenarioImpl(ProblemCollection.LOGIC + "_" + "NUMBER_FOUR_CHILDREN", true);
     private static final ProblemScenario MUSHROOMS = new ProblemScenarioImpl(ProblemCollection.LOGIC + "_" + "MUSHROOMS");
     private static final ProblemScenario YOU_ALL_LIARS = new ProblemScenarioImpl(ProblemCollection.LOGIC + "_" + "YOU_ALL_LIARS", true);
+    private static final ProblemScenario TOTAL_EVERYTHING_IS_TRUE = new ProblemScenarioImpl(ProblemCollection.LOGIC + "_" + "TOTAL_EVERYTHING_IS_TRUE", true);
 
     private static final Problem NUMBER_FOUR_CHILDREN;
 
@@ -47,8 +49,8 @@ public class LogicGenerator implements ProblemGenerator {
             TextWithTTSBuilder text = new TextWithTTSBuilder();
             int num = randomInt(5, 11);
             text.append("В комнате собрались ").append(getNumWithString(num, PEOPLE)).append(" с острова Рыцарей и Лжецов. ")
-                    .append("(Рыцари всегда говорят правду, а лдецы всегда врут.) " +
-                    "Каждый сказал остальным: «Вы все Лжецы!». Сколько лжецов среди них?");
+                    .append("(Рыцари всегда говорят правду, а лжецы всегда врут.) " +
+                    "Каждый сказал остальным: «Вы все лжецы!». Сколько лжецов среди них?");
             String hint1 = "Допустим, что все собравшиеся лжецы. Могло ли такое быть? ";
             int answer = num - 1;
             return new ProblemWithPossibleTextAnswers.Builder().text(text.getText()).tts(text.getTTS())
@@ -114,6 +116,23 @@ public class LogicGenerator implements ProblemGenerator {
                     .answer(answer).theme(ProblemCollection.LOGIC)
                     .possibleTextAnswers(Sets.newHashSet(textAnswer))
                     .hints(Lists.newArrayList(hint1, hint2)).scenario(MUSHROOMS).difficulty(Problem.Difficulty.HARD).create();
+        } else if (scenario.equals(TOTAL_EVERYTHING_IS_TRUE)) {
+            TextWithTTSBuilder text = new TextWithTTSBuilder();
+            int liars = randomInt(5, 16);
+            int knights = randomInt(5, 16);
+
+            text.append(getNumWithString(knights, KNIGHT)).append(" и ").append(getNumWithString(liars, LIAR))
+                    .append(" написали по статье каждый. ")
+                    .append("(Рыцари всегда говорят и пишут правду, а лжецы всегда врут.)")
+                    .append(" В конце статьи некоторые из них написали: Все, что здесь написано - правда. ")
+                    .append("Остальные написали: Все, что здесь написано - ложь. ")
+                    .append("Сколько человек написали первую фразу?");
+            String hint1 = "Подумайте, какую фразу мог написать рыцарь, а какую лжец. ";
+            int answer = liars + knights;
+            return new ProblemWithPossibleTextAnswers.Builder().text(text.getText()).tts(text.getTTS())
+                    .answer(answer).theme(ProblemCollection.LOGIC)
+                    .possibleTextAnswers(Sets.newHashSet(getNumWithString(answer, PEOPLE)))
+                    .hint(hint1).scenario(TOTAL_EVERYTHING_IS_TRUE).difficulty(Problem.Difficulty.EASY).create();
         }
         throw new IllegalArgumentException();
     }
@@ -137,7 +156,7 @@ public class LogicGenerator implements ProblemGenerator {
     public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty) {
         switch (difficulty) {
             case EASY:
-                return null;
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(TOTAL_EVERYTHING_IS_TRUE), new HashSet<>());
             case MEDIUM:
                 return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(YOU_ALL_LIARS), new HashSet<>());
             case HARD:

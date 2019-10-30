@@ -18,7 +18,9 @@ public class FindNumberGenerator implements ProblemGenerator {
 
     static {
         PROBLEMS.put(Problem.Difficulty.EASY, new HashMap<>());
+        PROBLEMS.put(Problem.Difficulty.MEDIUM, new HashMap<>());
         PROBLEMS.put(Problem.Difficulty.HARD, new HashMap<>());
+        PROBLEMS.put(Problem.Difficulty.EXPERT, new HashMap<>());
 
         TextWithTTSBuilder text = new TextWithTTSBuilder();
         text.append("Найди самое большое трёхзначное число, состоящее из разных нечётных цифр.");
@@ -61,9 +63,9 @@ public class FindNumberGenerator implements ProblemGenerator {
                 .theme(ProblemCollection.FIND_NUMBER)
                 .possibleTextAnswers(Sets.newHashSet("303369"))
                 .hint(hint).scenario(scenario)
-                .solution(new TextWithTTSBuilder().append("Если первая буква была a, а вторая  — b, то третья будет (a + b), четвёртая  — (a + 2b), пятая  — (2a + 3b), шестая  — (3a + 5b). Нам надо подобрать максимальное возможное значение a, чтобы выполнялось неравенство 3a + 5b < 10. Это возможно при a = 3, b = 0, то есть искомое число будет 303369. "))
+                .solution(new TextWithTTSBuilder().append("Если первая цифра была a, а вторая  — b, то третья будет (a + b), четвёртая  — (a + 2b), пятая  — (2a + 3b), шестая  — (3a + 5b). Нам надо подобрать максимальное возможное значение a, чтобы выполнялось неравенство 3a + 5b < 10. Это возможно при a = 3, b = 0, то есть искомое число будет 303369. "))
                 .difficulty(Problem.Difficulty.EXPERT).create();
-        PROBLEMS.get(Problem.Difficulty.HARD).put(scenario, problem);
+        PROBLEMS.get(Problem.Difficulty.EXPERT).put(scenario, problem);
 
     }
 
@@ -80,7 +82,7 @@ public class FindNumberGenerator implements ProblemGenerator {
     @Nullable
     @Override
     public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty) {
-        if (PROBLEMS.containsKey(difficulty)) {
+        if (PROBLEMS.containsKey(difficulty) && !PROBLEMS.get(difficulty).isEmpty()) {
             return findAvailableScenario(difficulty, alreadySolvedProblems, PROBLEMS.get(difficulty).keySet(), new HashSet<>());
         } else {
             return null;
