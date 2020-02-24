@@ -53,62 +53,8 @@ public class VariousProblems {
                 Node problemNode = nodeList.item(i);
 
                 if (problemNode.getNodeType() == Node.ELEMENT_NODE) {
-                    final String id = problemNode.getAttributes().getNamedItem("scenarioId").getNodeValue();
-                    final int answer = Integer.valueOf(problemNode.getAttributes().getNamedItem("answer").getNodeValue());
-                    String text = null;
-                    String tts = null;
-                    String comment = null;
-                    String commentTTS = null;
-                    TextWithTTSBuilder solution = null;
-
-                    List<String> hints = new ArrayList<>();
-                    final HashSet<String> possibleTextAnswers = Sets.newHashSet();
-
-                    final NodeList childNodes = problemNode.getChildNodes();
-                    for (int j = 0; j < childNodes.getLength(); j++) {
-                        final Node problemChildNode = childNodes.item(j);
-                        if (problemChildNode.getNodeType() == Node.ELEMENT_NODE) {
-                            if (problemChildNode.getNodeName().equals("text")) {
-                                text = problemChildNode.getTextContent();
-                            } else if (problemChildNode.getNodeName().equals("tts")) {
-                                tts = problemChildNode.getTextContent();
-                            } else if (problemChildNode.getNodeName().equals("hints")) {
-                                final NodeList hintsNodes = problemChildNode.getChildNodes();
-                                for (int k = 0; k < hintsNodes.getLength(); k++) {
-                                    final Node hintNode = hintsNodes.item(k);
-                                    if (hintNode.getNodeType() == Node.ELEMENT_NODE) {
-                                        final NodeList hintChildren = hintNode.getChildNodes();
-                                        for (int m = 0; m < hintChildren.getLength(); m++) {
-                                            final Node hintChild = hintChildren.item(m);
-                                            if (hintChild.getNodeType() == Node.ELEMENT_NODE) {
-                                                if (hintChild.getNodeName().equals("text")) {
-                                                    hints.add(hintChild.getTextContent());
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            } else if (problemChildNode.getNodeName().equals("text_answers")) {
-                                final NodeList textAnswerNodes = problemChildNode.getChildNodes();
-                                for (int k = 0; k < textAnswerNodes.getLength(); k++) {
-                                    final Node textAnswerNode = textAnswerNodes.item(k);
-                                    if (textAnswerNode.getNodeType() == Node.ELEMENT_NODE) {
-                                        possibleTextAnswers.add(textAnswerNode.getAttributes().getNamedItem("text").getNodeValue());
-                                    }
-                                }
-                            } else if (problemChildNode.getNodeName().equals("comment")) {
-                                final TextWithTTSBuilder commentBuilder = parseTextWithTTS(problemChildNode);
-                                comment = commentBuilder.getText();
-                                commentTTS = commentBuilder.getTTS();
-                            } else if (problemChildNode.getNodeName().equals("solution")) {
-                                solution = parseTextWithTTS(problemChildNode);
-                            }
-                        }
-                    }
-
-                    problems.put(difficulty, new ProblemWithPossibleTextAnswers.Builder().text(text).tts(tts).answer(answer).theme(THEME)
-                            .possibleTextAnswers(possibleTextAnswers).hints(hints).scenario(new ProblemScenarioImpl(THEME + "_" + id, true))
-                            .difficulty(difficulty).comment(comment).commentTTS(commentTTS).solution(solution).create());
+                    Problem problem = parseProblemXML(difficulty, problemNode);
+                    problems.put(difficulty, problem);
                 }
             }
         } catch (IOException | ParserConfigurationException | SAXException e) {
@@ -116,7 +62,66 @@ public class VariousProblems {
         }
     }
 
-    private TextWithTTSBuilder parseTextWithTTS(Node problemChildNode) {
+    static Problem parseProblemXML(Difficulty difficulty, Node problemNode) {
+        final String id = problemNode.getAttributes().getNamedItem("scenarioId").getNodeValue();
+        final int answer = Integer.valueOf(problemNode.getAttributes().getNamedItem("answer").getNodeValue());
+        String text = null;
+        String tts = null;
+        String comment = null;
+        String commentTTS = null;
+        TextWithTTSBuilder solution = null;
+
+        List<String> hints = new ArrayList<>();
+        final HashSet<String> possibleTextAnswers = Sets.newHashSet();
+
+        final NodeList childNodes = problemNode.getChildNodes();
+        for (int j = 0; j < childNodes.getLength(); j++) {
+            final Node problemChildNode = childNodes.item(j);
+            if (problemChildNode.getNodeType() == Node.ELEMENT_NODE) {
+                if (problemChildNode.getNodeName().equals("text")) {
+                    text = problemChildNode.getTextContent();
+                } else if (problemChildNode.getNodeName().equals("tts")) {
+                    tts = problemChildNode.getTextContent();
+                } else if (problemChildNode.getNodeName().equals("hints")) {
+                    final NodeList hintsNodes = problemChildNode.getChildNodes();
+                    for (int k = 0; k < hintsNodes.getLength(); k++) {
+                        final Node hintNode = hintsNodes.item(k);
+                        if (hintNode.getNodeType() == Node.ELEMENT_NODE) {
+                            final NodeList hintChildren = hintNode.getChildNodes();
+                            for (int m = 0; m < hintChildren.getLength(); m++) {
+                                final Node hintChild = hintChildren.item(m);
+                                if (hintChild.getNodeType() == Node.ELEMENT_NODE) {
+                                    if (hintChild.getNodeName().equals("text")) {
+                                        hints.add(hintChild.getTextContent());
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else if (problemChildNode.getNodeName().equals("text_answers")) {
+                    final NodeList textAnswerNodes = problemChildNode.getChildNodes();
+                    for (int k = 0; k < textAnswerNodes.getLength(); k++) {
+                        final Node textAnswerNode = textAnswerNodes.item(k);
+                        if (textAnswerNode.getNodeType() == Node.ELEMENT_NODE) {
+                            possibleTextAnswers.add(textAnswerNode.getAttributes().getNamedItem("text").getNodeValue());
+                        }
+                    }
+                } else if (problemChildNode.getNodeName().equals("comment")) {
+                    final TextWithTTSBuilder commentBuilder = parseTextWithTTS(problemChildNode);
+                    comment = commentBuilder.getText();
+                    commentTTS = commentBuilder.getTTS();
+                } else if (problemChildNode.getNodeName().equals("solution")) {
+                    solution = parseTextWithTTS(problemChildNode);
+                }
+            }
+        }
+
+        return new ProblemWithPossibleTextAnswers.Builder().text(text).tts(tts).answer(answer).theme(THEME)
+                .possibleTextAnswers(possibleTextAnswers).hints(hints).scenario(new ProblemScenarioImpl(THEME + "_" + id, true))
+                .difficulty(difficulty).comment(comment).commentTTS(commentTTS).solution(solution).create();
+    }
+
+    private static TextWithTTSBuilder parseTextWithTTS(Node problemChildNode) {
         String text = "";
         String tts = "";
         final NodeList commentChildNodes = problemChildNode.getChildNodes();
