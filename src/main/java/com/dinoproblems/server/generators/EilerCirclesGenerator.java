@@ -115,7 +115,7 @@ public class EilerCirclesGenerator implements ProblemGenerator {
                     "кто купил коробки конфет. Не забудьте, что " + getNumWithString(intersection, PEOPLE) + " купили и торт, и коробку конфет.";
             return new ProblemWithPossibleTextAnswers.Builder().text(text).answer(answer).theme(ProblemCollection.EILER_CIRCLES).possibleTextAnswers(Sets.newHashSet(getNumWithString(answer, BUYER), getNumWithString(answer, PEOPLE))).hint(hint).scenario(CANDIES_STORE_SCENARIO).difficulty(difficulty).create();
         } else if (problemAvailability.getScenario().equals(EXPERT_CANDIES_SCENARIO)) {
-            String text = "В школе на новогодней елке дети получили сладкие подарки: троечники - леденец, хорошисты - шоколадку, а отличники - леденец и шоколаднку. " +
+            String text = "В школе на новогодней елке дети получили сладкие подарки: троечники - леденец, хорошисты - шоколадку, а отличники - леденец и шоколадку. " +
                     "Известно, что хорошистов в два раза больше, чем тех, кто получил леденец, а троечников на 12 меньше, чем тех, кто получил шоколадку. " +
                     "Сколько в классе отличников, если всего в классе 24 ученика.";
             String hint = "Нарисуйте схему из двух кругов. В один круг поместите тех, кто получил леденец, а во второй - тех, кто получил шоколадку. " +

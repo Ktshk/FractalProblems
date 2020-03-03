@@ -275,6 +275,8 @@ public class DataBaseService {
                 "and " + schemeName + ".solutions.reference_id = " + schemeName + ".reference.reference_id and " + schemeName + ".solutions.problem_id = " + schemeName + ".problems.problem_id " +
                 "and " + schemeName + ".problems.scenario_id = " + schemeName + ".scenarios.scenario_id";
 
+        System.out.println(selectAllTables);
+
         String selectProblemOfTheDay = "SELECT problem_date, timezone, problem_text, difficulty, scenario, device_id, username, points, hint_used, generator_id, hints, hints_tts, solution, solution_tts, answer, text_tts, text_answers " +
                 "FROM " + schemeName + ".problem_of_the_day " +
                 "JOIN " + schemeName + ".problems ON " + schemeName + ".problem_of_the_day.problem_id=" + schemeName + ".problems.problem_id " +
@@ -282,6 +284,8 @@ public class DataBaseService {
                 "JOIN " + schemeName + ".reference ON " + schemeName + ".reference.reference_id = " + schemeName + ".problem_of_the_day.reference_id " +
                 "JOIN " + schemeName + ".users ON " + schemeName + ".users.user_id=" + schemeName + ".reference.user_id " +
                 "LEFT JOIN " + schemeName + ".solutions ON " + schemeName + ".solutions.reference_id=" + schemeName + ".reference.reference_id AND " + schemeName + ".solutions.problem_id=" + schemeName + ".problem_of_the_day.problem_id ";
+
+        System.out.println(selectProblemOfTheDay);
 
         try (Statement selectAllTablesQuery = connection.createStatement();
              Statement selectProblemOfTheDayQuery = connection.createStatement()) {
@@ -338,7 +342,6 @@ public class DataBaseService {
             final String clientId = allTables.getString("device_num");
 
             userInfo = new UserInfo(currentDeviceId, username, clientId);
-            System.out.println("userInfo = " + userInfo);
         }
         dbUserInfo.put(currentDeviceId, userInfo);
         return userInfo;

@@ -60,7 +60,17 @@ public class ProblemCollection {
     }
 
     @Nullable
-    public Problem generateProblem(UserInfo userInfo, Problem.Difficulty difficulty) {
+    public Problem generateProblem(UserInfo userInfo, Problem.Difficulty difficulty, Calendar date) {
+        System.out.println("Generate problem: date = " + date + ", diffuculty = " + difficulty);
+
+        if (difficulty == Problem.Difficulty.EXPERT && date != null) {
+            Problem todayProblem = QuestProblemsLoader.INSTANCE.getTodayProblem(date);
+            System.out.println("Today quest problem: " + todayProblem);
+            if (todayProblem != null) {
+                return todayProblem;
+            }
+        }
+
         if (userInfo.hasVariousProblems(difficulty) &&
                 ((difficulty == Problem.Difficulty.EXPERT && randomInt(0, 2) == 0)
                         || ((difficulty != Problem.Difficulty.EXPERT && randomInt(0, 3) == 0))) ) {
@@ -103,12 +113,7 @@ public class ProblemCollection {
 
         final Map.Entry<ProblemGenerator, Set<Problem>> entry = GeneratorUtils.chooseRandomElement(minValues);
         final ProblemAvailability problemAvailability = bestGenerators.get(entry.getKey());
-        System.out.println("problemAvailability = " + problemAvailability);
-        System.out.println("difficulty = " + difficulty);
-        final Problem problem = entry.getKey().generateProblem(difficulty, problemAvailability);
-        System.out.println("theme = " + problem.getTheme());
-        System.out.println("solved problems = " + userInfo.getSolvedProblemsByTheme(problem.getTheme()));
-        return problem;
+        return entry.getKey().generateProblem(difficulty, problemAvailability);
     }
 
     Collection<ProblemGenerator> getGenerators() {

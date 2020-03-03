@@ -32,7 +32,7 @@ public class TestProblemGenerator {
         int count = 0;
         Problem problem;
         final UserInfo userInfo = new UserInfo("test", "test", "test");
-        while (count < 100 && ((problem = ProblemCollection.INSTANCE.generateProblem(userInfo, Problem.Difficulty.EXPERT)) != null)) {
+        while (count < 100 && ((problem = ProblemCollection.INSTANCE.generateProblem(userInfo, Problem.Difficulty.EXPERT, null)) != null)) {
             problem.setState(Problem.State.SOLVED);
             userInfo.addSolvedProblem(problem.getTheme(), problem, 0);
 

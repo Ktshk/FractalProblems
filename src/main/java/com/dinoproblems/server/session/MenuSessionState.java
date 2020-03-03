@@ -2,6 +2,8 @@ package com.dinoproblems.server.session;
 
 import com.dinoproblems.server.MainServlet;
 import com.dinoproblems.server.UserInfo;
+import com.dinoproblems.server.generators.QuestProblems;
+import com.dinoproblems.server.generators.QuestProblemsLoader;
 import com.dinoproblems.server.utils.Dictionary;
 import com.dinoproblems.server.utils.GeneratorUtils;
 import com.dinoproblems.server.utils.TextWithTTSBuilder;
@@ -10,7 +12,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import javax.annotation.Nonnull;
+import java.util.Calendar;
 import java.util.Set;
+import java.util.TimeZone;
 
 import static com.dinoproblems.server.session.Session.checkAnswer;
 import static com.dinoproblems.server.session.Session.YES_ANSWERS;
@@ -86,10 +90,10 @@ public class MenuSessionState implements SessionState {
 
         createMenu(session, responseJson,
                 initial ? "Добро пожаловать, " + upperCaseFirstLetter(userInfo.getName()) + "!"
-                        : "Чем займёмся, " + upperCaseFirstLetter(userInfo.getName()) + "?");
+                        : "Чем займёмся, " + upperCaseFirstLetter(userInfo.getName()) + "?", timeZone);
     }
 
-    private void createMenu(Session session, JsonObject responseJson, String text) {
+    private void createMenu(Session session, JsonObject responseJson, String text, String timeZone) {
         final JsonObject cardObject = new JsonObject();
         cardObject.addProperty("type", "ItemsList");
         final JsonArray itemsArray = new JsonArray();
@@ -113,8 +117,15 @@ public class MenuSessionState implements SessionState {
 
         final JsonObject problemOfTheDay = new JsonObject();
         problemOfTheDay.addProperty("image_id", "997614/90e63015f03de2a5b6b3");
-        problemOfTheDay.addProperty("title", "Задача дня");
-        problemOfTheDay.addProperty("description", "Каждый день новая задача, над которой придется поломать голову");
+
+        QuestProblems questProblems = QuestProblemsLoader.INSTANCE.getCurrentQuestProblems(Calendar.getInstance(TimeZone.getTimeZone(timeZone)));
+        if (questProblems == null) {
+            problemOfTheDay.addProperty("title", "Задача дня");
+            problemOfTheDay.addProperty("description", "Каждый день новая задача, над которой придется поломать голову");
+        } else {
+            problemOfTheDay.addProperty("title", questProblems.getName());
+            problemOfTheDay.addProperty("description", questProblems.getDescription());
+        }
 
         final JsonObject problemOfTheDayButton = new JsonObject();
         problemOfTheDayButton.addProperty("text", "задача дня");

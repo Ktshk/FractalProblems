@@ -92,7 +92,7 @@ public class UserInfo {
                 }
             }
 
-            expertProblem = ProblemCollection.INSTANCE.generateProblem(this, Difficulty.EXPERT);
+            expertProblem = ProblemCollection.INSTANCE.generateProblem(this, Difficulty.EXPERT, expertProblemDate);
 
             DataBaseService.INSTANCE.saveProblemOfTheDay(this, expertProblem, expertProblemDate);
         }

@@ -107,7 +107,13 @@ public class ProblemWithPossibleTextAnswers implements Problem {
 
     @Override
     public String[] getTextAnswers() {
-        return (String[]) possibleTextAnswers.toArray();
+        String[] result = new String[possibleTextAnswers.size()];
+        int i = 0;
+        for (String possibleTextAnswer : possibleTextAnswers) {
+            result[i] = possibleTextAnswer;
+            i++;
+        }
+        return result;
     }
 
     public int getAnswer() {

@@ -24,7 +24,7 @@ import static com.dinoproblems.server.utils.GeneratorUtils.chooseRandomElement;
  * on 13.06.2019.
  */
 public abstract class AbstractSolvingProblemState implements SessionState {
-    private final static Set<String> ASK_HINT = Sets.newHashSet("подсказка", "подсказку", "сказать подсказку", "помощь",
+    final static Set<String> ASK_HINT = Sets.newHashSet("подсказка", "подсказку", "сказать подсказку", "помощь",
             "дать подсказку", "дай", "давай", "дай подсказку", "подскажи", "есть еще подсказка", "помоги");
     final static Set<String> ASK_TO_REPEAT = Sets.newHashSet("повтори", "повторить", "повтори задачу", "повтори условие",
             "еще раз", "прочитай еще раз", "расскажи еще раз", "повтори еще раз", "задачу повтори", "еще раз повтори",
@@ -35,7 +35,7 @@ public abstract class AbstractSolvingProblemState implements SessionState {
     private static final HashSet<String> ANOTHER_PROBLEM = Sets.newHashSet("другую", "другая", "другую задачу",
             "другая задача", "новую задачу", "дай другую задачу", "дай мне новую задачу", "дай другую", "дай другую задачу");
     final static Set<String> BACK_TO_MENU = Sets.newHashSet("вернуться в меню", "меню", "назад в меню", "назад",
-            "в меню", "вернись в меню", "вернись меню");
+            "в меню", "вернись в меню", "вернись меню", "вернемся в меню");
     final static String[] NOT_A_NUMBER = {"Это точно не ответ на задачу. ", "Даже не знаю, как на это реагировать. ",
             "Я почти уверена, что в ответе на задачу должно быть число. ", "Всё ещё жду ответа на задачу. "};
     final static String[] ALMOST = {"Почти.", "Почти верно.", "Близко, но нет."};
@@ -96,6 +96,7 @@ public abstract class AbstractSolvingProblemState implements SessionState {
             CorrectAnswer correctAnswer = checkProblemAnswer(currentProblem, command, entitiesArray);
 
             if (correctAnswer == CorrectAnswer.CORRECT) {
+                System.out.println("Correct simple problem");
                 return getNextStateWhenCorrectAnswerIsGiven(currentProblem, session);
             } else {
                 DataBaseService.INSTANCE.updateMiscAnswersTable(command, currentProblem.getText(), session.getLastServerResponse());
@@ -162,7 +163,7 @@ public abstract class AbstractSolvingProblemState implements SessionState {
         } else {
             request.addProperty("text", text == null ? "" : text.getText());
             if (text != null && text.getTTS() != null) {
-                request.addProperty("text", text.getTTS());
+                request.addProperty("tts", text.getTTS());
             }
 
             if (currentProblem != null) {
@@ -173,7 +174,7 @@ public abstract class AbstractSolvingProblemState implements SessionState {
 
     protected abstract void processProblemEnding(JsonObject request, Session session, Problem solvedProblem, String timeZone);
 
-    private void giveHint(JsonObject responseJson, Session session, Problem problem, @Nonnull String prefix, String hint) {
+    void giveHint(JsonObject responseJson, Session session, Problem problem, @Nonnull String prefix, String hint) {
         responseJson.addProperty("text", prefix + hint);
         session.setLastServerResponse(prefix + hint);
         addProblemButtons(responseJson, problem);
@@ -219,12 +220,14 @@ public abstract class AbstractSolvingProblemState implements SessionState {
     protected abstract SessionState getStateWhenAnswerIsAsked(Problem currentProblem, Session session);
 
     protected void finishWithProblem(Session session, Problem problem, Problem.State state, String clientId) {
-        problem.setState(state);
-        final int points = session.updateScore(problem);
+        if (problem.getState() == null) {
+            problem.setState(state);
+            final int points = session.updateScore(problem);
 
-        DataBaseService.INSTANCE.insertSessionInfo(session.getUserInfo().getDeviceId(), clientId, problem,
-                session.getUserInfo().getName(),
-                points, problem.wasHintGiven());
+            DataBaseService.INSTANCE.insertSessionInfo(session.getUserInfo().getDeviceId(), clientId, problem,
+                    session.getUserInfo().getName(),
+                    points, problem.wasHintGiven());
+        }
     }
 
     @Nonnull

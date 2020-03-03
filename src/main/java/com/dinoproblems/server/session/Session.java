@@ -101,7 +101,7 @@ public class Session {
     }
 
     private void generateNextProblem() {
-        final Problem currentDifficultyProblem = ProblemCollection.INSTANCE.generateProblem(getUserInfo(), getCurrentDifficulty());
+        final Problem currentDifficultyProblem = ProblemCollection.INSTANCE.generateProblem(getUserInfo(), getCurrentDifficulty(), null);
         if (currentDifficultyProblem == null) {
             nextProblem.remove(getCurrentDifficulty());
         } else {
@@ -115,7 +115,7 @@ public class Session {
                 continue;
             }
             if (!nextProblem.containsKey(difficulty)) {
-                final Problem problem = ProblemCollection.INSTANCE.generateProblem(getUserInfo(), difficulty);
+                final Problem problem = ProblemCollection.INSTANCE.generateProblem(getUserInfo(), difficulty, null);
                 if (problem != null) {
                     nextProblem.put(difficulty, problem);
                 }

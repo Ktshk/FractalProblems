@@ -81,11 +81,14 @@ public class ProblemOfTheDaySessionState extends AbstractSolvingProblemState {
                 return saySolutionState();
             } else if (checkAnswer(command, ASK_ANSWER, YES_ANSWERS)) {
                 return sayAnswerState(problemOfTheDay);
+            } else if (checkAnswer(command, ASK_HINT, YES_ANSWERS)) {
+                return sayHintState(null);
             } else {
                 final CorrectAnswer correctAnswer = checkProblemAnswer(problemOfTheDay, command, entitiesArray);
                 final String text;
 
                 if (correctAnswer == CorrectAnswer.CORRECT) {
+                    System.out.println("Correct problem of the day");
                     text = chooseRandomElement(PRAISES);
                 } else {
                     if (correctAnswer == CorrectAnswer.NOT_A_NUMBER) {
@@ -126,13 +129,19 @@ public class ProblemOfTheDaySessionState extends AbstractSolvingProblemState {
                         final String text = "Правильный ответ " + problemOfTheDay.getTextAnswer() + ". ";
                         request.addProperty("text", text);
                     }
+                } else if (isSayHint()) {
+                    if (problemOfTheDay.hasHint()) {
+                        giveHint(request, session, problemOfTheDay, "", problemOfTheDay.getNextHint());
+                    } else {
+                        giveHint(request, session, problemOfTheDay, "", problemOfTheDay.getLastHint());
+                    }
                 } else if (isSayAnswer()) {
                     final String text = "Правильный ответ " + problemOfTheDay.getTextAnswer() + ". ";
                     request.addProperty("text", text);
                 } else {
                     request.addProperty("text", getText() == null ? "" : getText().getText());
                     if (getText() != null && getText().getTTS() != null) {
-                        request.addProperty("text", getText().getTTS());
+                        request.addProperty("tts", getText().getTTS());
                     }
                 }
 
@@ -157,8 +166,9 @@ public class ProblemOfTheDaySessionState extends AbstractSolvingProblemState {
                 .append("У вас ")
                 .append(getNumWithString(session.getUserInfo().getExpertScore(), SCORE))
                 .append(" на уровне Эксперт. ")
-                .append(chooseRandomElement(PRAISE_SHORT));
-        return new MenuSessionState(text);
+                .append(chooseRandomElement(PRAISE_SHORT))
+                .append("Вернемся в меню?");
+        return new ProblemOfTheDaySessionState(text, false, false, false, currentProblem, false);
     }
 
     @Override
@@ -198,7 +208,7 @@ public class ProblemOfTheDaySessionState extends AbstractSolvingProblemState {
     }
 
     @Override
-    SessionState incorrectAnswerSessionState(Session session, String text)  {
+    SessionState incorrectAnswerSessionState(Session session, String text) {
         return new ProblemOfTheDaySessionState(text == null ? null : new TextWithTTSBuilder().append(text), false, false, false, null, false);
     }
 
