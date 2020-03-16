@@ -12,6 +12,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Calendar;
 import java.util.Set;
 import java.util.TimeZone;
@@ -35,6 +36,9 @@ public class MenuSessionState implements SessionState {
 
     private final static String MENU_TEXT = "Чтобы решать разные задачи, скажите: Разные задачи. " +
             "Чтобы решить задачу дня, скажите: Задача дня. Если хотите посмотреть таблицу рекордов, нажмите на кнопку: Рекорды";
+    private final static String QUEST_MENU_TEXT = "Чтобы решать разные задачи, скажите: Разные задачи. " +
+            "Чтобы решить задачу квеста, скажите: <quest name>. Если хотите посмотреть таблицу рекордов, нажмите на кнопку: Рекорды";
+
 
     private final boolean initial;
     private final TextWithTTSBuilder prefixText;
@@ -54,10 +58,14 @@ public class MenuSessionState implements SessionState {
     public SessionState getNextState(String command, JsonArray entitiesArray, Session session, String timeZone) {
         if (checkAnswer(command, VARIOUS_PROBLEMS, YES_ANSWERS)) {
             return new ChooseDifficultySessionState();
-        } else if (checkAnswer(command, PROBLEM_OF_THE_DAY, YES_ANSWERS)) {
-            return new ProblemOfTheDaySessionState(true);
         } else {
-            return new MenuSessionState(null);
+            QuestProblems questProblems = QuestProblemsLoader.INSTANCE.getCurrentQuestProblems(Calendar.getInstance(TimeZone.getTimeZone(timeZone)));
+            if (checkAnswer(command, PROBLEM_OF_THE_DAY, YES_ANSWERS)
+                    || (questProblems != null && checkAnswer(command, Sets.newHashSet(questProblems.getName().toLowerCase()), YES_ANSWERS))) {
+                return new ProblemOfTheDaySessionState(true);
+            } else {
+                return new MenuSessionState(null);
+            }
         }
     }
 
@@ -70,6 +78,8 @@ public class MenuSessionState implements SessionState {
     @Override
     public void processRequest(JsonObject responseJson, Session session, String timeZone) {
         final UserInfo userInfo = session.getUserInfo();
+        QuestProblems questProblems = QuestProblemsLoader.INSTANCE.getCurrentQuestProblems(Calendar.getInstance(TimeZone.getTimeZone(timeZone)));
+
         final TextWithTTSBuilder text;
         if (initial) {
             String helloText = chooseRandomElement(MEET_ONCE_MORE) + upperCaseFirstLetter(userInfo.getName()) + "! ";
@@ -83,17 +93,22 @@ public class MenuSessionState implements SessionState {
         } else {
             text = new TextWithTTSBuilder();
         }
-        text.append(MENU_TEXT);
+        if (questProblems == null) {
+            text.append(MENU_TEXT);
+        } else{
+            String questCommand = QUEST_MENU_TEXT.replace("<quest name>", questProblems.getName());
+            text.append(questCommand, questCommand.replace("квеста", "квэста"));
+        }
         responseJson.addProperty("text", text.getText());
         responseJson.addProperty("tts", text.getTTS() == null ? text.getText() : text.getTTS());
         session.setLastServerResponse(text.getText());
 
-        createMenu(session, responseJson,
+        createMenu(session, responseJson, questProblems,
                 initial ? "Добро пожаловать, " + upperCaseFirstLetter(userInfo.getName()) + "!"
                         : "Чем займёмся, " + upperCaseFirstLetter(userInfo.getName()) + "?", timeZone);
     }
 
-    private void createMenu(Session session, JsonObject responseJson, String text, String timeZone) {
+    private void createMenu(Session session, JsonObject responseJson, @Nullable QuestProblems questProblems, String text, String timeZone) {
         final JsonObject cardObject = new JsonObject();
         cardObject.addProperty("type", "ItemsList");
         final JsonArray itemsArray = new JsonArray();
@@ -118,7 +133,6 @@ public class MenuSessionState implements SessionState {
         final JsonObject problemOfTheDay = new JsonObject();
         problemOfTheDay.addProperty("image_id", "997614/90e63015f03de2a5b6b3");
 
-        QuestProblems questProblems = QuestProblemsLoader.INSTANCE.getCurrentQuestProblems(Calendar.getInstance(TimeZone.getTimeZone(timeZone)));
         if (questProblems == null) {
             problemOfTheDay.addProperty("title", "Задача дня");
             problemOfTheDay.addProperty("description", "Каждый день новая задача, над которой придется поломать голову");

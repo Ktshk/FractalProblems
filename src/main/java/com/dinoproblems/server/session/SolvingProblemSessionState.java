@@ -179,7 +179,7 @@ public class SolvingProblemSessionState extends AbstractSolvingProblemState {
             buttons.add(createButton("посложнее", true));
         }
 
-        buttons.add(createLeaderboardButton(session.getUserInfo(), true, false));
+        buttons.add(createLeaderboardButton(session.getUserInfo(), true, false, false));
 
         return buttons;
     }

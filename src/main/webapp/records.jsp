@@ -20,8 +20,11 @@
 <c:when test="${requestScope.selectedRecords==0}">
 <body style="margin:0px; background: #fbfbfb" onload="toggleVisibility('recordsTable')">
 </c:when>
-<c:otherwise>
+<c:when test="${requestScope.selectedRecords==1}">
 <body style="margin:0px; background: #fbfbfb" onload="toggleVisibility('expertRecordsTable')">
+</c:when>
+<c:otherwise>
+<body style="margin:0px; background: #fbfbfb" onload="toggleVisibility('questRecordsTable')">
 </c:otherwise>
 </c:choose>
 
@@ -41,9 +44,13 @@
     <span id="recordsButtonSpan" class="button-block">
         <a id="recordsButton" class="record-button" href="#" onclick="toggleVisibility('recordsTable');">Разные задачи</a>
     </span>
-        <span id="expertRecordsButtonSpan" class="button-block">
+    <span id="expertRecordsButtonSpan" class="button-block">
         <a id="expertRecordsButton" class="record-button" href="#" onclick="toggleVisibility('expertRecordsTable');">Задача дня</a>
     </span>
+    <span id="questRecordsButtonSpan" class="button-block">
+        <a id="questRecordsButton" class="record-button" href="#" onclick="toggleVisibility('questRecordsTable');">${requestScope.questName}</a>
+    </span>
+
     </div>
 </div>
 
@@ -113,41 +120,90 @@
     </table>
 </div>
 
+<div class="records-table" id="questRecordsTable" style="display: none;">
+    <table class="records-table-1" border=2 width="45%">
+        <colgroup>
+            <col span="1" style="width: 18%">
+            <col span="1" style="width: 42%;">
+            <col span="1" style="width: 20%;">
+            <col span="1" style="width: 20%;">
+        </colgroup>
+
+        <tr class="table-header">
+            <th class="table-cell">Место</th>
+            <th class="table-cell">Имя</th>
+            <th class="table-cell">Задачи</th>
+            <th class="table-cell">Баллы</th>
+        </tr>
+        <c:forEach var="record" items="${requestScope.questRecords}">
+            <c:choose>
+                <c:when test="${record.userId==requestScope.userId}">
+                    <tr id="selected" class="selected-row">
+                </c:when>
+                <c:otherwise>
+                    <tr>
+                </c:otherwise>
+            </c:choose>
+            <td class="position table-cell"><c:out value="${record.position}"/></td>
+            <td class="user-name-item table-cell"><c:out value="${record.userName}"/></td>
+            <td class="problem-count-item table-cell"><c:out value="${record.totalProblemCount}"/></td>
+            <td class="points-item table-cell"><c:out value="${record.totalPoints}"/></td>
+            </tr>
+        </c:forEach>
+    </table>
+</div>
+
 <script>
     function toggleVisibility(divid) {
         var selectedButton;
-        var nonSelectedButton;
+        var nonSelectedButtons;
         var selectedTable;
-        var nonSelectedTable;
+        var nonSelectedTables;
         var selectedButtonSpan;
-        var nonSelectedButtonSpan;
+        var nonSelectedButtonSpans;
 
         if (divid == "recordsTable") {
             selectedButton = document.getElementById("recordsButton");
             selectedTable = document.getElementById("recordsTable");
             selectedButtonSpan = document.getElementById("recordsButtonSpan");
 
-            nonSelectedButton = document.getElementById("expertRecordsButton");
-            nonSelectedTable = document.getElementById("expertRecordsTable");
-            nonSelectedButtonSpan = document.getElementById("expertRecordsButtonSpan");
+            nonSelectedButtons = [document.getElementById("expertRecordsButton"), document.getElementById("questRecordsButton")];
+            nonSelectedTables = [document.getElementById("expertRecordsTable"), document.getElementById("questRecordsTable")];
+            nonSelectedButtonSpans = [document.getElementById("expertRecordsButtonSpan"), document.getElementById("questRecordsButtonSpan")];
         }
         else if (divid == "expertRecordsTable") {
-            nonSelectedButton = document.getElementById("recordsButton");
-            nonSelectedTable = document.getElementById("recordsTable");
-            nonSelectedButtonSpan = document.getElementById("recordsButtonSpan");
+            nonSelectedButtons = [document.getElementById("recordsButton"), document.getElementById("questRecordsButton")];
+            nonSelectedTables = [document.getElementById("recordsTable"), document.getElementById("questRecordsTable")];
+            nonSelectedButtonSpans = [document.getElementById("recordsButtonSpan"), document.getElementById("questRecordsButtonSpan")];
 
             selectedButton = document.getElementById("expertRecordsButton");
             selectedTable = document.getElementById("expertRecordsTable");
             selectedButtonSpan = document.getElementById("expertRecordsButtonSpan");
         }
+        else if (divid == "questRecordsTable") {
+            nonSelectedButtons = [document.getElementById("recordsButton"), document.getElementById("expertRecordsButton")];
+            nonSelectedTables = [document.getElementById("recordsTable"), document.getElementById("expertRecordsTable")];
+            nonSelectedButtonSpans = [document.getElementById("recordsButtonSpan"), document.getElementById("expertRecordsButtonSpan")];
+
+            selectedButton = document.getElementById("questRecordsButton");
+            selectedTable = document.getElementById("questRecordsTable");
+            selectedButtonSpan = document.getElementById("questRecordsButtonSpan");
+        }
         selectedButton.style.color = "black";
         selectedButtonSpan.style.borderBottom = "2px solid #4800a8";
         selectedTable.style.display = "block";
 
-        nonSelectedButton.style.color = "#777777";
-        nonSelectedTable.style.display = "none";
-        nonSelectedButtonSpan.style.borderBottom = "none"
+        for (var i = 0; i < nonSelectedButtons.length; i++) {
+            nonSelectedButtons[i].style.color = "#777777";
+        }
+        for (i = 0; i < nonSelectedTables.length; i++) {
+            nonSelectedTables[i].style.display = "none";
+        }
+        for (i = 0; i <  nonSelectedButtonSpans.length; i++) {
+            nonSelectedButtonSpans[i].style.borderBottom = "none"
+        }
     }
+
 </script>
 
 

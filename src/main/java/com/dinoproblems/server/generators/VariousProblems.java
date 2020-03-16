@@ -123,7 +123,7 @@ public class VariousProblems {
 
     private static TextWithTTSBuilder parseTextWithTTS(Node problemChildNode) {
         String text = "";
-        String tts = "";
+        String tts = null;
         final NodeList commentChildNodes = problemChildNode.getChildNodes();
         for (int k = 0; k < commentChildNodes.getLength(); k++) {
             final Node commentChildNode = commentChildNodes.item(k);

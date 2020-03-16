@@ -2,6 +2,8 @@ package com.dinoproblems.server.session;
 
 import com.dinoproblems.server.DataBaseService;
 import com.dinoproblems.server.Problem;
+import com.dinoproblems.server.generators.QuestProblems;
+import com.dinoproblems.server.generators.QuestProblemsLoader;
 import com.dinoproblems.server.utils.TextWithTTSBuilder;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonArray;
@@ -10,7 +12,9 @@ import com.google.gson.JsonObject;
 
 import javax.annotation.Nonnull;
 
+import java.util.Calendar;
 import java.util.Set;
+import java.util.TimeZone;
 
 import static com.dinoproblems.server.session.Session.*;
 import static com.dinoproblems.server.utils.Dictionary.SCORE;
@@ -239,7 +243,8 @@ public class ProblemOfTheDaySessionState extends AbstractSolvingProblemState {
         if (problemOfTheDay.hasSolution()) {
             buttons.add(createButton("Решение", false));
         }
-        buttons.add(createLeaderboardButton(session.getUserInfo(), false, true));
+        QuestProblems questProblems = QuestProblemsLoader.INSTANCE.getCurrentQuestProblems(Calendar.getInstance(TimeZone.getTimeZone(timeZone)));
+        buttons.add(createLeaderboardButton(session.getUserInfo(), false, questProblems == null, questProblems != null));
         buttons.add(createButton("Вернуться в меню", false));
 
         return buttons;

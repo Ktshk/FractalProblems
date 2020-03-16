@@ -400,7 +400,7 @@ public class DataBaseService {
     private Set<String> ignoredRecords = null;
 
     @Nullable
-    public List<RecordRow> getRecords(boolean expert) {
+    public List<RecordRow> getRecords(boolean expert, @Nullable String scenario) {
         if (connection == null) {
             return null;
         }
@@ -420,12 +420,13 @@ public class DataBaseService {
         final String selectAllRecords = "select " + schemeName + ".users.username, " + schemeName + ".problems.difficulty, "
                 + schemeName + ".devices.device_id, " + schemeName + ".solutions.points"
                 + " from " + schemeName + ".users, " + schemeName + ".solutions, " + schemeName + ".reference, "
-                + schemeName + ".devices, " + schemeName + ".problems"
+                + schemeName + ".devices, " + schemeName + ".problems, " + schemeName + ".scenarios"
                 + " where " + schemeName + ".reference.user_id=" + schemeName + ".users.user_id and "
                 + schemeName + ".solutions.reference_id=" + schemeName + ".reference.reference_id"
                 + " and " + schemeName + ".reference.device_id=" + schemeName + ".devices.device_id and "
                 + schemeName + ".problems.problem_id=" + schemeName + ".solutions.problem_id"
-                + " and " + (expert ? schemeName + ".problems.difficulty='EXPERT'" : schemeName + ".problems.difficulty!='EXPERT'");
+                + " and " + (expert ? schemeName + ".problems.difficulty='EXPERT'" : schemeName + ".problems.difficulty!='EXPERT'")
+                + (scenario != null ? (" and " + schemeName + ".problems.scenario_id=" + schemeName + ".scenarios.scenario_id" + " and " + schemeName + ".scenarios.scenario='" + scenario+ "'") : "");
 
         System.out.println(selectAllRecords);
 

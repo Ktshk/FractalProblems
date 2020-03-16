@@ -64,4 +64,8 @@ public class QuestProblems {
     public String getDescription() {
         return description;
     }
+
+    public Problem getProblem(int num) {
+        return problems.get(num);
+    }
 }

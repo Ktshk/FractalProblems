@@ -1,11 +1,15 @@
 package com.dinoproblems.server;
 
+import com.dinoproblems.server.generators.QuestProblems;
+import com.dinoproblems.server.generators.QuestProblemsLoader;
+
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -24,13 +28,23 @@ public class ShowRecordsServlet extends HttpServlet {
             selectedRecords = 1;
         }
 
-        final List<RecordRow> records = DataBaseService.INSTANCE.getRecords(false);
-        final List<RecordRow> expertRecords = DataBaseService.INSTANCE.getRecords(true);
+        final List<RecordRow> records = DataBaseService.INSTANCE.getRecords(false, null);
+        final List<RecordRow> expertRecords = DataBaseService.INSTANCE.getRecords(true, null);
+
+        QuestProblems questProblems = QuestProblemsLoader.INSTANCE.getLastQuestProblems(Calendar.getInstance());
+        String scenarioName = questProblems.getProblem(0).getProblemScenario().getScenarioId();
+        final List<RecordRow> questRecords = DataBaseService.INSTANCE.getRecords(true, scenarioName);
+
+        System.out.println("scenarioName = " + scenarioName);
+        System.out.println("questRecords = " + questRecords);
 
         request.setAttribute("records", records);
         request.setAttribute("expertRecords", expertRecords);
         request.setAttribute("userId", userId == null ? "" : userId);
         request.setAttribute("selectedRecords", selectedRecords);
+        request.setAttribute("questRecords", questRecords);
+        request.setAttribute("questName", questProblems.getName());
+
 
         RequestDispatcher rd = request.getRequestDispatcher("records.jsp");
         rd.forward(request, response);

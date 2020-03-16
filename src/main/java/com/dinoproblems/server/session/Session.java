@@ -4,6 +4,8 @@ import com.dinoproblems.server.MainServlet;
 import com.dinoproblems.server.Problem;
 import com.dinoproblems.server.ProblemCollection;
 import com.dinoproblems.server.UserInfo;
+import com.dinoproblems.server.generators.QuestProblems;
+import com.dinoproblems.server.generators.QuestProblemsLoader;
 import com.dinoproblems.server.utils.TextWithTTSBuilder;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonArray;
@@ -136,7 +138,7 @@ public class Session {
         if (problem.getDifficulty() != Problem.Difficulty.EXPERT) {
             userInfo.setCurrentProblem(null, getCurrentDifficulty());
             points = sessionResult.updateScore(problem);
-        }  else {
+        } else {
             points = problem.getState() == Problem.State.SOLVED ? EXPERT_SOLVED_POINTS :
                     problem.getState() == Problem.State.SOLVED_WITH_HINT ? EXPERT_SOLVED_WITH_HINT_POINTS : 0;
         }
@@ -183,7 +185,6 @@ public class Session {
     public SessionState processRequest(@Nullable String command, JsonObject result, JsonArray entitiesArray, String timeZone) {
         final JsonObject responseJson = new JsonObject();
         responseJson.addProperty("end_session", false);
-
         if (sessionState == null) {
             if (userInfo == null) {
                 sessionState = new RegistrationSessionState();
@@ -193,6 +194,11 @@ public class Session {
             sessionState.processRequest(responseJson, this, timeZone);
         } else if ("помощь".equalsIgnoreCase(command) || "что ты умеешь".equalsIgnoreCase(command) || "правила".equalsIgnoreCase(command)) {
             responseJson.addProperty("text", HELP);
+        } else if ("yes".equals(System.getProperty("test")) && parseTestQuestProblemCommand(command) != null) {
+            Problem problem = parseTestQuestProblemCommand(command);
+            getUserInfo().setExpertProblem(problem, Calendar.getInstance(TimeZone.getTimeZone(timeZone)));
+            sessionState = new ProblemOfTheDaySessionState(true);
+            sessionState.processRequest(responseJson, this, timeZone);
         } else if (Objects.equals(command, "end session") ||
                 checkAnswer(command, END_SESSION_ANSWERS)) {
             final TextWithTTSBuilder sessionResult = getSessionResult().getResult(getUserInfo() == null ? 0 : getUserInfo().getTotalScore());
@@ -212,6 +218,28 @@ public class Session {
         result.add("response", responseJson);
 
         return sessionState;
+    }
+
+    private Problem parseTestQuestProblemCommand(@Nullable String command) {
+        try {
+            System.out.println("parseTestQuestProblemCommand");
+            if (command == null || !command.startsWith("квест ")) {
+                return null;
+            }
+            Map<String, QuestProblems> allQuests = QuestProblemsLoader.INSTANCE.getAllQuests();
+            String questNameAndNum = command.substring("квест ".length());
+            for (String s : allQuests.keySet()) {
+                if (questNameAndNum.startsWith(s.toLowerCase())) {
+                    int num = Integer.valueOf(questNameAndNum.substring((s + " ").length()));
+                    return allQuests.get(s).getProblem(num - 1);
+
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        return null;
     }
 
     static boolean checkAnswer(String answer, Set<String> answerCollection) {
@@ -274,10 +302,12 @@ public class Session {
         return buttonJson;
     }
 
-    static JsonObject createLeaderboardButton(UserInfo userInfo, boolean hideButton, boolean showExpertRecords) {
-        final JsonObject buttonJson = createButton("Рекорды", true);
+    static JsonObject createLeaderboardButton(UserInfo userInfo, boolean hideButton, boolean showExpertRecords, boolean showQuestRecords) {
+        final JsonObject buttonJson = createButton("Рекорды", hideButton);
         String url = "http://" + MainServlet.URL + "/records";
-        if (showExpertRecords) {
+        if (showQuestRecords) {
+            url += "?button=2";
+        } else if (showExpertRecords) {
             url += "?button=1";
         } else {
             url += "?button=0";

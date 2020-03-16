@@ -84,7 +84,7 @@ public class ChooseDifficultySessionState implements SessionState {
         if (currentDifficulty != Problem.Difficulty.HARD) {
             buttons.add(createButton("сложная", false));
         }
-        buttons.add(createLeaderboardButton(session.getUserInfo(), false, false));
+        buttons.add(createLeaderboardButton(session.getUserInfo(), false, false, false));
         if (currentDifficulty != null) {
             buttons.add(createButton("меню", false));
         }

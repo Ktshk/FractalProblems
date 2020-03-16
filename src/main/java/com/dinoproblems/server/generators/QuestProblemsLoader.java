@@ -7,6 +7,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -104,5 +105,27 @@ public class QuestProblemsLoader {
         }
 
         return null;
+    }
+
+    @Nonnull
+    public QuestProblems getLastQuestProblems(Calendar date) {
+        final QuestProblems key = new QuestProblems("", "", date.getTime(), null, null);
+        int ind = Collections.binarySearch(allQuests, key, QUEST_START_COMPARATOR);
+        if (ind < 0) {
+            ind = -ind - 1 - 1;
+        }
+        if (ind < 0) {
+            return allQuests.get(0);
+        }
+
+        return allQuests.get(ind);
+    }
+
+    public Map<String, QuestProblems> getAllQuests() {
+        HashMap<String, QuestProblems> res = new HashMap<>();
+        for (QuestProblems quest : allQuests) {
+            res.put(quest.getName(), quest);
+        }
+        return res;
     }
 }
