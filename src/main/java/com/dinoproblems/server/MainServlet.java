@@ -81,9 +81,6 @@ public class MainServlet extends HttpServlet {
             result.addProperty("version", version);
             result.add("session", bodyJson.get("session"));
 
-            System.out.println("userInfos = " + userInfos);
-            System.out.println("userId = " + userId);
-
             if (userInfos.containsKey(userId)) {
                 final UserInfo userInfo = userInfos.get(userId);
                 if (userInfo.getCurrentProblem() != null) {

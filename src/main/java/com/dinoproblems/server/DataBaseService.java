@@ -100,7 +100,7 @@ public class DataBaseService {
 
         String scenarioCheck = "SELECT scenario_id FROM " + schemeName + ".scenarios WHERE scenario = \'" + problem.getProblemScenario().getScenarioId() + "\'";
 
-        String problemCheck = "select problem_text, difficulty, problem_id FROM " + schemeName + ".problems WHERE problem_text = \'" + problem.getText() + "\' and difficulty = \'" + problem.getDifficulty() + "\'";
+        String problemCheck = getProblemExistsSQL(problem);
 
         try (Statement refCheckStatement = connection.createStatement();
              ResultSet refExists = refCheckStatement.executeQuery(refCheck);
@@ -131,6 +131,10 @@ public class DataBaseService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private String getProblemExistsSQL(Problem problem) {
+        return "SELECT problem_text, difficulty, problem_id, answer FROM " + schemeName + ".problems WHERE problem_text = \'" + problem.getText() + "\' and difficulty = \'" + problem.getDifficulty() + "\'";
     }
 
     private int insertReference(String deviceId, String deviceNum, String username) throws SQLException {
@@ -208,17 +212,19 @@ public class DataBaseService {
     }
 
     private int getProblemId(Problem problem, int scenarioId, ResultSet problemExists) throws SQLException {
-        ResultSet problemLastId;
-        String insertTableProblems;
 
-        if (problem.getDifficulty() == Problem.Difficulty.EXPERT) {
-            insertTableProblems = "INSERT INTO " + schemeName + ".problems (problem_text, difficulty, scenario_id, answer, " +
-                    "hints, text_answers, text_tts, solution, solution_tts" + ") " + "VALUES" + "(?,?,?,?,?,?,?,?,?)";
-        } else {
-            insertTableProblems = "INSERT INTO " + schemeName + ".problems (problem_text, difficulty, scenario_id) " +
-                    "VALUES" + "(?,?,?)";
-        }
         if (!problemExists.next()) {
+            ResultSet problemLastId;
+            String insertTableProblems;
+
+            if (problem.getDifficulty() == Problem.Difficulty.EXPERT) {
+                insertTableProblems = "INSERT INTO " + schemeName + ".problems (problem_text, difficulty, scenario_id, answer, " +
+                        "hints, text_answers, text_tts, solution, solution_tts" + ") " + "VALUES" + "(?,?,?,?,?,?,?,?,?)";
+            } else {
+                insertTableProblems = "INSERT INTO " + schemeName + ".problems (problem_text, difficulty, scenario_id) " +
+                        "VALUES" + "(?,?,?)";
+            }
+
             try (PreparedStatement preparedStatementInsertProblems = connection.prepareStatement(insertTableProblems, Statement.RETURN_GENERATED_KEYS)) {
 
                 preparedStatementInsertProblems.setString(1, problem.getText());
@@ -257,7 +263,39 @@ public class DataBaseService {
                 }
             }
         } else {
-            return problemExists.getInt("problem_id");
+            int problemId = problemExists.getInt("problem_id");
+            if (problem.getDifficulty() == Problem.Difficulty.EXPERT) {
+                problemExists.getInt("answer");
+                if (problemExists.wasNull()) {
+                    String updateProblem = "UPDATE " + schemeName + ".problems SET answer=?, hints=?, text_answers=?, text_tts=?, solution=?, solution_tts=? WHERE problem_id = " + problemId;
+                    PreparedStatement updateStatement = connection.prepareStatement(updateProblem);
+                    updateStatement.setInt(1, problem.getNumericAnswer());
+
+                    Array hintsArray = connection.createArrayOf("varchar", problem.getHints());
+                    updateStatement.setArray(2, hintsArray);
+                    Array answersArray = connection.createArrayOf("varchar", problem.getTextAnswers());
+                    updateStatement.setArray(3, answersArray);
+                    if (problem.getTTS() != null) {
+                        updateStatement.setString(4, problem.getTTS());
+                    } else {
+                        updateStatement.setNull(4, Types.VARCHAR);
+                    }
+                    if (problem.getSolution() != null) {
+                        updateStatement.setString(5, problem.getSolution().getText());
+                        final String solutionTTS = problem.getSolution().getTTS();
+                        if (solutionTTS != null) {
+                            updateStatement.setString(6, solutionTTS);
+                        } else {
+                            updateStatement.setNull(6, Types.VARCHAR);
+                        }
+                    } else {
+                        updateStatement.setNull(5, Types.VARCHAR);
+                        updateStatement.setNull(6, Types.VARCHAR);
+                    }
+                    updateStatement.executeUpdate();
+                }
+            }
+            return problemId;
         }
     }
 
@@ -425,6 +463,7 @@ public class DataBaseService {
                 + schemeName + ".solutions.reference_id=" + schemeName + ".reference.reference_id"
                 + " and " + schemeName + ".reference.device_id=" + schemeName + ".devices.device_id and "
                 + schemeName + ".problems.problem_id=" + schemeName + ".solutions.problem_id"
+                + " and " + schemeName + ".problems.scenario_id=" + schemeName + ".scenarios.scenario_id"
                 + " and " + (expert ? schemeName + ".problems.difficulty='EXPERT'" : schemeName + ".problems.difficulty!='EXPERT'")
                 + (scenario != null ? (" and " + schemeName + ".problems.scenario_id=" + schemeName + ".scenarios.scenario_id" + " and " + schemeName + ".scenarios.scenario='" + scenario+ "'") : "");
 
@@ -477,7 +516,7 @@ public class DataBaseService {
 
         String scenarioCheck = "SELECT scenario_id FROM " + schemeName + ".scenarios WHERE scenario = \'" + expertProblem.getProblemScenario().getScenarioId() + "\'";
 
-        String problemCheck = "select problem_text, difficulty, problem_id FROM " + schemeName + ".problems WHERE problem_text = \'" + expertProblem.getText() + "\' and difficulty = \'" + expertProblem.getDifficulty() + "\'";
+        String problemCheck = getProblemExistsSQL(expertProblem);
 
         try (Statement refCheckStatement = connection.createStatement();
              ResultSet refExists = refCheckStatement.executeQuery(refCheck);
