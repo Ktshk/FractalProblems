@@ -1,6 +1,7 @@
 package com.dinoproblems.server.session;
 
 import com.dinoproblems.server.Problem;
+import com.dinoproblems.server.UserInfo;
 import com.dinoproblems.server.utils.GeneratorUtils;
 import com.dinoproblems.server.utils.NumberWord;
 import com.dinoproblems.server.utils.TextWithTTSBuilder;
@@ -9,7 +10,6 @@ import static com.dinoproblems.server.utils.Dictionary.SCORE;
 import static com.dinoproblems.server.utils.GeneratorUtils.Gender.*;
 import static com.dinoproblems.server.utils.GeneratorUtils.chooseRandomElement;
 import static com.dinoproblems.server.utils.GeneratorUtils.getNumWithString;
-import static com.dinoproblems.server.utils.GeneratorUtils.randomInt;
 
 //First stable ver got by Simar 22.04.2019
 
@@ -25,10 +25,10 @@ class SessionResult {
     private int solvedInARow = 0;
     private int solvedInARowWithHint = 0;
 
-    int updateScore(Problem problem) {
+    int updateScore(Problem problem, UserInfo userInfo) {
         totalProblems++;
         int points = 0;
-        if (problem.getState() == Problem.State.SOLVED) {
+        if (userInfo.getProblemState(problem) == UserInfo.ProblemState.SOLVED) {
             if (problem.getDifficulty() == Problem.Difficulty.EASY) points = 2;
             else if (problem.getDifficulty() == Problem.Difficulty.MEDIUM) points = 4;
             else if (problem.getDifficulty() == Problem.Difficulty.HARD) points = 6;
@@ -41,7 +41,7 @@ class SessionResult {
                 points = points * 2;
             }
         }
-        if (problem.getState() == Problem.State.SOLVED_WITH_HINT) {
+        if (userInfo.getProblemState(problem) == UserInfo.ProblemState.SOLVED_WITH_HINT) {
             if (problem.getDifficulty() == Problem.Difficulty.EASY) points = 1;
             else if (problem.getDifficulty() == Problem.Difficulty.MEDIUM) points = 2;
             else if (problem.getDifficulty() == Problem.Difficulty.HARD) points = 3;
@@ -55,7 +55,7 @@ class SessionResult {
                 points = points * 2;
             }
         }
-        if (problem.getState() == Problem.State.ANSWER_GIVEN) {
+        if (userInfo.getProblemState(problem) == UserInfo.ProblemState.ANSWER_GIVEN) {
             if (sessionScore - 5 > 0) {
                 points = -5;
             } else {

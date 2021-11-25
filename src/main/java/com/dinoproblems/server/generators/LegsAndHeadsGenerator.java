@@ -184,14 +184,14 @@ public class LegsAndHeadsGenerator implements ProblemGenerator {
     }
 
     @Override
-    public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty) {
+    public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty, UserInfo userInfo) {
         switch (difficulty) {
             case EASY:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, EASY_SCENARIOS, new HashSet<>());
+                return findAvailableScenario(difficulty, alreadySolvedProblems, EASY_SCENARIOS, new HashSet<>(), userInfo);
             case MEDIUM:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(MEDIUM_SCENARIOS), EASY_SCENARIOS);
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(MEDIUM_SCENARIOS), EASY_SCENARIOS, userInfo);
             case HARD:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, HARD_SCENARIOS, Sets.newHashSet(MEDIUM_SCENARIOS));
+                return findAvailableScenario(difficulty, alreadySolvedProblems, HARD_SCENARIOS, Sets.newHashSet(MEDIUM_SCENARIOS), userInfo);
             case EXPERT:
                 return null;
 

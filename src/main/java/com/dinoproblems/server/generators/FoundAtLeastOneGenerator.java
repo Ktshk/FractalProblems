@@ -102,12 +102,12 @@ public class FoundAtLeastOneGenerator implements ProblemGenerator {
     }
 
     @Override
-    public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty) {
+    public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty, UserInfo userInfo) {
         if (difficulty != Problem.Difficulty.HARD) {
             return null;
         }
 
         return GeneratorUtils.findAvailableScenario(difficulty, alreadySolvedProblems,
-                Lists.newArrayList(DEFAULT_SCENARIO), new HashSet<>());
+                Lists.newArrayList(DEFAULT_SCENARIO), new HashSet<>(), userInfo);
     }
 }

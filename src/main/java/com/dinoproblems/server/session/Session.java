@@ -119,6 +119,8 @@ public class Session {
             if (!nextProblem.containsKey(difficulty)) {
                 final Problem problem = ProblemCollection.INSTANCE.generateProblem(getUserInfo(), difficulty, null);
                 if (problem != null) {
+                    System.out.println("Generate next problem: " + problem);
+                    System.out.println("problem.getState() = " + getUserInfo().getProblemState(problem));
                     nextProblem.put(difficulty, problem);
                 }
             }
@@ -137,12 +139,14 @@ public class Session {
         final int points;
         if (problem.getDifficulty() != Problem.Difficulty.EXPERT) {
             userInfo.setCurrentProblem(null, getCurrentDifficulty());
-            points = sessionResult.updateScore(problem);
+            points = sessionResult.updateScore(problem, userInfo);
         } else {
-            points = problem.getState() == Problem.State.SOLVED ? EXPERT_SOLVED_POINTS :
-                    problem.getState() == Problem.State.SOLVED_WITH_HINT ? EXPERT_SOLVED_WITH_HINT_POINTS : 0;
+            UserInfo.ProblemState problemState = userInfo.getProblemState(problem);
+            points = problemState == UserInfo.ProblemState.SOLVED ? EXPERT_SOLVED_POINTS :
+                    problemState == UserInfo.ProblemState.SOLVED_WITH_HINT ? EXPERT_SOLVED_WITH_HINT_POINTS : 0;
         }
-        userInfo.addSolvedProblem(problem.getTheme(), problem, points);
+        QuestProblems currentQuest = QuestProblemsLoader.INSTANCE.getCurrentQuestProblems(Calendar.getInstance());
+        userInfo.addSolvedProblem(problem.getTheme(), problem, points, currentQuest);
 
         if (problem.getDifficulty() != Problem.Difficulty.EXPERT) {
             generateNextProblem();

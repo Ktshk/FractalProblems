@@ -26,13 +26,13 @@ public interface Problem {
     @Nullable
     String getCommentTTS();
 
-    String getNextHint();
+    String getNextHint(int currentHint);
 
-    String getLastHint();
+    String getLastHint(int currentHint);
 
-    boolean hasHint();
+    boolean hasHint(int currentHint);
 
-    boolean wasHintGiven();
+    boolean wasHintGiven(int currentHint);
 
     ProblemScenario getProblemScenario();
 
@@ -53,10 +53,6 @@ public interface Problem {
     String[] getHints();
 
     String[] getTextAnswers();
-
-    enum State {
-        ANSWER_GIVEN, SOLVED, SOLVED_WITH_HINT
-    }
 
     enum Difficulty {
         EASY, MEDIUM, HARD, EXPERT;
@@ -90,10 +86,5 @@ public interface Problem {
         }
     }
 
-    @Nullable
-    State getState();//вынести в TaskResult с удалением из Problem
-
     Difficulty getDifficulty();
-
-    void setState(State newState);
 }

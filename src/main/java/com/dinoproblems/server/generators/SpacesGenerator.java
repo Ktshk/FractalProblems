@@ -288,20 +288,20 @@ public class SpacesGenerator implements ProblemGenerator {
     }
 
     @Override
-    public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty) {
+    public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty, UserInfo userInfo) {
 
 
         switch (difficulty) {
             case EASY:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, EASY_SCENARIOS, new HashSet<>());
+                return findAvailableScenario(difficulty, alreadySolvedProblems, EASY_SCENARIOS, new HashSet<>(), userInfo);
             case MEDIUM:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, MEDIUM_SCENARIOS, Sets.newHashSet(EASY_SCENARIOS));
+                return findAvailableScenario(difficulty, alreadySolvedProblems, MEDIUM_SCENARIOS, Sets.newHashSet(EASY_SCENARIOS), userInfo);
             case HARD:
                 return findAvailableScenario(difficulty, alreadySolvedProblems,
                         Lists.newArrayList(new SpacesScenario(DRAWING, false), new SpacesScenario(LOG, false)),
-                        Sets.newHashSet(MEDIUM_SCENARIOS));
+                        Sets.newHashSet(MEDIUM_SCENARIOS), userInfo);
             case EXPERT:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(EXPERT_SCENARIO), new HashSet<>());
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(EXPERT_SCENARIO), new HashSet<>(), userInfo);
 
         }
 

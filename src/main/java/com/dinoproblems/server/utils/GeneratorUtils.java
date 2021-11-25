@@ -5,6 +5,7 @@ import com.dinoproblems.server.Problem.Difficulty;
 import com.dinoproblems.server.ProblemGenerator.ProblemAvailability;
 import com.dinoproblems.server.ProblemGenerator.ProblemAvailabilityType;
 import com.dinoproblems.server.ProblemScenario;
+import com.dinoproblems.server.UserInfo;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -134,7 +135,8 @@ public class GeneratorUtils {
     @Nullable
     public static ProblemAvailability findAvailableScenario(Difficulty difficulty, @Nonnull Collection<Problem> alreadySolvedProblems,
                                                             @Nonnull Collection<ProblemScenario> availableScenarios,
-                                                            @Nonnull Collection<ProblemScenario> easierScenarios) {
+                                                            @Nonnull Collection<ProblemScenario> easierScenarios,
+                                                            UserInfo userInfo) {
         if (alreadySolvedProblems.isEmpty()) {
             return new ProblemAvailability(ProblemAvailabilityType.newProblem, chooseRandomElement(availableScenarios));
         }
@@ -151,7 +153,7 @@ public class GeneratorUtils {
                 if (!problemsByScenario.containsKey(problemScenario)) {
                     problemsByScenario.put(problemScenario, new HashMap<>());
                 }
-                final boolean solved = problem.getState() == Problem.State.SOLVED;
+                final boolean solved = userInfo.getProblemState(problem) == UserInfo.ProblemState.SOLVED;
                 if (!problemsByScenario.get(problemScenario).containsKey(solved)) {
                     problemsByScenario.get(problemScenario).put(solved, new HashSet<>());
                 }
@@ -160,7 +162,7 @@ public class GeneratorUtils {
 
             if (difficulty != EASY && problem.getDifficulty() == difficulty.getPrevious()) {
                 easierScenariosSet.remove(problem.getProblemScenario());
-                if (problem.getState() == Problem.State.SOLVED) {
+                if (userInfo.getProblemState(problem) == UserInfo.ProblemState.SOLVED) {
                     easierProblemIsSolved = true;
                 }
             }

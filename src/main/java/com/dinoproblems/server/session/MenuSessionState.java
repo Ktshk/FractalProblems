@@ -34,9 +34,9 @@ public class MenuSessionState implements SessionState {
     private final static Set<String> PROBLEM_OF_THE_DAY = Sets.newHashSet("задачу дня", "задача дня", "решать задачу дня",
             "решать задачу дня", "решим задачу дня");
 
-    private final static String MENU_TEXT = "Чтобы решать разные задачи, скажите: Разные задачи. " +
+    private final static String MENU_TEXT = "Чтобы решать олимпиадные задачи различной сложности, скажите: Разные задачи. " +
             "Чтобы решить задачу дня, скажите: Задача дня. Если хотите посмотреть таблицу рекордов, нажмите на кнопку: Рекорды";
-    private final static String QUEST_MENU_TEXT = "Чтобы решать разные задачи, скажите: Разные задачи. " +
+    private final static String QUEST_MENU_TEXT = "Чтобы решать олимпиадные задачи различной сложности, скажите: Разные задачи. " +
             "Чтобы решить задачу квеста, скажите: <quest name>. Если хотите посмотреть таблицу рекордов, нажмите на кнопку: Рекорды";
 
 
@@ -57,7 +57,7 @@ public class MenuSessionState implements SessionState {
     @Override
     public SessionState getNextState(String command, JsonArray entitiesArray, Session session, String timeZone) {
         if (checkAnswer(command, VARIOUS_PROBLEMS, YES_ANSWERS)) {
-            return new ChooseDifficultySessionState();
+            return new ChooseDifficultySessionState(null);
         } else {
             QuestProblems questProblems = QuestProblemsLoader.INSTANCE.getCurrentQuestProblems(Calendar.getInstance(TimeZone.getTimeZone(timeZone)));
             if (checkAnswer(command, PROBLEM_OF_THE_DAY, YES_ANSWERS)

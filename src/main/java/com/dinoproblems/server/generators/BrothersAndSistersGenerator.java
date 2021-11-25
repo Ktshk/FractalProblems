@@ -52,12 +52,12 @@ public class BrothersAndSistersGenerator implements ProblemGenerator {
 
     @Nullable
     @Override
-    public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty) {
+    public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty, UserInfo userInfo) {
         switch (difficulty) {
             case EASY:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(COUNT_CHILDREN, BROTHERS_SISTERS_DIFFERENCE), new HashSet<>());
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(COUNT_CHILDREN, BROTHERS_SISTERS_DIFFERENCE), new HashSet<>(), userInfo);
             case MEDIUM:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(BROTHERS_SISTERS_DIFFERENCE), Sets.newHashSet(COUNT_CHILDREN));
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(BROTHERS_SISTERS_DIFFERENCE), Sets.newHashSet(COUNT_CHILDREN), userInfo);
             case HARD:
             case EXPERT:
                 return null;

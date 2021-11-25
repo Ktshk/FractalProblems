@@ -153,16 +153,16 @@ public class LogicGenerator implements ProblemGenerator {
 
     @Nullable
     @Override
-    public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty) {
+    public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty, UserInfo userInfo) {
         switch (difficulty) {
             case EASY:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(TOTAL_EVERYTHING_IS_TRUE), new HashSet<>());
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(TOTAL_EVERYTHING_IS_TRUE), new HashSet<>(), userInfo);
             case MEDIUM:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(YOU_ALL_LIARS), new HashSet<>());
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(YOU_ALL_LIARS), new HashSet<>(), userInfo);
             case HARD:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(MUSHROOMS), new HashSet<>());
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(MUSHROOMS), new HashSet<>(), userInfo);
             case EXPERT:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(NUMBER_FOUR_CHILDREN_SCENARIO), new HashSet<>());
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(NUMBER_FOUR_CHILDREN_SCENARIO), new HashSet<>(), userInfo);
 
         }
 

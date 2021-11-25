@@ -2,6 +2,7 @@ package com.dinoproblems.server.session;
 
 import com.dinoproblems.server.DataBaseService;
 import com.dinoproblems.server.Problem;
+import com.dinoproblems.server.UserInfo;
 import com.dinoproblems.server.utils.TextWithTTSBuilder;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonArray;
@@ -68,14 +69,16 @@ public abstract class AbstractSolvingProblemState implements SessionState {
     private final boolean sayAnswer;
     private final boolean problemSolved;
     private final Problem solvedProblem;
+    private final boolean sayComment;
 
-    AbstractSolvingProblemState(TextWithTTSBuilder text, boolean showProblemText, boolean sayHint, boolean sayAnswer, boolean problemSolved, Problem solvedProblem) {
+    AbstractSolvingProblemState(TextWithTTSBuilder text, boolean showProblemText, boolean sayHint, boolean sayAnswer, boolean problemSolved, Problem solvedProblem, boolean sayComment) {
         this.text = text;
         this.showProblemText = showProblemText;
         this.sayHint = sayHint;
         this.sayAnswer = sayAnswer;
         this.problemSolved = problemSolved;
         this.solvedProblem = solvedProblem;
+        this.sayComment = sayComment;
     }
 
     @Nonnull
@@ -87,7 +90,7 @@ public abstract class AbstractSolvingProblemState implements SessionState {
         } else if (checkAnswer(command, ASK_TO_REPEAT, YES_ANSWERS)) {
             return repeatProblemState();
         } else if (checkAnswer(command, ASK_ANSWER, YES_ANSWERS)) {
-            if (currentProblem.hasHint()) {
+            if (session.getUserInfo().hasHint(currentProblem)) {
                 return sayHintState("Давайте дам вам подсказку. ");
             } else {
                 return getStateWhenAnswerIsAsked(currentProblem, session);
@@ -97,10 +100,8 @@ public abstract class AbstractSolvingProblemState implements SessionState {
 
             if (correctAnswer == CorrectAnswer.CORRECT) {
                 System.out.println("Correct simple problem");
-                return getNextStateWhenCorrectAnswerIsGiven(currentProblem, session);
+                return getNextStateWhenCorrectAnswerIsGiven(currentProblem, session, timeZone);
             } else {
-                DataBaseService.INSTANCE.updateMiscAnswersTable(command, currentProblem.getText(), session.getLastServerResponse());
-
                 final String text;
                 if (correctAnswer == CorrectAnswer.NOT_A_NUMBER) {
                     text = chooseRandomElement(NOT_A_NUMBER) + " " + chooseRandomElement(PROPOSE_ANSWER_OR_HINT);
@@ -147,15 +148,15 @@ public abstract class AbstractSolvingProblemState implements SessionState {
         if (showProblemText) {
             addProblemTextToResponse(request, session, text == null ? null : text.getText(), timeZone, currentProblem);
         } else if (sayHint) {
-            if (!currentProblem.hasHint()) {
-                giveHint(request, session, currentProblem, chooseRandomElement(ALL_HINT_ARE_GIVEN), currentProblem.getLastHint());
+            if (!session.getUserInfo().hasHint(currentProblem)) {
+                giveHint(request, session, currentProblem, chooseRandomElement(ALL_HINT_ARE_GIVEN), session.getUserInfo().getLastHint(currentProblem));
             } else {
                 if (text != null && text.getText() != null) {
-                    giveHint(request, session, currentProblem, text.getText(), currentProblem.getNextHint());
-                } else if (currentProblem.wasHintGiven()) {
-                    giveHint(request, session, currentProblem, chooseRandomElement(NEXT_HINT), currentProblem.getNextHint());
+                    giveHint(request, session, currentProblem, text.getText(), session.getUserInfo().getNextHint(currentProblem));
+                } else if (session.getUserInfo().wasHintGiven(currentProblem)) {
+                    giveHint(request, session, currentProblem, chooseRandomElement(NEXT_HINT), session.getUserInfo().getNextHint(currentProblem));
                 } else {
-                    giveHint(request, session, currentProblem, "", currentProblem.getNextHint());
+                    giveHint(request, session, currentProblem, "", session.getUserInfo().getNextHint(currentProblem));
                 }
             }
         } else if (sayAnswer || problemSolved) {
@@ -167,7 +168,7 @@ public abstract class AbstractSolvingProblemState implements SessionState {
             }
 
             if (currentProblem != null) {
-                addProblemButtons(request, currentProblem);
+                addProblemButtons(request, currentProblem, session);
             }
         }
     }
@@ -177,13 +178,13 @@ public abstract class AbstractSolvingProblemState implements SessionState {
     void giveHint(JsonObject responseJson, Session session, Problem problem, @Nonnull String prefix, String hint) {
         responseJson.addProperty("text", prefix + hint);
         session.setLastServerResponse(prefix + hint);
-        addProblemButtons(responseJson, problem);
+        addProblemButtons(responseJson, problem, session);
     }
 
     void addProblemTextToResponse(JsonObject responseJson, Session session, @Nullable String prefix, String timeZone, Problem problem) {
         if (problem == null) {
             // should never come here
-            new ChooseDifficultySessionState().processRequest(responseJson, session, timeZone);
+            new ChooseDifficultySessionState(session.getCurrentDifficulty()).processRequest(responseJson, session, timeZone);
             final String text = "Извините, но вы уже решили все мои задачи на этом уровне сложности. Может быть, порешаем задачи другой сложности?";
             responseJson.addProperty("text", text);
         } else {
@@ -193,40 +194,42 @@ public abstract class AbstractSolvingProblemState implements SessionState {
 
     void sayProblemText(JsonObject responseJson, Session session, @Nullable String prefix, Problem problem) {
         final String text = (prefix != null ? prefix : "") +
-                (problem.getComment() != null ? (problem.getComment() + " ") : "") + problem.getText();
+                (sayComment && problem.getComment() != null ? (problem.getComment() + " ") : "") + problem.getText();
         responseJson.addProperty("text", text);
-        addProblemButtons(responseJson, problem);
-        if (problem.getTTS() != null || problem.getCommentTTS() != null) {
+        addProblemButtons(responseJson, problem, session);
+        if (problem.getTTS() != null || (sayComment && problem.getCommentTTS() != null)) {
             responseJson.addProperty("tts", (prefix != null ? prefix : "") +
-                    (problem.getCommentTTS() != null ? problem.getCommentTTS() :
-                            (problem.getComment() != null ? (problem.getComment() + " ") : ""))
+                    (sayComment && problem.getCommentTTS() != null ? problem.getCommentTTS() :
+                            (sayComment && problem.getComment() != null ? (problem.getComment() + " ") : ""))
                     + (problem.getTTS() != null ? problem.getTTS() : problem.getText()));
         }
         session.setLastServerResponse(text);
     }
 
-    private void addProblemButtons(JsonObject responseJson, Problem problem) {
+    private void addProblemButtons(JsonObject responseJson, Problem problem, Session session) {
         final JsonArray buttons = new JsonArray();
         buttons.add(createButton("Повторить", true));
         buttons.add(createButton("Подсказка", true));
-        if (!problem.hasHint()) {
+        if (!session.getUserInfo().hasHint(problem)) {
             buttons.add(createButton("Сказать ответ", true));
         }
         responseJson.add("buttons", buttons);
     }
 
-    protected abstract SessionState getNextStateWhenCorrectAnswerIsGiven(Problem currentProblem, Session session);
+    protected abstract SessionState getNextStateWhenCorrectAnswerIsGiven(Problem currentProblem, Session session, String timeZone);
 
     protected abstract SessionState getStateWhenAnswerIsAsked(Problem currentProblem, Session session);
 
-    protected void finishWithProblem(Session session, Problem problem, Problem.State state, String clientId) {
-        if (problem.getState() == null) {
-            problem.setState(state);
+    protected void finishWithProblem(Session session, Problem problem, UserInfo.ProblemState state, String clientId) {
+        System.out.println("Finish with problem: " + session.getUserInfo().getProblemState(problem));
+        System.out.println("Problem text: " + problem.getText());
+        if (session.getUserInfo().getProblemState(problem) == null) {
+            session.getUserInfo().setProblemState(problem, state);
             final int points = session.updateScore(problem);
 
             DataBaseService.INSTANCE.insertSessionInfo(session.getUserInfo().getDeviceId(), clientId, problem,
                     session.getUserInfo().getName(),
-                    points, problem.wasHintGiven());
+                    points, session.getUserInfo().wasHintGiven(problem));
         }
     }
 

@@ -166,14 +166,14 @@ public class RangeGenerator implements ProblemGenerator {
     }
 
     @Override
-    public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty) {
+    public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty, UserInfo userInfo) {
         switch (difficulty) {
             case EASY:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(NUMBERS, READ_PAGES, NUMBERS_NOT_LESS_NOT_GREATER), new HashSet<>());
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(NUMBERS, READ_PAGES, NUMBERS_NOT_LESS_NOT_GREATER), new HashSet<>(), userInfo);
             case MEDIUM:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(SCENARIOS), Sets.newHashSet(NUMBERS, READ_PAGES, NUMBERS_NOT_LESS_NOT_GREATER));
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(SCENARIOS), Sets.newHashSet(NUMBERS, READ_PAGES, NUMBERS_NOT_LESS_NOT_GREATER), userInfo);
             case HARD:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(TORN_OUT_PAGES, DATES), Sets.newHashSet(SCENARIOS));
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(TORN_OUT_PAGES, DATES), Sets.newHashSet(SCENARIOS), userInfo);
             case EXPERT:
                 return null;
                 // TODO: uncomment

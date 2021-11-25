@@ -85,18 +85,18 @@ public class SnailGenerator implements ProblemGenerator {
     }
 
     @Override
-    public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Difficulty difficulty) {
+    public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Difficulty difficulty, UserInfo userInfo) {
         switch (difficulty) {
             case EASY:
                 return null;
             case MEDIUM:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(MEDIUM_AND_EASY_SCENARIO, TEREMOK_SCENARIO), new HashSet<>());
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(MEDIUM_AND_EASY_SCENARIO, TEREMOK_SCENARIO), new HashSet<>(), userInfo);
             case HARD:
                 return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(MEDIUM_AND_EASY_SCENARIO),
-                        Sets.newHashSet(MEDIUM_AND_EASY_SCENARIO));
+                        Sets.newHashSet(MEDIUM_AND_EASY_SCENARIO), userInfo);
             case EXPERT:
                 return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(HARD_SCENARIO),
-                        Sets.newHashSet(MEDIUM_AND_EASY_SCENARIO));
+                        Sets.newHashSet(MEDIUM_AND_EASY_SCENARIO), userInfo);
 
         }
 

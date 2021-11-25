@@ -103,14 +103,14 @@ public class SumDifferenceGenerator implements ProblemGenerator {
     }
 
     @Override
-    public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty) {
+    public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty, UserInfo userInfo) {
         switch (difficulty) {
             case EASY:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(DEFAULT_SCENARIO), new HashSet<>());
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(DEFAULT_SCENARIO), new HashSet<>(), userInfo);
             case MEDIUM:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(DEFAULT_SCENARIO), Sets.newHashSet(DEFAULT_SCENARIO));
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(DEFAULT_SCENARIO), Sets.newHashSet(DEFAULT_SCENARIO), userInfo);
             case HARD:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(DEFAULT_SCENARIO), Sets.newHashSet(DEFAULT_SCENARIO));
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(DEFAULT_SCENARIO), Sets.newHashSet(DEFAULT_SCENARIO), userInfo);
             case EXPERT:
                 return null;
         }

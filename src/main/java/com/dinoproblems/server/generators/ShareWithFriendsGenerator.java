@@ -56,9 +56,9 @@ public class ShareWithFriendsGenerator implements ProblemGenerator {
 
     @Nullable
     @Override
-    public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Difficulty difficulty) {
+    public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Difficulty difficulty, UserInfo userInfo) {
         if (difficulty == Difficulty.EASY) {
-            return GeneratorUtils.findAvailableScenario(Difficulty.EASY, alreadySolvedProblems, Lists.newArrayList(DEFAULT_SCENARIO), new HashSet<>());
+            return GeneratorUtils.findAvailableScenario(Difficulty.EASY, alreadySolvedProblems, Lists.newArrayList(DEFAULT_SCENARIO), new HashSet<>(), userInfo);
         }
 //        else if (difficulty == Difficulty.MEDIUM) {
 //            return GeneratorUtils.findAvailableScenario(Difficulty.EASY, alreadySolvedProblems, Lists.newArrayList(INDIRECT_SCENARIO), Sets.newHashSet(DEFAULT_SCENARIO));

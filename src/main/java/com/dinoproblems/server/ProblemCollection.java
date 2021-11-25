@@ -84,7 +84,7 @@ public class ProblemCollection {
         for (Map.Entry<String, ProblemGenerator> problemGeneratorEntry : generators.entrySet()) {
             final ProblemGenerator problemGenerator = problemGeneratorEntry.getValue();
             final Collection<Problem> themedProblems = userInfo.getSolvedProblemsByTheme(problemGeneratorEntry.getKey());
-            final ProblemAvailability problemAvailability = problemGenerator.hasProblem(themedProblems, difficulty);
+            final ProblemAvailability problemAvailability = problemGenerator.hasProblem(themedProblems, difficulty, userInfo);
             if (problemAvailability != null) {
                 if (!availabilityTypeToGenerator.containsKey(problemAvailability.getType())) {
                     availabilityTypeToGenerator.put(problemAvailability.getType(), new HashMap<>());

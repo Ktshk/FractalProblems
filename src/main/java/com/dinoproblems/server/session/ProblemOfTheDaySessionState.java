@@ -2,6 +2,7 @@ package com.dinoproblems.server.session;
 
 import com.dinoproblems.server.DataBaseService;
 import com.dinoproblems.server.Problem;
+import com.dinoproblems.server.UserInfo;
 import com.dinoproblems.server.generators.QuestProblems;
 import com.dinoproblems.server.generators.QuestProblemsLoader;
 import com.dinoproblems.server.utils.TextWithTTSBuilder;
@@ -49,13 +50,13 @@ public class ProblemOfTheDaySessionState extends AbstractSolvingProblemState {
     private final boolean saySolution;
 
     ProblemOfTheDaySessionState(boolean start) {
-        super(null, true, false, false, false, null);
+        super(null, true, false, false, false, null, true);
         this.start = start;
         this.saySolution = false;
     }
 
     private ProblemOfTheDaySessionState(TextWithTTSBuilder text, boolean showProblemText, boolean sayHint, boolean sayAnswer, Problem solvedProblem, boolean saySolution) {
-        super(text, showProblemText, sayHint, sayAnswer, false, solvedProblem);
+        super(text, showProblemText, sayHint, sayAnswer, false, solvedProblem, true);
         this.saySolution = saySolution;
         this.start = false;
     }
@@ -66,17 +67,17 @@ public class ProblemOfTheDaySessionState extends AbstractSolvingProblemState {
         final Problem problemOfTheDay = session.getUserInfo().getProblemOfTheDay(timeZone);
         if (checkAnswer(command, BACK_TO_MENU)) {
             final String text;
-            if (problemOfTheDay.getState() == null) {
+            if (session.getUserInfo().getProblemState(problemOfTheDay) == null) {
                 text = chooseRandomElement(ASK_TO_BE_BACK);
             } else {
-                if (problemOfTheDay.getState() == Problem.State.ANSWER_GIVEN) {
+                if (session.getUserInfo().getProblemState(problemOfTheDay) == UserInfo.ProblemState.ANSWER_GIVEN) {
                     text = chooseRandomElement(ASK_TO_BE_BACK_TOMORROW_WHEN_NOT_SOLVED);
                 } else {
                     text = chooseRandomElement(ASK_TO_BE_BACK_TOMORROW);
                 }
             }
             return new MenuSessionState(new TextWithTTSBuilder().append(text));
-        } else if (problemOfTheDay.getState() == null) {
+        } else if (session.getUserInfo().getProblemState(problemOfTheDay) == null) {
             return super.getNextState(problemOfTheDay, command, entitiesArray, session, timeZone);
         } else {
             if (checkAnswer(command, ASK_TO_REPEAT, YES_ANSWERS)) {
@@ -96,7 +97,6 @@ public class ProblemOfTheDaySessionState extends AbstractSolvingProblemState {
                     text = chooseRandomElement(PRAISES);
                 } else {
                     if (correctAnswer == CorrectAnswer.NOT_A_NUMBER) {
-                        DataBaseService.INSTANCE.updateMiscAnswersTable(command, problemOfTheDay.getText(), session.getLastServerResponse());
                         text = chooseRandomElement(DID_NOT_UNDERSTAND) + " Я могу повторить задачу, сказать ответ или вернуться в меню. Чтобы посмотреть таблицу рекордов, нажмите на кнопку Рекорды.";
                     } else {
                         text = chooseRandomElement(correctAnswer == CorrectAnswer.ALMOST_CORRECT ? ALMOST : WRONG_ANSWER);
@@ -113,14 +113,14 @@ public class ProblemOfTheDaySessionState extends AbstractSolvingProblemState {
     public void processRequest(JsonObject request, Session session, String timeZone) {
         if (start) {
             final Problem problemOfTheDay = session.getUserInfo().getProblemOfTheDay(timeZone);
-            if (problemOfTheDay.getState() == null) {
+            if (session.getUserInfo().getProblemState(problemOfTheDay) == null) {
                 sayProblemText(request, session, "", problemOfTheDay);
             } else {
                 sayProblemText(request, session, chooseRandomElement(HAS_NO_PROBLEM_OF_THE_DAY) + "Задача была такая. ", problemOfTheDay);
             }
         } else {
             final Problem problemOfTheDay = session.getUserInfo().getProblemOfTheDay(timeZone);
-            if (problemOfTheDay.getState() == null) {
+            if (session.getUserInfo().getProblemState(problemOfTheDay) == null) {
                 super.processRequest(problemOfTheDay, request, session, timeZone);
             } else {
                 if (isShowProblemText()) {
@@ -134,10 +134,10 @@ public class ProblemOfTheDaySessionState extends AbstractSolvingProblemState {
                         request.addProperty("text", text);
                     }
                 } else if (isSayHint()) {
-                    if (problemOfTheDay.hasHint()) {
-                        giveHint(request, session, problemOfTheDay, "", problemOfTheDay.getNextHint());
+                    if (session.getUserInfo().hasHint(problemOfTheDay)) {
+                        giveHint(request, session, problemOfTheDay, "", session.getUserInfo().getNextHint(problemOfTheDay));
                     } else {
-                        giveHint(request, session, problemOfTheDay, "", problemOfTheDay.getLastHint());
+                        giveHint(request, session, problemOfTheDay, "", session.getUserInfo().getLastHint(problemOfTheDay));
                     }
                 } else if (isSayAnswer()) {
                     final String text = "Правильный ответ " + problemOfTheDay.getTextAnswer() + ". ";
@@ -162,22 +162,41 @@ public class ProblemOfTheDaySessionState extends AbstractSolvingProblemState {
     }
 
     @Override
-    protected SessionState getNextStateWhenCorrectAnswerIsGiven(Problem currentProblem, Session session) {
-        finishWithProblem(session, currentProblem, currentProblem.wasHintGiven() ? Problem.State.SOLVED_WITH_HINT : Problem.State.SOLVED, session.getClientId());
-        final TextWithTTSBuilder text = new TextWithTTSBuilder()
-                .append("", chooseRandomElement(SOUND_PRAISES))
-                .append(chooseRandomElement(PRAISES))
-                .append("У вас ")
-                .append(getNumWithString(session.getUserInfo().getExpertScore(), SCORE))
-                .append(" на уровне Эксперт. ")
-                .append(chooseRandomElement(PRAISE_SHORT))
-                .append("Вернемся в меню?");
+    protected SessionState getNextStateWhenCorrectAnswerIsGiven(Problem currentProblem, Session session, String timeZone) {
+        finishWithProblem(session, currentProblem, session.getUserInfo().wasHintGiven(currentProblem) ? UserInfo.ProblemState.SOLVED_WITH_HINT : UserInfo.ProblemState.SOLVED, session.getClientId());
+
+        Calendar today = Calendar.getInstance(TimeZone.getTimeZone(timeZone));
+        QuestProblems questProblems = QuestProblemsLoader.INSTANCE.getCurrentQuestProblems(today);
+        final TextWithTTSBuilder text;
+        if (questProblems != null) {
+
+            text = new TextWithTTSBuilder()
+                    .append("", chooseRandomElement(SOUND_PRAISES))
+                    .append(chooseRandomElement(PRAISES))
+                    .append(" Вы заработали уже ")
+                    .append(getNumWithString(session.getUserInfo().getQuestPoints(questProblems.getName()), SCORE))
+                    .append(" в квесте: ", " в квэсте: ")
+                    .append(questProblems.getName())
+                    .append(". ")
+                    .append(chooseRandomElement(PRAISE_SHORT))
+                    .append("Вернемся в меню?");
+        } else {
+            text = new TextWithTTSBuilder()
+                    .append("", chooseRandomElement(SOUND_PRAISES))
+                    .append(chooseRandomElement(PRAISES))
+                    .append("У вас ")
+                    .append(getNumWithString(session.getUserInfo().getExpertScore(), SCORE))
+                    .append(" на уровне Эксперт. ")
+                    .append(chooseRandomElement(PRAISE_SHORT))
+                    .append("Вернемся в меню?");
+
+        }
         return new ProblemOfTheDaySessionState(text, false, false, false, currentProblem, false);
     }
 
     @Override
     protected SessionState getStateWhenAnswerIsAsked(Problem currentProblem, Session session) {
-        finishWithProblem(session, currentProblem, Problem.State.ANSWER_GIVEN, session.getClientId());
+        finishWithProblem(session, currentProblem, UserInfo.ProblemState.ANSWER_GIVEN, session.getClientId());
         return sayAnswerState(currentProblem);
     }
 
@@ -218,18 +237,18 @@ public class ProblemOfTheDaySessionState extends AbstractSolvingProblemState {
 
     @Override
     protected void processProblemEnding(JsonObject responseJson, Session session, Problem solvedProblem, String timeZone) {
-        Problem.State problemState = solvedProblem.getState();
+        UserInfo.ProblemState problemState = session.getUserInfo().getProblemState(solvedProblem);
 
-        String text = problemState == Problem.State.ANSWER_GIVEN ? "Правильный ответ " + solvedProblem.getTextAnswer() + ". "
+        String text = problemState == UserInfo.ProblemState.ANSWER_GIVEN ? "Правильный ответ " + solvedProblem.getTextAnswer() + ". "
                 : chooseRandomElement(PRAISES) + " ";
 
-        if (problemState != Problem.State.ANSWER_GIVEN && session.getNextProblem() != null) {
+        if (problemState != UserInfo.ProblemState.ANSWER_GIVEN && session.getNextProblem() != null) {
             text += "Вы заработали " + getNumWithString(session.getUserInfo().getTotalScore(), SCORE) + " на уровне Эксперт. " + chooseRandomElement(PRAISE_SHORT);
         }
 
         responseJson.add("buttons", createSolvedProblemButtons(session, timeZone));
         responseJson.addProperty("text", text);
-        if (problemState != Problem.State.ANSWER_GIVEN) {
+        if (problemState != UserInfo.ProblemState.ANSWER_GIVEN) {
             responseJson.addProperty("tts", chooseRandomElement(SOUND_PRAISES) + " " + responseJson.get("text"));
         }
     }

@@ -17,15 +17,17 @@
 </head>
 
 <c:choose>
-<c:when test="${requestScope.selectedRecords==0}">
-<body style="margin:0px; background: #fbfbfb" onload="toggleVisibility('recordsTable')">
-</c:when>
-<c:when test="${requestScope.selectedRecords==1}">
-<body style="margin:0px; background: #fbfbfb" onload="toggleVisibility('expertRecordsTable')">
-</c:when>
-<c:otherwise>
-<body style="margin:0px; background: #fbfbfb" onload="toggleVisibility('questRecordsTable')">
-</c:otherwise>
+    <c:when test="${requestScope.selectedRecords==0}">
+<body style="margin:0px; background: #fbfbfb; width: fit-content" onload="toggleVisibility('recordsTable')">
+    </c:when>
+
+    <c:when test="${requestScope.selectedRecords==1}">
+<body style="margin:0px; background: #fbfbfb; width: fit-content" onload="toggleVisibility('expertRecordsTable')">
+    </c:when>
+
+    <c:otherwise>
+<body style="margin:0px; background: #fbfbfb; width: fit-content" onload="toggleVisibility('questRecordsTable')">
+    </c:otherwise>
 </c:choose>
 
 <div class="first-line">
@@ -78,7 +80,19 @@
                     <tr>
                 </c:otherwise>
             </c:choose>
-            <td class="position table-cell"><c:out value="${record.position}"/></td>
+            <td class="position table-cell">
+                <c:choose>
+                    <c:when test="${record.position==1}">
+                        <img class="star_img" src="/images/gold.jpg"/>
+                    </c:when>
+                    <c:when test="${record.position==2}">
+                        <img class="star_img" src="/images/silver.jpg"/>
+                    </c:when>
+                    <c:when test="${record.position==3}">
+                        <img class="star_img" src="/images/bronse.jpg"/>
+                    </c:when>
+                </c:choose>
+                <c:out value="${record.position}"/></td>
             <td class="user-name-item table-cell"><c:out value="${record.userName}"/></td>
             <td class="problem-count-item table-cell"><c:out value="${record.totalProblemCount}"/></td>
             <td class="points-item table-cell"><c:out value="${record.totalPoints}"/></td>
@@ -111,7 +125,20 @@
                     <tr>
                 </c:otherwise>
             </c:choose>
-            <td class="position table-cell"><c:out value="${record.position}"/></td>
+            <td class="position table-cell">
+                <c:choose>
+                    <c:when test="${record.position==1}">
+                        <img class="star_img" src="/images/gold.jpg"/>
+                    </c:when>
+                    <c:when test="${record.position==2}">
+                        <img class="star_img" src="/images/silver.jpg"/>
+                    </c:when>
+                    <c:when test="${record.position==3}">
+                        <img class="star_img" src="/images/bronse.jpg"/>
+                    </c:when>
+                </c:choose>
+                <c:out value="${record.position}"/>
+            </td>
             <td class="user-name-item table-cell"><c:out value="${record.userName}"/></td>
             <td class="problem-count-item table-cell"><c:out value="${record.totalProblemCount}"/></td>
             <td class="points-item table-cell"><c:out value="${record.totalPoints}"/></td>
@@ -144,7 +171,20 @@
                     <tr>
                 </c:otherwise>
             </c:choose>
-            <td class="position table-cell"><c:out value="${record.position}"/></td>
+            <td class="position table-cell">
+                <c:choose>
+                    <c:when test="${record.position==1}">
+                        <img class="star_img" src="/images/gold.jpg"/>
+                    </c:when>
+                    <c:when test="${record.position==2}">
+                        <img class="star_img" src="/images/silver.jpg"/>
+                    </c:when>
+                    <c:when test="${record.position==3}">
+                        <img class="star_img" src="/images/bronse.jpg"/>
+                    </c:when>
+                </c:choose>
+                <c:out value="${record.position}"/>
+            </td>
             <td class="user-name-item table-cell"><c:out value="${record.userName}"/></td>
             <td class="problem-count-item table-cell"><c:out value="${record.totalProblemCount}"/></td>
             <td class="points-item table-cell"><c:out value="${record.totalPoints}"/></td>
@@ -240,12 +280,18 @@
         height: 120px;
     }
 
+    .star_img {
+        width: 32px;
+        height: 32px;
+    }
+
+
     .table-header {
         background: #eeeeee;
     }
 
     .buttons-row {
-        max-width: 960px;
+        /*max-width: 960px;*/
         margin: 32px auto 16px auto;
         font-size: 32px;
         font-family: BlinkMacSystemFont, Roboto, Open Sans, Helvetica Neue, sans-serif;
@@ -254,7 +300,7 @@
 
     .button-block {
         padding: 0 0 16px 0;
-        margin-right: 16px;
+        margin-right: 24px;
     }
 
     .record-button {
@@ -264,7 +310,7 @@
     .records-table {
         font-family: BlinkMacSystemFont, Roboto, Open Sans, Helvetica Neue, sans-serif;
         font-size: 32px;
-        max-width: 960px;
+        /*max-width: 960px;*/
         margin: 0 auto;
     }
 

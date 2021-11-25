@@ -4,6 +4,7 @@ import com.dinoproblems.server.utils.TextWithTTSBuilder;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -17,9 +18,7 @@ public class ProblemWithPossibleTextAnswers implements Problem {
     private final String tts;
     private int answer;
     private Set<String> possibleTextAnswers;
-    private State state = null;
     List<String> hints;
-    private int currentHint = 0;
     private final Difficulty difficulty;
     private final ProblemScenario scenario;
     private String comment;
@@ -58,24 +57,22 @@ public class ProblemWithPossibleTextAnswers implements Problem {
     }
 
     @Override
-    public String getNextHint() {
-        final String result = hints.get(currentHint);
-        currentHint++;
-        return result;
+    public String getNextHint(int currentHint) {
+        return hints.get(currentHint);
     }
 
     @Override
-    public String getLastHint() {
+    public String getLastHint(int currentHint) {
         return hints.get(currentHint - 1);
     }
 
     @Override
-    public boolean hasHint() {
+    public boolean hasHint(int currentHint) {
         return currentHint < hints.size();
     }
 
     @Override
-    public boolean wasHintGiven() {
+    public boolean wasHintGiven(int currentHint) {
         return currentHint > 0;
     }
 
@@ -135,19 +132,9 @@ public class ProblemWithPossibleTextAnswers implements Problem {
         return true;
     }
 
-    @Nullable
-    @Override
-    public State getState() {
-        return state;
-    }
-
     @Override
     public Difficulty getDifficulty() {
         return difficulty;
-    }
-
-    public void setState(State state) {
-        this.state = state;
     }
 
     public String getTextAnswer() {
@@ -196,7 +183,7 @@ public class ProblemWithPossibleTextAnswers implements Problem {
         private String text;
         private int answer;
         private String theme;
-        private Set<String> possibleTextAnswers;
+        private Set<String> possibleTextAnswers = new HashSet<>();
         private ProblemScenario scenario;
         private Difficulty difficulty;
         private String tts = null;

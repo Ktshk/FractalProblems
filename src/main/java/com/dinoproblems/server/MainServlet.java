@@ -84,8 +84,8 @@ public class MainServlet extends HttpServlet {
             if (userInfos.containsKey(userId)) {
                 final UserInfo userInfo = userInfos.get(userId);
                 if (userInfo.getCurrentProblem() != null) {
-                    System.out.println("currentProblem.hasHint() = " + userInfo.getCurrentProblem().hasHint());
-                    System.out.println("currentProblem.wasHintGiven() = " + userInfo.getCurrentProblem().wasHintGiven());
+                    System.out.println("currentProblem.hasHint() = " + userInfo.hasHint(userInfo.getCurrentProblem()));
+                    System.out.println("currentProblem.wasHintGiven() = " + userInfo.wasHintGiven(userInfo.getCurrentProblem()));
                     System.out.println("currentProblem.hints = " + ((ProblemWithPossibleTextAnswers) userInfo.getCurrentProblem()).hints);
                 }
             }

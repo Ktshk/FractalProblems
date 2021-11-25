@@ -75,12 +75,12 @@ public class BrickAndHalfGenerator implements ProblemGenerator {
         }
     }
 
-    public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Difficulty difficulty) {
+    public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Difficulty difficulty, UserInfo userInfo) {
         if (difficulty == Difficulty.HARD || difficulty == Difficulty.EXPERT) {
             return null;
         }
 
         return GeneratorUtils.findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(SCENARIOS),
-                difficulty == Difficulty.MEDIUM ? Sets.newHashSet(SCENARIOS) : new HashSet<>());
+                difficulty == Difficulty.MEDIUM ? Sets.newHashSet(SCENARIOS) : new HashSet<>(), userInfo);
     }
 }

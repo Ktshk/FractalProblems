@@ -171,16 +171,16 @@ public class SequenceGenerator implements ProblemGenerator {
     }
 
     @Override
-    public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty) {
+    public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty, UserInfo userInfo) {
 
 
         switch (difficulty) {
             case EASY:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(ARITHMETIC, DOUBLEARITHMETIC), new HashSet<>());
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(ARITHMETIC, DOUBLEARITHMETIC), new HashSet<>(), userInfo);
             case MEDIUM:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(ARITHMETIC, DOUBLEARITHMETIC), Sets.newHashSet(ARITHMETIC, DOUBLEARITHMETIC));
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(ARITHMETIC, DOUBLEARITHMETIC), Sets.newHashSet(ARITHMETIC, DOUBLEARITHMETIC), userInfo);
             case HARD:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(FIBONACCI, PARITY_IMPARITY, MUL_ON_TWO, GEOMETRIC, DOUBLEARITHMETIC, FAST_GROWING_SEQ, PRIME_NUMBERS), Sets.newHashSet(ARITHMETIC, DOUBLEARITHMETIC));
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(FIBONACCI, PARITY_IMPARITY, MUL_ON_TWO, GEOMETRIC, DOUBLEARITHMETIC, FAST_GROWING_SEQ, PRIME_NUMBERS), Sets.newHashSet(ARITHMETIC, DOUBLEARITHMETIC), userInfo);
             case EXPERT:
                 return null;
         }

@@ -2,6 +2,7 @@ package com.dinoproblems.server.session;
 
 import com.dinoproblems.server.DataBaseService;
 import com.dinoproblems.server.Problem;
+import com.dinoproblems.server.UserInfo;
 import com.dinoproblems.server.utils.GeneratorUtils;
 import com.dinoproblems.server.utils.TextWithTTSBuilder;
 import com.google.common.collect.Sets;
@@ -79,7 +80,7 @@ public class SolvingProblemSessionState extends AbstractSolvingProblemState {
     }
 
     private SolvingProblemSessionState(boolean newProblem, Session session, TextWithTTSBuilder text, boolean showProblemText, boolean sayHint, boolean sayAnswer, boolean problemSolved, Problem solvedProblem) {
-        super(text, showProblemText, sayHint, sayAnswer, problemSolved, solvedProblem);
+        super(text, showProblemText, sayHint, sayAnswer, problemSolved, solvedProblem, true);
         if (newProblem) {
             final Problem problem;
             if (session.getCurrentProblem() == null) {
@@ -109,13 +110,13 @@ public class SolvingProblemSessionState extends AbstractSolvingProblemState {
             final TextWithTTSBuilder text = session.getSessionResult().getResult(session.getUserInfo().getTotalScore());
             return new MenuSessionState(text);
         } else if (session.getCurrentProblem() == null && session.getNextProblem() == null) {
-            return new ChooseDifficultySessionState();
+            return new ChooseDifficultySessionState(null);
         } else if (checkAnswer(command, EASIER, YES_ANSWERS) || checkAnswer(command, EASIER, continueAnswers)) {
             if (session.getCurrentDifficulty() == Problem.Difficulty.EASY) {
                 return new SolvingProblemSessionState(chooseRandomElement(DONT_HAVE_EASIER), session, showProblemText);
             } else {
                 session.setCurrentDifficulty(session.getCurrentDifficulty().getPrevious());
-                return new SolvingProblemSessionState(chooseRandomElement(EASIER_PROBLEM), session, showProblemText);
+                return new SolvingProblemSessionState(true, session, chooseRandomElement(EASIER_PROBLEM), true);
             }
         } else {
             final Problem currentProblem = session.getCurrentProblem();
@@ -130,8 +131,6 @@ public class SolvingProblemSessionState extends AbstractSolvingProblemState {
             } else if (currentProblem == null && (checkAnswer(command, YES_ANSWERS) || checkAnswer(command, continueAnswers, YES_ANSWERS))) {
                 return new SolvingProblemSessionState(true, session);
             } else if (currentProblem == null) {
-                DataBaseService.INSTANCE.updateMiscAnswersTable(command, "", session.getLastServerResponse());
-
                 final String responseText = chooseRandomElement(DID_NOT_UNDERSTAND) + chooseRandomElement(WANT_A_PROBLEM_QUESTION);
                 return new SolvingProblemSessionState(false, session, responseText, false);
             } else {
@@ -157,10 +156,10 @@ public class SolvingProblemSessionState extends AbstractSolvingProblemState {
                 showProblemText, isSayHint(), isSayAnswer(), isProblemSolved(), getSolvedProblem());
     }
 
-    protected SessionState getNextStateWhenCorrectAnswerIsGiven(Problem currentProblem, Session session) {
-        finishWithProblem(session, currentProblem, currentProblem.wasHintGiven() ? Problem.State.SOLVED_WITH_HINT : Problem.State.SOLVED, session.getClientId());
+    protected SessionState getNextStateWhenCorrectAnswerIsGiven(Problem currentProblem, Session session, String timeZone) {
+        finishWithProblem(session, currentProblem, session.getUserInfo().wasHintGiven(currentProblem) ? UserInfo.ProblemState.SOLVED_WITH_HINT : UserInfo.ProblemState.SOLVED, session.getClientId());
         if (session.getNextProblem() == null) {
-            return new ChooseDifficultySessionState(getProblemEndText(session, currentProblem) + "Поздравляю! Вы решили все задачи на этом уровне сложности. Порешаем другие задачи?");
+            return new ChooseDifficultySessionState(getProblemEndText(session, currentProblem) + "Поздравляю! Вы решили все задачи на этом уровне сложности. Порешаем другие задачи?", session.getCurrentDifficulty());
         }
         return problemSolvedState(currentProblem);
     }
@@ -184,7 +183,7 @@ public class SolvingProblemSessionState extends AbstractSolvingProblemState {
         return buttons;
     }
 
-    protected void finishWithProblem(Session session, Problem problem, Problem.State problemState, String clientId) {
+    protected void finishWithProblem(Session session, Problem problem, UserInfo.ProblemState problemState, String clientId) {
         super.finishWithProblem(session, problem, problemState, clientId);
         session.setCurrentProblem(null);
     }
@@ -195,32 +194,32 @@ public class SolvingProblemSessionState extends AbstractSolvingProblemState {
     }
 
     protected void processProblemEnding(JsonObject responseJson, Session session, Problem problem, String timeZone) {
-        Problem.State problemState = problem.getState();
+        UserInfo.ProblemState problemState = session.getUserInfo().getProblemState(problem);
         String text = getProblemEndText(session, problem);
 
         text += chooseRandomElement(ONE_MORE_QUESTION);
-        responseJson.add("buttons", createNewProblemButtons(session, problemState != Problem.State.ANSWER_GIVEN));
+        responseJson.add("buttons", createNewProblemButtons(session, problemState != UserInfo.ProblemState.ANSWER_GIVEN));
         responseJson.addProperty("text", text);
-        if (problemState != Problem.State.ANSWER_GIVEN) {
+        if (problemState != UserInfo.ProblemState.ANSWER_GIVEN) {
             responseJson.addProperty("tts", chooseRandomElement(SOUND_PRAISES) + " " + responseJson.get("text"));
         }
     }
 
     protected SessionState getStateWhenAnswerIsAsked(Problem currentProblem, Session session) {
-        finishWithProblem(session, currentProblem, Problem.State.ANSWER_GIVEN, session.getClientId());
+        finishWithProblem(session, currentProblem, UserInfo.ProblemState.ANSWER_GIVEN, session.getClientId());
         if (session.getNextProblem() == null) {
-            return new ChooseDifficultySessionState(getProblemEndText(session, currentProblem) + "Поздравляю! Вы решили все задачи на этом уровне сложности. Порешаем другие задачи?");
+            return new ChooseDifficultySessionState(getProblemEndText(session, currentProblem) + "Поздравляю! Вы решили все задачи на этом уровне сложности. Порешаем другие задачи?", session.getCurrentDifficulty());
         }
         return sayAnswerState(currentProblem);
     }
 
     private String getProblemEndText(Session session, Problem problem) {
-        Problem.State problemState = problem.getState();
+        UserInfo.ProblemState problemState = session.getUserInfo().getProblemState(problem);
 
-        String text = problemState == Problem.State.ANSWER_GIVEN ? "Правильный ответ " + problem.getTextAnswer() + ". "
+        String text = problemState == UserInfo.ProblemState.ANSWER_GIVEN ? "Правильный ответ " + problem.getTextAnswer() + ". "
                 : chooseRandomElement(PRAISES) + " ";
 
-        if (problemState != Problem.State.ANSWER_GIVEN && session.getNextProblem() != null) {
+        if (problemState != UserInfo.ProblemState.ANSWER_GIVEN && session.getNextProblem() != null) {
             final int solvedInARow = session.getSessionResult().getSolvedInARow();
             if (solvedInARow > 0 && solvedInARow % 3 == 0) {
                 text += "Вы решили " + getNumWithString(solvedInARow, PROBLEM) + " подряд. " + chooseRandomElement(PRAISE_SHORT);

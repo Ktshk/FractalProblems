@@ -81,9 +81,9 @@ public class FindNumberGenerator implements ProblemGenerator {
 
     @Nullable
     @Override
-    public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty) {
+    public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty, UserInfo userInfo) {
         if (PROBLEMS.containsKey(difficulty) && !PROBLEMS.get(difficulty).isEmpty()) {
-            return findAvailableScenario(difficulty, alreadySolvedProblems, PROBLEMS.get(difficulty).keySet(), new HashSet<>());
+            return findAvailableScenario(difficulty, alreadySolvedProblems, PROBLEMS.get(difficulty).keySet(), new HashSet<>(), userInfo);
         } else {
             return null;
         }

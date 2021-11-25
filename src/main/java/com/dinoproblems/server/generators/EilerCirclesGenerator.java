@@ -470,18 +470,18 @@ public class EilerCirclesGenerator implements ProblemGenerator {
 
     @Nullable
     @Override
-    public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty) {
+    public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty, UserInfo userInfo) {
         switch (difficulty) {
             case EASY:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, EASY_SCENARIOS, new HashSet<>());
+                return findAvailableScenario(difficulty, alreadySolvedProblems, EASY_SCENARIOS, new HashSet<>(), userInfo);
             case MEDIUM:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, SCENARIOS, Sets.newHashSet(EASY_SCENARIOS));
+                return findAvailableScenario(difficulty, alreadySolvedProblems, SCENARIOS, Sets.newHashSet(EASY_SCENARIOS), userInfo);
             case HARD:
                 final List<ProblemScenario> scenarios = new ArrayList<>(SCENARIOS);
                 scenarios.add(CANDIES_STORE_SCENARIO);
-                return findAvailableScenario(difficulty, alreadySolvedProblems, scenarios, Sets.newHashSet(SCENARIOS));
+                return findAvailableScenario(difficulty, alreadySolvedProblems, scenarios, Sets.newHashSet(SCENARIOS), userInfo);
             case EXPERT:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(EXPERT_CANDIES_SCENARIO), Sets.newHashSet(SCENARIOS));
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(EXPERT_CANDIES_SCENARIO), Sets.newHashSet(SCENARIOS), userInfo);
 
         }
 

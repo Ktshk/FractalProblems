@@ -1,6 +1,8 @@
 package com.dinoproblems.server;
 
 import com.dinoproblems.server.generators.ProblemScenarioImpl;
+import com.dinoproblems.server.generators.QuestProblems;
+import com.dinoproblems.server.generators.QuestProblemsLoader;
 import com.dinoproblems.server.utils.GeneratorUtils;
 import com.dinoproblems.server.utils.TextWithTTSBuilder;
 
@@ -55,33 +57,6 @@ public class DataBaseService {
             System.out.println("RDS_HOSTNAME not specified");
         }
         return null;
-    }
-
-    public void updateMiscAnswersTable(String answer, String problem, String lastServerResponse) {
-        if (connection == null) {
-            System.out.println("Could not connect to DB");
-            return;
-        }
-
-        Statement stmt = null;
-        try {
-            stmt = connection.createStatement();
-            String sql = "INSERT INTO " + schemeName + ".misc_answers (answer_text,problem_text,last_server_response)\n" +
-                    "\tVALUES (" +
-                    "\'" + answer + "\'," +
-                    "\'" + problem + "\'," +
-                    "\'" + lastServerResponse + "\')" +
-                    "\tON CONFLICT (answer_text,last_server_response) DO UPDATE\n" +
-                    "\tSET counter = " + schemeName + ".misc_answers.counter + 1";
-            System.out.println(sql);
-            stmt.executeUpdate(sql);
-
-            stmt.close();
-            connection.commit();
-            System.out.println("Records created successfully");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public void insertSessionInfo(String deviceId,
@@ -178,14 +153,18 @@ public class DataBaseService {
     }
 
     private void insertSolution(int points, boolean hintUsed, int referenceId, int problemId) throws SQLException {
-        String insertTableSolutions = "INSERT INTO " + schemeName + ".solutions (reference_id, problem_id, points, hint_used) " +
-                "VALUES" + "(?,?,?,?)";
+        String insertTableSolutions = "INSERT INTO " + schemeName + ".solutions (reference_id, problem_id, points, hint_used, date_solved) " +
+                "VALUES" + "(?,?,?,?,?)";
+
+        System.out.println(insertTableSolutions);
 
         try (PreparedStatement preparedStatementInsertSolutions = connection.prepareStatement(insertTableSolutions, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatementInsertSolutions.setInt(1, referenceId);
             preparedStatementInsertSolutions.setInt(2, problemId);
             preparedStatementInsertSolutions.setInt(3, points);
             preparedStatementInsertSolutions.setBoolean(4, hintUsed);
+            preparedStatementInsertSolutions.setDate(5, new Date(Calendar.getInstance().getTimeInMillis()));
+
             preparedStatementInsertSolutions.executeUpdate();
         }
     }
@@ -315,15 +294,18 @@ public class DataBaseService {
 
         System.out.println(selectAllTables);
 
-        String selectProblemOfTheDay = "SELECT problem_date, timezone, problem_text, difficulty, scenario, device_id, username, points, hint_used, generator_id, hints, hints_tts, solution, solution_tts, answer, text_tts, text_answers " +
+        String selectProblemOfTheDay = "SELECT problem_date, timezone, problem_text, difficulty, scenario, " + schemeName + ".devices.device_id, username, points, hint_used, generator_id, hints, hints_tts, solution, solution_tts, answer, text_tts, text_answers, device_num " +
                 "FROM " + schemeName + ".problem_of_the_day " +
                 "JOIN " + schemeName + ".problems ON " + schemeName + ".problem_of_the_day.problem_id=" + schemeName + ".problems.problem_id " +
                 "JOIN " + schemeName + ".scenarios ON " + schemeName + ".scenarios.scenario_id=" + schemeName + ".problems.scenario_id " +
                 "JOIN " + schemeName + ".reference ON " + schemeName + ".reference.reference_id = " + schemeName + ".problem_of_the_day.reference_id " +
                 "JOIN " + schemeName + ".users ON " + schemeName + ".users.user_id=" + schemeName + ".reference.user_id " +
+                "JOIN " + schemeName + ".devices ON " + schemeName + ".devices.device_id=" + schemeName + ".reference.device_id " +
                 "LEFT JOIN " + schemeName + ".solutions ON " + schemeName + ".solutions.reference_id=" + schemeName + ".reference.reference_id AND " + schemeName + ".solutions.problem_id=" + schemeName + ".problem_of_the_day.problem_id ";
 
         System.out.println(selectProblemOfTheDay);
+
+        QuestProblems currentQuest = QuestProblemsLoader.INSTANCE.getCurrentQuestProblems(Calendar.getInstance());
 
         try (Statement selectAllTablesQuery = connection.createStatement();
              Statement selectProblemOfTheDayQuery = connection.createStatement()) {
@@ -334,10 +316,10 @@ public class DataBaseService {
                 final int points = allTables.getInt("points");
                 final String theme = allTables.getString("generator_id");
 
-                final Problem problem = getProblemFromQuery(allTables, points, theme);
                 final UserInfo userInfo = getUserInfoFromQuery(dbUserInfo, allTables, currentDeviceId);
+                final Problem problem = getProblemFromQuery(allTables, points, theme, userInfo);
 
-                userInfo.addSolvedProblem(theme, problem, points);
+                userInfo.addSolvedProblem(theme, problem, points, currentQuest);
             }
 
             System.out.println("Load problem of the day");
@@ -349,10 +331,11 @@ public class DataBaseService {
                 if (problemOfTheDayResultSet.wasNull()) {
                     points = null;
                 }
-                final Problem problem = getProblemFromQuery(problemOfTheDayResultSet, points, theme);
-
                 final String currentDeviceId = problemOfTheDayResultSet.getString("device_id");
+                System.out.println("currentDeviceId = " + currentDeviceId);
                 final UserInfo userInfo = getUserInfoFromQuery(dbUserInfo, problemOfTheDayResultSet, currentDeviceId);
+
+                final Problem problem = getProblemFromQuery(problemOfTheDayResultSet, points, theme, userInfo);
 
                 final String timeZone = problemOfTheDayResultSet.getString("timezone");
                 final Date problemDate = problemOfTheDayResultSet.getDate("problem_date");
@@ -385,7 +368,7 @@ public class DataBaseService {
         return userInfo;
     }
 
-    private Problem getProblemFromQuery(ResultSet resultSet, @Nullable Integer points, String theme) throws SQLException {
+    private Problem getProblemFromQuery(ResultSet resultSet, @Nullable Integer points, String theme, UserInfo userInfo) throws SQLException {
         final ProblemScenario scenario = new ProblemScenarioImpl(resultSet.getString("scenario"));
 
         Boolean hintUsed = resultSet.getBoolean("hint_used");
@@ -429,8 +412,8 @@ public class DataBaseService {
         }
 
         final Problem problem = problemBuilder.create();
-        if (points != null && hintUsed != null) {
-            problem.setState(points <= 0 ? Problem.State.ANSWER_GIVEN : (hintUsed ? Problem.State.SOLVED_WITH_HINT : Problem.State.SOLVED));
+        if (points != null && hintUsed != null && userInfo != null) {
+            userInfo.setProblemState(problem, points <= 0 ? UserInfo.ProblemState.ANSWER_GIVEN : (hintUsed ? UserInfo.ProblemState.SOLVED_WITH_HINT : UserInfo.ProblemState.SOLVED));
         }
         return problem;
     }
@@ -438,7 +421,7 @@ public class DataBaseService {
     private Set<String> ignoredRecords = null;
 
     @Nullable
-    public List<RecordRow> getRecords(boolean expert, @Nullable String scenario) {
+    public List<RecordRow> getRecords(boolean expert, @Nullable String scenario, boolean today) {
         if (connection == null) {
             return null;
         }
@@ -464,8 +447,9 @@ public class DataBaseService {
                 + " and " + schemeName + ".reference.device_id=" + schemeName + ".devices.device_id and "
                 + schemeName + ".problems.problem_id=" + schemeName + ".solutions.problem_id"
                 + " and " + schemeName + ".problems.scenario_id=" + schemeName + ".scenarios.scenario_id"
-                + " and " + (expert ? schemeName + ".problems.difficulty='EXPERT'" : schemeName + ".problems.difficulty!='EXPERT'")
-                + (scenario != null ? (" and " + schemeName + ".problems.scenario_id=" + schemeName + ".scenarios.scenario_id" + " and " + schemeName + ".scenarios.scenario='" + scenario+ "'") : "");
+                + (today ? "" : " and " + (expert ? schemeName + ".problems.difficulty='EXPERT'" : schemeName + ".problems.difficulty!='EXPERT'"))
+                + (scenario != null ? (" and " + schemeName + ".problems.scenario_id=" + schemeName + ".scenarios.scenario_id" + " and " + schemeName + ".scenarios.scenario='" + scenario + "'") : "")
+                + (today ? " and " + schemeName + ".solutions.date_solved=CURRENT_DATE": "");
 
         System.out.println(selectAllRecords);
 
@@ -494,7 +478,11 @@ public class DataBaseService {
             final List<RecordRow> result = new ArrayList<>(records.values());
             result.sort((o1, o2) -> o2.getTotalPoints() - o1.getTotalPoints());
             for (int i = 0; i < result.size(); i++) {
-                result.get(i).setPosition(i + 1);
+                if (i > 0 && result.get(i).getTotalPoints() == result.get(i - 1).getTotalPoints()) {
+                    result.get(i).setPosition(result.get(i - 1).getPosition());
+                } else {
+                    result.get(i).setPosition(i + 1);
+                }
             }
             return result;
         } catch (SQLException e) {
@@ -502,6 +490,7 @@ public class DataBaseService {
             return null;
         }
     }
+
 
     public void saveProblemOfTheDay(UserInfo userInfo, Problem expertProblem, Calendar date) {
         if (connection == null) {

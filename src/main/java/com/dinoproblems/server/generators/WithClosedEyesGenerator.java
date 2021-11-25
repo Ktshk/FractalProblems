@@ -158,18 +158,18 @@ public class WithClosedEyesGenerator implements ProblemGenerator {
     }
 
     @Nullable
-    public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty) {
+    public ProblemAvailability hasProblem(@Nonnull Collection<Problem> alreadySolvedProblems, @Nonnull Problem.Difficulty difficulty, UserInfo userInfo) {
         final HashSet<ProblemScenario> mediumScenarios = Sets.newHashSet(ANY_COLOR, DIFFERENT_COLORS, SPECIAL_COLOR, PAIRS);
 
         switch (difficulty) {
             case EASY:
                 return null;
             case MEDIUM:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, new ArrayList<>(mediumScenarios), new HashSet<>());
+                return findAvailableScenario(difficulty, alreadySolvedProblems, new ArrayList<>(mediumScenarios), new HashSet<>(), userInfo);
             case HARD:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, new ArrayList<>(mediumScenarios), new HashSet<>(mediumScenarios));
+                return findAvailableScenario(difficulty, alreadySolvedProblems, new ArrayList<>(mediumScenarios), new HashSet<>(mediumScenarios), userInfo);
             case EXPERT:
-                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(COUNT_ITEMS_HARD), mediumScenarios);
+                return findAvailableScenario(difficulty, alreadySolvedProblems, Lists.newArrayList(COUNT_ITEMS_HARD), mediumScenarios, userInfo);
 
         }
 

@@ -22,13 +22,15 @@ public class ChooseDifficultySessionState implements SessionState {
 //    private final static HashSet<String> EXPERT = Sets.newHashSet("эксперт", "экспертная", "задачу для экспертов");
 
     private final String text;
+    private final Problem.Difficulty currentDifficulty;
 
-    public ChooseDifficultySessionState(String text) {
+    public ChooseDifficultySessionState(String text, Problem.Difficulty currentDifficulty) {
         this.text = text;
+        this.currentDifficulty = currentDifficulty;
     }
 
-    public ChooseDifficultySessionState() {
-        this(null);
+    public ChooseDifficultySessionState(Problem.Difficulty currentDifficulty) {
+        this(null, currentDifficulty);
     }
 
 
@@ -37,13 +39,12 @@ public class ChooseDifficultySessionState implements SessionState {
     public SessionState getNextState(String command, JsonArray entitiesArray, Session session, String timeZone) {
         final Problem.Difficulty currentDifficulty = parseDifficulty(command);
         if (currentDifficulty == null) {
-            DataBaseService.INSTANCE.updateMiscAnswersTable(command, "", session.getLastServerResponse());
-            return new ChooseDifficultySessionState(chooseRandomElement(DID_NOT_UNDERSTAND));
+            return new ChooseDifficultySessionState(chooseRandomElement(DID_NOT_UNDERSTAND), currentDifficulty);
         } else {
             session.setCurrentDifficulty(currentDifficulty);
             if (session.getNextProblem() == null) {
                 final String text = "Извините, но вы уже решили все мои задачи на этом уровне сложности. Может быть, порешаем задачи другой сложности?";
-                return new ChooseDifficultySessionState(text);
+                return new ChooseDifficultySessionState(text, currentDifficulty);
             }
             return new SolvingProblemSessionState(true, session);
         }
@@ -66,14 +67,13 @@ public class ChooseDifficultySessionState implements SessionState {
     @Override
     public SessionState addTextPrefix(String text) {
         if (this.text == null) {
-            return new ChooseDifficultySessionState(text);
+            return new ChooseDifficultySessionState(text, currentDifficulty);
         }
-        return new ChooseDifficultySessionState(text + this.text);
+        return new ChooseDifficultySessionState(text + this.text, currentDifficulty);
     }
 
     private JsonArray createDifficultyButtons(Session session) {
         final JsonArray buttons = new JsonArray();
-        final Problem.Difficulty currentDifficulty = session.getCurrentDifficulty();
 
         if (currentDifficulty != Problem.Difficulty.EASY) {
             buttons.add(createButton("простая", false));
